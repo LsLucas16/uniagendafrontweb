@@ -1,0 +1,192 @@
+// --- Variáveis de Cores e Fontes (Baseadas na Imagem) ---
+$font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+$bg-color-main: #7B9FCE; // Cor de fundo da página (azul suave)
+$bg-color-card: #FFFFFF; // Cor do card
+$text-color-title: #2A3D59; // Cor do título "Acesse sua conta"
+$text-color-label: #5A6A85; // Cor dos labels e texto geral
+$text-color-placeholder: #A0AEC0; // Cor do placeholder
+$border-color-input: #CBD5E0; // Cor da borda dos inputs
+$primary-color-btn: #6F9ED6; // Cor do botão "Entrar"
+$primary-color-btn-hover: #5A8AC0; // Cor hover do botão
+$link-color: #6F9ED6; // Cor do link de ajuda
+$shadow-card: 0 10px 25px rgba(0, 0, 0, 0.1);
+
+// Reset básico para garantir consistência
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  height: 100%;
+  font-family: $font-family;
+}
+
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: $bg-color-main;
+  padding: 20px; // Espaço em telas menores
+}
+
+.login-card {
+  background-color: $bg-color-card;
+  padding: 40px 40px 50px 40px; // Padding inferior maior para o botão
+  border-radius: 16px; // Bordas bem arredondadas
+  box-shadow: $shadow-card;
+  width: 100%;
+  max-width: 450px; // Largura máxima do card
+  text-align: center;
+
+  .login-header {
+    margin-bottom: 35px;
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: $text-color-title;
+    }
+  }
+
+  .login-form {
+    text-align: left; // Alinha labels e inputs à esquerda
+
+    .form-group {
+      margin-bottom: 20px;
+
+      label {
+        display: block;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: $text-color-label;
+        margin-bottom: 8px;
+      }
+
+      // Estilo Base Compartilhado para Inputs e Select
+      .form-input {
+        width: 100%;
+        padding: 12px 15px;
+        font-size: 1rem;
+        color: $text-color-label;
+        border: 1.5px solid $border-color-input;
+        border-radius: 8px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+        background-color: #fff; // Garante fundo branco
+
+        &::placeholder {
+          color: $text-color-placeholder;
+        }
+
+        &:focus {
+          border-color: $primary-color-btn;
+          box-shadow: 0 0 0 3px rgba($primary-color-btn, 0.1); // Sombra suave no foco
+        }
+      }
+
+      // --- Estilização Específica do Select ---
+      .select-wrapper {
+        position: relative;
+        
+        select.form-input {
+          appearance: none; // Remove seta padrão do navegador
+          -webkit-appearance: none;
+          -moz-appearance: none;
+          padding-right: 40px; // Espaço para o ícone customizado
+          cursor: pointer;
+
+          &.placeholder {
+            color: $text-color-placeholder; // Cor do placeholder quando nada está selecionado
+          }
+
+          option {
+            color: $text-color-label; // Cor das opções
+          }
+        }
+
+        .select-icon {
+          position: absolute;
+          right: 15px;
+          top: 50%;
+          transform: translateY(-50%);
+          color: $text-color-placeholder;
+          pointer-events: none; // Permite clicar no select através do ícone
+        }
+      }
+
+      // --- Estilização Específica do Input de Senha ---
+      .password-input-wrapper.form-input {
+        display: flex;
+        align-items: center;
+        padding-right: 10px; // Espaço para o ícone de olho
+
+        input {
+          border: none;
+          padding: 0; // Remove padding interno pois o wrapper já tem
+          flex-grow: 1;
+          background: transparent; // Fundo transparente para usar o do wrapper
+          
+          &:focus {
+             // Remove outline do input interno para usar o do wrapper
+             outline: none; 
+          }
+        }
+
+        .toggle-password {
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: $text-color-placeholder;
+          padding: 5px;
+          display: flex;
+          align-items: center;
+          transition: color 0.2s;
+
+          &:hover {
+            color: $text-color-label;
+          }
+        }
+      }
+    }
+
+    .form-help {
+      text-align: right;
+      margin-top: -10px; // Aproxima um pouco do campo de senha
+      margin-bottom: 30px;
+      
+      a {
+        font-size: 0.9rem;
+        color: $link-color;
+        text-decoration: none;
+        transition: text-decoration 0.2s;
+        
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+      background-color: $primary-color-btn;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.2s, transform 0.1s;
+
+      &:hover {
+        background-color: $primary-color-btn-hover;
+      }
+
+      &:active {
+        transform: scale(0.98); // Efeito de clique
+      }
+    }
+  }
+}
