@@ -1,98 +1,62 @@
-import React, { useState } from 'react';
-import './Login.scss';
-// Ícone de seta para o select e ícones de olho para a senha
-import { ChevronDown, Eye, EyeOff } from 'lucide-react';
+import React from "react";
+import "./Login.scss";
 
-const Login = () => {
-  const [showPassword, setShowPassword] = useState(false);
-  // Estado para controlar a seleção da instituição (opcional, para controle do formulário)
-  const [institution, setInstitution] = useState('');
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
+// Imports das imagens (mantenha os nomes dos seus arquivos webp)
+import logo from "../../assets/logo.webp"; 
+import agenda from "../../assets/agenda.webp"; 
+import sombra from "../../assets/sombra.webp"; 
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Dados do formulário:', { institution, login, password });
-    // Adicione sua lógica de autenticação aqui
-  };
-
+export const Login = () => {
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <header className="login-header">
-          <h1>Acesse sua conta</h1>
-        </header>
+    <div className="login-screen">
+      {/* Background e Elementos Decorativos (Meias Luas) */}
+      <img src={sombra} className="bg-overlay" alt="" />
+      <div className="corner-decoration top-left" />
+      <div className="corner-decoration top-right" />
+      <div className="corner-decoration bottom-left" />
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          {/* Campo Select - Instituição */}
-          <div className="form-group">
-            <div className="select-wrapper">
-              <select 
-                id="institution" 
-                value={institution}
-                onChange={(e) => setInstitution(e.target.value)}
-                className={`form-input ${!institution ? 'placeholder' : ''}`} // Classe para cor do placeholder
-                required
-              >
-                <option value="" disabled hidden>Selecione sua instituição</option>
-                <option value="inst1">Instituição Federal 1</option>
-                <option value="inst2">Universidade Estadual 2</option>
-                <option value="inst3">Faculdade Privada 3</option>
+      {/* Logo superior */}
+      <header className="brand-header">
+        <img src={logo} alt="Uni Logo" className="main-logo" />
+      </header>
+
+      <main className="content-wrapper">
+        {/* Card de Login */}
+        <section className="login-box">
+          <h2>Acesse sua conta</h2>
+          
+          <form className="form-container">
+            <div className="input-wrapper">
+              <select className="institution-select">
+                <option value="">Selecione sua instituição</option>
+                <option value="1">Instituição A</option>
+                <option value="2">Instituição B</option>
               </select>
-              <ChevronDown className="select-icon" size={20} />
             </div>
-          </div>
 
-          {/* Campo Input - Login */}
-          <div className="form-group">
-            <label htmlFor="login-input">Login</label>
-            <input 
-              type="text" 
-              id="login-input" 
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
-              placeholder="Digite seu login" 
-              className="form-input"
-              required 
-            />
-          </div>
-
-          {/* Campo Input - Senha */}
-          <div className="form-group">
-            <label htmlFor="password-input">Senha</label>
-            <div className="password-input-wrapper form-input">
-              <input 
-                type={showPassword ? "text" : "password"} 
-                id="password-input" 
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Digite sua senha" 
-                required 
-              />
-              <button 
-                type="button" 
-                className="toggle-password"
-                onClick={() => setShowPassword(!showPassword)}
-                aria-label={showPassword ? "Ocultar senha" : "Exibir senha"}
-              >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
+            <div className="input-group">
+              <label>Login</label>
+              <input type="text" placeholder="Digite seu login" />
             </div>
-          </div>
 
-          {/* Link de Ajuda */}
-          <div className="form-help">
-            <a href="/recuperar-senha">Problemas com login e/ou senha?</a>
-          </div>
+            <div className="input-group">
+              <label>Senha</label>
+              <input type="password" placeholder="Digite sua senha" />
+            </div>
 
-          {/* Botão Entrar */}
-          <button type="submit" className="btn-login">
-            Entrar
-          </button>
-        </form>
+            <div className="form-footer">
+              <a href="#" className="forgot-link">Problemas com login e/ou senha?</a>
+            </div>
+
+            <button type="submit" className="btn-login">Entrar</button>
+          </form>
+        </section>
+      </main>
+
+      {/* Ilustração da Agenda e Menina no canto inferior */}
+      <div className="illustration-container">
+        <img src={agenda} alt="Ilustração Agenda" className="agenda-img" />
       </div>
     </div>
   );
 };
-
-export default Login;
