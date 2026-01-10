@@ -170,3 +170,54 @@ $border-color: #8f89a080;
 .top-left { width: 250px; height: 250px; top: -100px; left: -100px; }
 .top-right { width: 300px; height: 300px; top: -150px; right: -50px; }
 .bottom-left { width: 200px; height: 200px; bottom: -50px; left: -80px; }
+
+
+// Meias luas decorativas (Esferas) - Ajustadas para maior visibilidade
+.corner-decoration {
+  position: absolute;
+  // Aumentamos a opacidade de 0.4 para 0.6 no início do degradê
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.05) 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 2;
+  // Removi o blur para a borda ficar mais definida e limpa
+}
+
+// Meia lua superior esquerda (perto do logo)
+.top-left { 
+  width: 450px; 
+  height: 450px; 
+  top: -200px; 
+  left: 15%; 
+  opacity: 0.8; // Aumentei a opacidade global do elemento
+}
+
+// Meia lua superior direita
+.top-right { 
+  width: 380px; 
+  height: 380px; 
+  top: 10%; 
+  right: -150px; 
+  opacity: 0.6;
+}
+
+// Meia lua inferior esquerda
+.bottom-left { 
+  width: 300px; 
+  height: 300px; 
+  bottom: -50px; 
+  left: -100px; 
+  opacity: 0.7;
+}
+
+.login-screen {
+  // Substitua a cor sólida por este degradê radial
+  background: radial-gradient(circle at center, #8eb9e2 0%, #76a8d9 100%);
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Inter', sans-serif;
+}
