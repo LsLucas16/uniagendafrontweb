@@ -1,24 +1,32 @@
 import React, { useState } from "react";
-import dados from "../../api/dados.json"; // Importando seu JSON
 import "./Login.scss";
-// ... seus imports de imagem aqui
+import dados from "../../api/dados.json"; 
+
+import logo from "../../assets/logo.webp"; 
+import agenda from "../../assets/agenda.webp"; 
+import sombra from "../../assets/sombra.webp"; 
 
 export const Login = () => {
-  const [usuario, setUsuario] = useState("");
-  const [senha, setSenha] = useState("");
-  const [instituicao, setInstituicao] = useState("");
+  // Estados para capturar os inputs
+  const [loginDigitado, setLoginDigitado] = useState("");
+  const [senhaDigitada, setSenhaDigitada] = useState("");
+  const [idInstSelecionada, setIdInstSelecionada] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
 
-    // Busca o usuário no JSON
-    const userAuth = dados.usuarios.find(
-      (u) => u.user === usuario && u.senha === senha && u.faculdadeId === parseInt(instituicao)
-    );
+    // Lógica de busca: usuário + senha + vínculo com a instituição
+    const usuarioAuth = dados.usuarios.find((u) => {
+      return (
+        u.user === loginDigitado && 
+        u.senha === senhaDigitada && 
+        u.faculdadeId === parseInt(idInstSelecionada)
+      );
+    });
 
-    if (userAuth) {
-      alert(`Logado com sucesso como ${userAuth.tipo}: ${userAuth.nome}`);
-      // Futuro: use o useNavigate() aqui para redirecionar conforme o tipo
+    if (usuarioAuth) {
+      alert(`Bem-vindo, ${usuarioAuth.nome}! Acesso nível: ${usuarioAuth.tipo}`);
+      // Aqui você usaria o useNavigate para mudar de página
     } else {
       alert("Credenciais inválidas ou instituição incorreta.");
     }
@@ -26,8 +34,15 @@ export const Login = () => {
 
   return (
     <div className="login-screen">
-      {/* ... meias luas e logo ... */}
-      
+      <img src={sombra} className="bg-overlay" alt="" />
+      <div className="corner-decoration top-left" />
+      <div className="corner-decoration top-right" />
+      <div className="corner-decoration bottom-left" />
+
+      <header className="brand-header">
+        <img src={logo} alt="Uni Logo" className="main-logo" />
+      </header>
+
       <main className="content-wrapper">
         <section className="login-box">
           <h2>Acesse sua conta</h2>
@@ -35,11 +50,11 @@ export const Login = () => {
           <form className="form-container" onSubmit={handleLogin}>
             <div className="input-wrapper">
               <select 
-                className="institution-select" 
-                required 
-                onChange={(e) => setInstituicao(e.target.value)}
+                className="institution-select"
+                required
+                onChange={(e) => setIdInstSelecionada(e.target.value)}
               >
-                <option value="">Selecione sua faculdade</option>
+                <option value="">Selecione sua instituição</option>
                 {dados.instituicoes.map((inst) => (
                   <option key={inst.id} value={inst.id}>
                     {inst.nome}
@@ -53,9 +68,9 @@ export const Login = () => {
               <input 
                 type="text" 
                 placeholder="Digite seu login" 
-                value={usuario}
-                onChange={(e) => setUsuario(e.target.value)}
                 required
+                value={loginDigitado}
+                onChange={(e) => setLoginDigitado(e.target.value)}
               />
             </div>
 
@@ -64,18 +79,24 @@ export const Login = () => {
               <input 
                 type="password" 
                 placeholder="Digite sua senha" 
-                value={senha}
-                onChange={(e) => setSenha(e.target.value)}
                 required
+                value={senhaDigitada}
+                onChange={(e) => setSenhaDigitada(e.target.value)}
               />
+            </div>
+
+            <div className="form-footer">
+              <a href="#" className="forgot-link">Problemas com login e/ou senha?</a>
             </div>
 
             <button type="submit" className="btn-login">Entrar</button>
           </form>
         </section>
       </main>
-      
-      {/* ... imagem da agenda ... */}
+
+      <div className="illustration-container">
+        <img src={agenda} alt="Ilustração Agenda" className="agenda-img" />
+      </div>
     </div>
   );
 };

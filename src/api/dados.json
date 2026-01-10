@@ -7,7 +7,7 @@
   "usuarios": [
     {
       "id": 101,
-      "user": "admin.geral",
+      "user": "admin",
       "senha": "123",
       "nome": "Carlos Augusto",
       "tipo": "admin",
