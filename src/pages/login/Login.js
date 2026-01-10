@@ -90,6 +90,7 @@ export const Login = () => {
             </div>
 
             <button type="submit" className="btn-login">Entrar</button>
+            <div className="bottom-lines"></div>
           </form>
         </section>
       </main>

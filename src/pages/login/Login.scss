@@ -4,7 +4,7 @@ $light-blue: #76a8d9;
 $border-color: #8f89a080;
 
 .login-screen {
-  background-color: $light-blue;
+  background: radial-gradient(circle at center, #8eb9e2 0%, #76a8d9 100%);
   width: 100vw;
   height: 100vh;
   position: relative;
@@ -29,8 +29,9 @@ $border-color: #8f89a080;
   position: relative;
   padding: 40px 60px;
   z-index: 10;
+
   .main-logo {
-    width: 80px; 
+    width: 80px;
     height: auto;
     display: block;
   }
@@ -41,33 +42,29 @@ $border-color: #8f89a080;
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: center;
-  z-index: 10;
+  align-items: flex-start;
+  padding-top: 40px;
 }
 
 .login-box {
   background: #ffffff;
   width: 450px;
   padding: 40px;
-  border-radius: 20px;
+  border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
   z-index: 11;
-
-  h2 {
-    color: #2e4a67;
-    font-size: 32px;
-    margin-bottom: 35px;
-    font-weight: 700;
-  }
+  margin-top: -100px;
 }
 
 .form-container {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  position: relative;
 
   .input-group {
     text-align: left;
+
     label {
       display: block;
       color: #2e4a67;
@@ -77,32 +74,33 @@ $border-color: #8f89a080;
     }
   }
 
-  // ESTILIZAÇÃO DOS INPUTS E SELECT
   input, .institution-select {
     width: 100%;
     padding: 15px;
-    border: 2px solid $border-color; // Aumentei para 2px para o efeito ficar mais visível
+    border: 2px solid $border-color;
     border-radius: 10px;
     font-size: 16px;
     color: #2e4a67;
     outline: none;
     box-sizing: border-box;
-    transition: all 0.3s ease; // Transição suave para todas as propriedades
+    transition: all 0.3s ease;
 
     &::placeholder {
       color: #a0a0a0;
     }
 
-    // Efeito ao passar o mouse
     &:hover {
       border-color: $primary-deep;
     }
 
-    // Efeito ao clicar (Focus)
     &:focus {
       border-color: $primary-deep;
-      box-shadow: 0 0 8px rgba(23, 6, 69, 0.2); // Sombra leve com a cor escolhida
+      box-shadow: 0 0 8px rgba(23, 6, 69, 0.2);
     }
+  }
+
+  .institution-select {
+    border-radius: 0 !important;
   }
 
   .forgot-link {
@@ -119,30 +117,46 @@ $border-color: #8f89a080;
     }
   }
 
-  // ESTILIZAÇÃO DO BOTÃO
   .btn-login {
     background-color: $light-blue;
     color: white;
     border: none;
     padding: 16px;
-    border-radius: 8px;
+    border-radius: 0 !important;
     font-size: 18px;
     font-weight: 600;
     cursor: pointer;
     margin-top: 10px;
     transition: all 0.3s ease;
 
-    // Efeito no botão ao passar o mouse
     &:hover {
       background-color: $primary-deep;
-      transform: translateY(-2px); // Sobe levemente o botão
+      transform: translateY(-2px);
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
     }
 
-    // Efeito ao clicar no botão
     &:active {
       transform: translateY(0);
     }
+  }
+}
+
+/* SOMENTE 2 LINHAS ABAIXO DO BOTÃO */
+.bottom-lines {
+  width: 100%;
+  height: 1px;
+  background: #E5E5E5;
+  position: relative;
+  margin-top: 20px;
+
+  &::after {
+    content: "";
+    width: 100%;
+    height: 1px;
+    background: #E5E5E5;
+    position: absolute;
+    top: 20px;
+    left: 0;
   }
 }
 
@@ -151,6 +165,7 @@ $border-color: #8f89a080;
   bottom: 0;
   right: 0;
   z-index: 5;
+
   .agenda-img {
     width: 550px;
     height: auto;
@@ -158,66 +173,34 @@ $border-color: #8f89a080;
   }
 }
 
-// Meias luas decorativas
 .corner-decoration {
   position: absolute;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.top-left { width: 250px; height: 250px; top: -100px; left: -100px; }
-.top-right { width: 300px; height: 300px; top: -150px; right: -50px; }
-.bottom-left { width: 200px; height: 200px; bottom: -50px; left: -80px; }
-
-
-// Meias luas decorativas (Esferas) - Ajustadas para maior visibilidade
-.corner-decoration {
-  position: absolute;
-  // Aumentamos a opacidade de 0.4 para 0.6 no início do degradê
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.05) 70%);
   border-radius: 50%;
   pointer-events: none;
   z-index: 2;
-  // Removi o blur para a borda ficar mais definida e limpa
 }
 
-// Meia lua superior esquerda (perto do logo)
-.top-left { 
-  width: 450px; 
-  height: 450px; 
-  top: -200px; 
-  left: 15%; 
-  opacity: 0.8; // Aumentei a opacidade global do elemento
+.top-left {
+  width: 450px;
+  height: 450px;
+  top: -200px;
+  left: 15%;
+  opacity: 0.8;
 }
 
-// Meia lua superior direita
-.top-right { 
-  width: 380px; 
-  height: 380px; 
-  top: 10%; 
-  right: -150px; 
+.top-right {
+  width: 380px;
+  height: 380px;
+  top: 10%;
+  right: -150px;
   opacity: 0.6;
 }
 
-// Meia lua inferior esquerda
-.bottom-left { 
-  width: 300px; 
-  height: 300px; 
-  bottom: -50px; 
-  left: -100px; 
+.bottom-left {
+  width: 300px;
+  height: 300px;
+  bottom: -50px;
+  left: -100px;
   opacity: 0.7;
-}
-
-.login-screen {
-  // Substitua a cor sólida por este degradê radial
-  background: radial-gradient(circle at center, #8eb9e2 0%, #76a8d9 100%);
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  font-family: 'Inter', sans-serif;
 }
