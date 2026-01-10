@@ -1,62 +1,81 @@
-import React from "react";
+import React, { useState } from "react";
+import dados from "../../api/dados.json"; // Importando seu JSON
 import "./Login.scss";
-
-// Imports das imagens (mantenha os nomes dos seus arquivos webp)
-import logo from "../../assets/logo.webp"; 
-import agenda from "../../assets/agenda.webp"; 
-import sombra from "../../assets/sombra.webp"; 
+// ... seus imports de imagem aqui
 
 export const Login = () => {
+  const [usuario, setUsuario] = useState("");
+  const [senha, setSenha] = useState("");
+  const [instituicao, setInstituicao] = useState("");
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+
+    // Busca o usuário no JSON
+    const userAuth = dados.usuarios.find(
+      (u) => u.user === usuario && u.senha === senha && u.faculdadeId === parseInt(instituicao)
+    );
+
+    if (userAuth) {
+      alert(`Logado com sucesso como ${userAuth.tipo}: ${userAuth.nome}`);
+      // Futuro: use o useNavigate() aqui para redirecionar conforme o tipo
+    } else {
+      alert("Credenciais inválidas ou instituição incorreta.");
+    }
+  };
+
   return (
     <div className="login-screen">
-      {/* Background e Elementos Decorativos (Meias Luas) */}
-      <img src={sombra} className="bg-overlay" alt="" />
-      <div className="corner-decoration top-left" />
-      <div className="corner-decoration top-right" />
-      <div className="corner-decoration bottom-left" />
-
-      {/* Logo superior */}
-      <header className="brand-header">
-        <img src={logo} alt="Uni Logo" className="main-logo" />
-      </header>
-
+      {/* ... meias luas e logo ... */}
+      
       <main className="content-wrapper">
-        {/* Card de Login */}
         <section className="login-box">
           <h2>Acesse sua conta</h2>
           
-          <form className="form-container">
+          <form className="form-container" onSubmit={handleLogin}>
             <div className="input-wrapper">
-              <select className="institution-select">
-                <option value="">Selecione sua instituição</option>
-                <option value="1">Instituição A</option>
-                <option value="2">Instituição B</option>
+              <select 
+                className="institution-select" 
+                required 
+                onChange={(e) => setInstituicao(e.target.value)}
+              >
+                <option value="">Selecione sua faculdade</option>
+                {dados.instituicoes.map((inst) => (
+                  <option key={inst.id} value={inst.id}>
+                    {inst.nome}
+                  </option>
+                ))}
               </select>
             </div>
 
             <div className="input-group">
               <label>Login</label>
-              <input type="text" placeholder="Digite seu login" />
+              <input 
+                type="text" 
+                placeholder="Digite seu login" 
+                value={usuario}
+                onChange={(e) => setUsuario(e.target.value)}
+                required
+              />
             </div>
 
             <div className="input-group">
               <label>Senha</label>
-              <input type="password" placeholder="Digite sua senha" />
-            </div>
-
-            <div className="form-footer">
-              <a href="#" className="forgot-link">Problemas com login e/ou senha?</a>
+              <input 
+                type="password" 
+                placeholder="Digite sua senha" 
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                required
+              />
             </div>
 
             <button type="submit" className="btn-login">Entrar</button>
           </form>
         </section>
       </main>
-
-      {/* Ilustração da Agenda e Menina no canto inferior */}
-      <div className="illustration-container">
-        <img src={agenda} alt="Ilustração Agenda" className="agenda-img" />
-      </div>
+      
+      {/* ... imagem da agenda ... */}
     </div>
   );
 };

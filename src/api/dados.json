@@ -1,0 +1,53 @@
+{
+  "instituicoes": [
+    { "id": 1, "nome": "Faculdade de Tecnologia (FATEC)" },
+    { "id": 2, "nome": "Universidade Estadual (UNIESP)" },
+    { "id": 3, "nome": "Centro Universitário Sudeste" }
+  ],
+  "usuarios": [
+    {
+      "id": 101,
+      "user": "admin.geral",
+      "senha": "123",
+      "nome": "Carlos Augusto",
+      "tipo": "admin",
+      "faculdadeId": 1
+    },
+    {
+      "id": 201,
+      "user": "prof.roberto",
+      "senha": "123",
+      "nome": "Roberto Almeida",
+      "tipo": "professor",
+      "faculdadeId": 1,
+      "disciplinas": ["Cálculo I", "Física Aplicada"]
+    },
+    {
+      "id": 202,
+      "user": "prof.ana",
+      "senha": "123",
+      "nome": "Ana Cláudia",
+      "tipo": "professor",
+      "faculdadeId": 2,
+      "disciplinas": ["Arquitetura de Software", "Banco de Dados"]
+    },
+    {
+      "id": 301,
+      "user": "aluno.marcos",
+      "senha": "123",
+      "nome": "Marcos Vinicius",
+      "tipo": "aluno",
+      "faculdadeId": 1,
+      "curso": "Engenharia"
+    },
+    {
+      "id": 302,
+      "user": "aluno.julia",
+      "senha": "123",
+      "nome": "Julia Costa",
+      "tipo": "aluno",
+      "faculdadeId": 3,
+      "curso": "Medicina"
+    }
+  ]
+}
