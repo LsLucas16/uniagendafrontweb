@@ -60,7 +60,7 @@ export const Login = () => {
 
       <main className="content-wrapper">
         <section className="login-box">
-          <h2>Acesse sua conta</h2>
+          <h2 className="login-title">Acesse sua conta</h2>
           
           <form className="form-container" onSubmit={handleLogin}>
             <div className="input-wrapper">
