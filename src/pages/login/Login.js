@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import "./Login.scss";
+import Swal from "sweetalert2";
+
 import dados from "../../api/dados.json"; 
 
 import logo from "../../assets/logo.webp"; 
@@ -13,24 +15,37 @@ export const Login = () => {
   const [idInstSelecionada, setIdInstSelecionada] = useState("");
 
   const handleLogin = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Lógica de busca: usuário + senha + vínculo com a instituição
-    const usuarioAuth = dados.usuarios.find((u) => {
-      return (
-        u.user === loginDigitado && 
-        u.senha === senhaDigitada && 
-        u.faculdadeId === parseInt(idInstSelecionada)
-      );
+  const usuarioAuth = dados.usuarios.find((u) => {
+    return (
+      u.user === loginDigitado && 
+      u.senha === senhaDigitada && 
+      u.faculdadeId === parseInt(idInstSelecionada)
+    );
+  });
+
+  if (usuarioAuth) {
+    Swal.fire({
+      icon: "success",
+      title: "Acesso autorizado",
+      text: `Bem-vindo, ${usuarioAuth.nome}.`,
+      showConfirmButton: false,
+      timer: 1500,
     });
 
-    if (usuarioAuth) {
-      alert(`Bem-vindo, ${usuarioAuth.nome}! Acesso nível: ${usuarioAuth.tipo}`);
-      // Aqui você usaria o useNavigate para mudar de página
-    } else {
-      alert("Credenciais inválidas ou instituição incorreta.");
-    }
-  };
+    // Depois colocar o navigate aqui
+  } else {
+    Swal.fire({
+      title: "Não foi possível acessar",
+      text: "Verifique se a unidade selecionada está correta e se as credenciais estão válidas.",
+      icon: "error",
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#170645",
+    });
+  }
+};
+
 
   return (
     <div className="login-screen">
