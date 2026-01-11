@@ -1,11 +1,23 @@
 // Variáveis para facilitar a manutenção
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
 $primary-deep: #170645;
 $light-blue: #76a8d9;
 $border-color: #8f89a080;
 
 .login-screen {
   background: radial-gradient(circle at center, #8eb9e2 0%, #76a8d9 100%);
-  width: 100vw;
+  width: 100%;
   height: 100vh;
   position: relative;
   overflow: hidden;
