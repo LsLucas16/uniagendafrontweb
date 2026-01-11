@@ -1,53 +1,88 @@
 {
   "instituicoes": [
-    { "id": 1, "nome": "Faculdade de Tecnologia (FATEC)" },
-    { "id": 2, "nome": "Universidade Estadual (UNIESP)" },
-    { "id": 3, "nome": "Centro Universitário Sudeste" }
+    { "id": 1, "nome": "Universidade Catolica de Brasilia" },
+    { "id": 2, "nome": "Universidade de Brasilia (UNB)" },
+    { "id": 3, "nome": "Centro Universitario de Brasilia (CEUB)" }
   ],
   "usuarios": [
     {
       "id": 101,
-      "user": "admin",
+      "user": "aluno",
       "senha": "123",
-      "nome": "Carlos Augusto",
-      "tipo": "admin",
-      "faculdadeId": 1
+      "nome": "Carlos Augusto de Silva Pinho",
+      "tipo": "aluno",
+      "faculdadeId": 1,
+      "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"]
+      
     },
     {
       "id": 201,
-      "user": "prof.roberto",
+      "user": "professor",
       "senha": "123",
-      "nome": "Roberto Almeida",
+      "nome": "Roberto Almeida Costa Junior",
       "tipo": "responsavel",
       "faculdadeId": 1,
-      "disciplinas": ["Cálculo I", "Física Aplicada"]
-    },
-    {
-      "id": 202,
-      "user": "prof.ana",
-      "senha": "123",
-      "nome": "Ana Cláudia",
-      "tipo": "responsavel",
-      "faculdadeId": 2,
-      "disciplinas": ["Arquitetura de Software", "Banco de Dados"]
+      "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"] 
+        
     },
     {
       "id": 301,
-      "user": "aluno.marcos",
+      "user": "coordenador",
       "senha": "123",
-      "nome": "Marcos Vinicius",
-      "tipo": "aluno",
+      "nome": "Ana Claudia Oliveira",
+      "tipo": "coordenador",
       "faculdadeId": 1,
-      "curso": "Engenharia"
+      "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"] 
+      
     },
     {
-      "id": 302,
-      "user": "aluno.julia",
+      "id": 401,
+      "user": "aluno.responsavel",
       "senha": "123",
-      "nome": "Julia Costa",
+      "nome": "Junior Carlos Costa de Matos",
+      "tipo": "aluno",
+      "faculdadeId": 1,
+      "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"]
+      
+    },
+    {
+      "id": 102,
+      "user": "aluno",
+      "senha": "123",
+      "nome": "Lucas Ribeiro Silva",
       "tipo": "aluno",
       "faculdadeId": 3,
-      "curso": "Medicina"
-    }
-  ]
-}
+      "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
+      
+  },
+  {
+      "id": 202,
+      "user": "coordenador",
+      "senha": "123",
+      "nome": "Marcos Antônio Ferreira",
+      "tipo": "coordenador",
+      "faculdadeId": 3,
+      "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
+  },
+  {
+      "id": 302,
+      "user": "professor",
+      "senha": "123",
+      "nome": "Renata Oliveira Costa",
+      "tipo": "professor",
+      "faculdadeId": 3,
+      "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
+
+  },
+  {
+      "id": 402,
+      "user": "aluno.responsavel",
+      "senha": "123",
+      "nome": "Fernanda Ribeiro Silva",
+      "tipo": "aluno",
+      "faculdadeId": 3,
+      "disciplinas":  ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
+      
+     } 
+   ]
+ }
