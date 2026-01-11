@@ -167,7 +167,7 @@ $border-color: #8f89a080;
   z-index: 5;
 
   .agenda-img {
-    width: 550px;
+    width: min(550px, 30vw);
     height: auto;
     display: block;
   }
