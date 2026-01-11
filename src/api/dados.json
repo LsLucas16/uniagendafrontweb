@@ -18,7 +18,7 @@
       "user": "prof.roberto",
       "senha": "123",
       "nome": "Roberto Almeida",
-      "tipo": "professor",
+      "tipo": "responsavel",
       "faculdadeId": 1,
       "disciplinas": ["Cálculo I", "Física Aplicada"]
     },
@@ -27,7 +27,7 @@
       "user": "prof.ana",
       "senha": "123",
       "nome": "Ana Cláudia",
-      "tipo": "professor",
+      "tipo": "responsavel",
       "faculdadeId": 2,
       "disciplinas": ["Arquitetura de Software", "Banco de Dados"]
     },
