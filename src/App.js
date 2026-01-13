@@ -2,8 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Login } from "./pages/login/Login";
 import { PrivateRoute } from "./PrivateRoute";
 import { RoleRoute } from "./RoleRoute";
-import Header from "./components/header/Header";
-import MenuLateral from "./components/menuLateral/MenuLateral";
+import Layout from "./components/Layout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import CriarEvento from "./pages/criarEvento/CriarEvento";
 
@@ -11,37 +10,31 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Rota pública */}
+
+        {/* Público */}
         <Route path="/" element={<Login />} />
 
-        {/* Rotas protegidas */}
+        {/* Privado (todos autenticados) */}
         <Route element={<PrivateRoute />}>
-          {/* Dashboard acessível para todos autenticados */}
+          
+          {/* Dashboard acessível para todos */}
           <Route
             path="/dashboard"
             element={
-              <div style={{ display: "flex", height: "100vh" }}>
-                <MenuLateral />
-                <div style={{ flex: 1 }}>
-                  <Header />
-                  <Dashboard />
-                </div>
-              </div>
+              <Layout>
+                <Dashboard />
+              </Layout>
             }
           />
 
-          {/* Rotas com controle de tipo */}
+          {/* Páginas que exigem permissão */}
           <Route element={<RoleRoute allowed={["professor", "coordenador", "responsavel"]} />}>
             <Route
               path="/criar-evento"
               element={
-                <div style={{ display: "flex", height: "100vh" }}>
-                  <MenuLateral />
-                  <div style={{ flex: 1 }}>
-                    <Header />
-                    <CriarEvento />
-                  </div>
-                </div>
+                <Layout>
+                  <CriarEvento />
+                </Layout>
               }
             />
           </Route>

@@ -1,0 +1,165 @@
+.menuLateral {
+  width: 280px;
+  height: 100vh;
+  background: #ffffff;
+  border-right: 1px solid #d9e4f5;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  overflow-y: auto;
+  box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+.menuHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+
+  .avatar {
+    width: 70px;
+    height: 70px;
+    background: #4e6e8e;
+    border-radius: 50%;
+    color: #ffffff;
+    font-size: 30px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+
+  .nome {
+    font-size: 16px;
+    font-weight: 600;
+    color: #4e6e8e;
+    text-align: center;
+    margin-bottom: 4px;
+  }
+
+  .instituicao {
+    font-size: 13px;
+    color: #607080;
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  .btnSair {
+    border: none;
+    background: #d9534f;
+    color: #ffffff;
+    font-size: 13px;
+    padding: 6px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+  }
+
+  .btnSair:hover {
+    background: #b94442;
+  }
+}
+
+.menuConteudo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.professorWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  .menuBtn {
+    height: 42px;
+    border: none;
+    background: #eef4ff;
+    border-radius: 100px;
+    color: #4e6e8e;
+    font-size: 14px;
+    text-align: left;
+    padding: 0 18px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .menuBtn:hover {
+    background: #7fafde;
+    color: #ffffff;
+  }
+
+  .menuBtn:active {
+    background: #608dba;
+    color: #ffffff;
+  }
+}
+
+.disciplinasWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.disciplinaItem {
+  .disciplinaHeader {
+    display: flex;
+    align-items: center;
+    background: #eef4ff;
+    border-radius: 100px;
+    height: 42px;
+    padding: 0 14px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+
+  .disciplinaHeader:hover {
+    background: #7fafde;
+
+    .disciplinaNome {
+      color: #ffffff;
+    }
+
+    .btnToggle {
+      color: #ffffff;
+    }
+  }
+
+  .bolinha {
+    width: 12px;
+    height: 12px;
+    background: #4e6e8e;
+    border-radius: 50%;
+    margin-right: 10px;
+  }
+
+  .disciplinaNome {
+    flex: 1;
+    font-size: 14px;
+    color: #4e6e8e;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btnToggle {
+    border: none;
+    background: none;
+    color: #4e6e8e;
+    font-size: 18px;
+    cursor: pointer;
+    width: 26px;
+    text-align: center;
+  }
+
+  .disciplinaCard {
+    margin-top: 6px;
+    background: #eef4ff;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 13px;
+    color: #4e6e8e;
+    border: 1px solid #d9e4f5;
+  }
+}

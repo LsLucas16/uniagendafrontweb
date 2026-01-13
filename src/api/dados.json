@@ -10,6 +10,7 @@
       "user": "aluno",
       "senha": "123",
       "nome": "Carlos Augusto de Silva Pinho",
+      "contato": "(99)99999-9999",
       "tipo": "aluno",
       "faculdadeId": 1,
       "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"]
@@ -20,7 +21,8 @@
       "user": "professor",
       "senha": "123",
       "nome": "Roberto Almeida Costa Junior",
-      "tipo": "responsavel",
+      "contato": "professor@faculdade.br",
+      "tipo": "professor",
       "faculdadeId": 1,
       "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"] 
         
@@ -30,6 +32,7 @@
       "user": "coordenador",
       "senha": "123",
       "nome": "Ana Claudia Oliveira",
+      "contato": "coordenador@faculdade.br",
       "tipo": "coordenador",
       "faculdadeId": 1,
       "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"] 
@@ -40,7 +43,8 @@
       "user": "aluno.responsavel",
       "senha": "123",
       "nome": "Junior Carlos Costa de Matos",
-      "tipo": "aluno",
+      "contato": "(99)99999-9999",
+      "tipo": "responsavel",
       "faculdadeId": 1,
       "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"]
       
@@ -50,6 +54,7 @@
       "user": "aluno",
       "senha": "123",
       "nome": "Lucas Ribeiro Silva",
+      "contato": "(99)99999-9999",
       "tipo": "aluno",
       "faculdadeId": 3,
       "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
@@ -60,6 +65,7 @@
       "user": "coordenador",
       "senha": "123",
       "nome": "Marcos Antônio Ferreira",
+      "contato": "coordenador@faculdade.br",
       "tipo": "coordenador",
       "faculdadeId": 3,
       "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
@@ -69,6 +75,7 @@
       "user": "professor",
       "senha": "123",
       "nome": "Renata Oliveira Costa",
+      "contato": "professor@faculdade.br",
       "tipo": "professor",
       "faculdadeId": 3,
       "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
@@ -79,7 +86,8 @@
       "user": "aluno.responsavel",
       "senha": "123",
       "nome": "Fernanda Ribeiro Silva",
-      "tipo": "aluno",
+      "contato": "(99)99999-9999",
+      "tipo": "responsavel",
       "faculdadeId": 3,
       "disciplinas":  ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
       
