@@ -1,0 +1,137 @@
+$azul-primario: #334E68;
+$azul-claro: #7FB3D5;
+$cinza-borda: #E2E8F0;
+$cinza-texto: #9DB2C6;
+$branco: #FFFFFF;
+
+.painel-evento {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  background-color: #F7FAFC;
+  min-height: 100vh;
+
+  .card-form {
+    width: 100%;
+    max-width: 900px;
+    background: $branco;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+  }
+}
+
+.titulo-sessao {
+  color: $azul-primario;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.campo {
+  margin-bottom: 25px;
+  label {
+    display: block;
+    color: $azul-primario;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  input[type="text"], textarea, .input-data {
+    width: 100%;
+    padding: 14px;
+    border: 1px solid $cinza-borda;
+    border-radius: 8px;
+    background-color: #FDFDFD;
+    &::placeholder { color: #CBD5E0; }
+  }
+}
+
+// Estilo Específico do Calendário (Grid Idêntico)
+.calendario-customizado {
+  border: none !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08) !important;
+  font-family: inherit !important;
+
+  .react-datepicker__header {
+    background-color: $branco !important;
+    border-bottom: none !important;
+    padding: 15px 15px 0 15px;
+  }
+
+  .react-datepicker__current-month {
+    color: $azul-primario !important;
+    text-align: left;
+    margin-left: 35px;
+    font-size: 16px;
+  }
+
+  .react-datepicker__day-names {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    border-bottom: 1px solid #F0F4F8;
+  }
+
+  .react-datepicker__day-name {
+    color: $cinza-texto !important;
+    font-weight: 600;
+    font-size: 12px;
+    width: 40px;
+  }
+
+  .react-datepicker__month {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: $branco;
+  }
+
+  .react-datepicker__day {
+    width: 45px !important;
+    height: 45px !important;
+    line-height: 45px !important;
+    margin: 0 !important;
+    border: 0.5px solid #F0F4F8; // Cria a grade do seu print
+    border-radius: 0 !important;
+    color: $azul-primario;
+
+    &:hover { background-color: #f0f7ff !important; }
+
+    &--selected {
+      background-color: $azul-claro !important;
+      color: $branco !important;
+    }
+
+    &--disabled {
+      color: #E2E8F0 !important;
+      cursor: not-allowed;
+    }
+
+    &--outside-month {
+      color: #E2E8F0 !important;
+    }
+  }
+
+  // Botões de navegação
+  .react-datepicker__navigation {
+    top: 18px;
+    &--previous { left: 15px; }
+    &--next { left: 160px; } // Posiciona as setas próximas ao mês
+  }
+}
+
+.btn-publicar {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  margin: 40px auto 0;
+  padding: 15px;
+  background-color: $azul-claro;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  &:hover { opacity: 0.9; }
+}
