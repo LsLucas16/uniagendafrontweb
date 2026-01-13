@@ -8,6 +8,15 @@ registerLocale('pt-BR', ptBR);
 
 const CriarEvento = () => {
   const [startDate, setStartDate] = useState(null);
+  // Estado para gerenciar as notificações de forma independente
+  const [notificacoes, setNotificacoes] = useState({
+    calendario: true,
+    destaque: false
+  });
+
+  const handleCheckbox = (tipo) => {
+    setNotificacoes(prev => ({ ...prev, [tipo]: !prev[tipo] }));
+  };
 
   return (
     <div className="painel-evento">
@@ -17,25 +26,25 @@ const CriarEvento = () => {
         <div className="formulario">
           <div className="campo">
             <label>Título</label>
-            <input type="text" placeholder="Digite o título do evento" />
+            <input type="text" placeholder="Digite o título do evento" className="input-estilizado" />
           </div>
 
           <div className="campo">
             <label>Descrição</label>
-            <textarea rows="5" placeholder="Descreva os detalhes do evento"></textarea>
+            <textarea rows="4" placeholder="Descreva os detalhes do evento" className="input-estilizado"></textarea>
           </div>
 
           <div className="campo">
-            <label>Tipo de notificação</label>
-            <div className="opcoes-radio">
-              <label className="radio-item">
-                <input type="radio" name="notificacao" defaultChecked />
+            <label className="label-notificacao">Tipo de notificação</label>
+            <div className="opcoes-checkbox">
+              <div className="item-check" onClick={() => handleCheckbox('calendario')}>
+                <div className={`circular-check ${notificacoes.calendario ? 'active' : ''}`}></div>
                 <span>Aviso no calendário</span>
-              </label>
-              <label className="radio-item">
-                <input type="radio" name="notificacao" />
+              </div>
+              <div className="item-check" onClick={() => handleCheckbox('destaque')}>
+                <div className={`circular-check ${notificacoes.destaque ? 'active' : ''}`}></div>
                 <span>Aviso em destaque</span>
-              </label>
+              </div>
             </div>
           </div>
 
@@ -47,17 +56,18 @@ const CriarEvento = () => {
                 onChange={(date) => setStartDate(date)}
                 locale="pt-BR"
                 dateFormat="dd/MM/yyyy"
-                minDate={new Date()} // Bloqueia datas anteriores a hoje
+                minDate={new Date()}
                 placeholderText="Escolha uma data"
                 className="input-data"
                 calendarClassName="calendario-customizado"
                 showPopperArrow={false}
               />
-              <i className="icone-calendario"></i> 
             </div>
           </div>
 
-          <button className="btn-publicar">Publicar</button>
+          <div className="container-btn">
+            <button className="btn-publicar">Publicar</button>
+          </div>
         </div>
       </div>
     </div>
