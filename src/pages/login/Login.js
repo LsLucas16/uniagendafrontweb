@@ -14,7 +14,7 @@ export const Login = () => {
   const [senhaDigitada, setSenhaDigitada] = useState("");
   const [idInstSelecionada, setIdInstSelecionada] = useState("");
 
-  const handleLogin = (e) => {
+const handleLogin = (e) => {
   e.preventDefault();
 
   const usuarioAuth = dados.usuarios.find((u) => {
@@ -34,7 +34,24 @@ export const Login = () => {
       timer: 1500,
     });
 
-    // Depois colocar o navigate aqui
+    // Armazena dados relevantes para uso interno
+    localStorage.setItem("token", "ok");
+    localStorage.setItem("usuario", JSON.stringify({
+      id: usuarioAuth.id,
+      nome: usuarioAuth.nome,
+      tipo: usuarioAuth.tipo,
+      faculdadeId: usuarioAuth.faculdadeId
+    }));
+
+    // Regras de redirecionamento
+    const ehResponsavel = ["coordenador", "professor", "responsavel"].includes(usuarioAuth.tipo.toLowerCase());
+
+    if (ehResponsavel) {
+      window.location.href = "/criar-evento";
+    } else {
+      window.location.href = "/dashboard";
+    }
+
   } else {
     Swal.fire({
       title: "Não foi possível acessar",
@@ -45,7 +62,6 @@ export const Login = () => {
     });
   }
 };
-
 
   return (
     <div className="login-screen">
