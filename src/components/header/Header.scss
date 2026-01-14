@@ -1,0 +1,37 @@
+.header-container {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px; // Ajuste conforme a margem lateral do seu layout
+  background-color: #ffffff;
+  border-bottom: 1.5px solid #e0e0e0; // Linha fina cinza claro
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif; // Opcional: define uma fonte limpa
+
+  .left-content {
+    .text-saudacao {
+      font-size: 20px;
+      font-weight: 700; // Negrito (Bold)
+      color: #2c3e50;    // Azul escuro/marinho
+      display: flex;
+      align-items: center;
+
+      .emoji {
+        margin-left: 8px;
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .right-content {
+    .data-text {
+      font-size: 15px;
+      font-weight: 400; // Regular
+      color: #7f8c8d;    // Cinza médio
+      
+      // Remove o excesso de "de" caso queira um visual mais clean, 
+      // mas mantemos o formato original da sua função.
+    }
+  }
+}
