@@ -1,19 +1,22 @@
-// Variáveis para facilitar a manutenção
+/* Reset */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-body, html {
+html, body {
   width: 100%;
   height: 100%;
   overflow-x: hidden;
+  font-family: "Inter", sans-serif;
 }
 
+/* Variáveis */
 $primary-deep: #170645;
 $light-blue: #76a8d9;
-$border-color: #8f89a080;
+$border-color: rgba(143, 137, 160, 0.5);
+$text-main: rgb(46, 74, 103);
 
 .login-screen {
   background: radial-gradient(circle at center, #8eb9e2 0%, #76a8d9 100%);
@@ -23,13 +26,12 @@ $border-color: #8f89a080;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  font-family: 'Inter', sans-serif;
 }
 
+/* Overlay (imagem de fundo) */
 .bg-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -37,142 +39,171 @@ $border-color: #8f89a080;
   pointer-events: none;
 }
 
+/* Logo no topo esquerdo */
 .brand-header {
   position: relative;
-  padding: 40px 60px;
   z-index: 10;
+  padding: 28px 48px; /* menor que o seu, mais próximo do Figma */
 
   .main-logo {
-    width: 80px;
+    width: 64px; /* reduz para não “puxar” percepção de zoom */
     height: auto;
     display: block;
   }
 }
 
+/* Centralização do card */
 .content-wrapper {
   position: relative;
+  z-index: 11;
   flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding-top: 0;
+
+  /* Sobe levemente o card como no Figma, sem clamp agressivo */
+  transform: translateY(-60px);
 }
 
+/* Card igual Figma (menor) */
 .login-box {
-  background: #ffffff;
+  background: #fff;
   width: 100%;
-  max-width: 450px;
-  padding: 40px;
+  max-width: 340px; /* ponto principal: reduz do 450 */
+  padding: 28px 26px; /* reduz do 40 */
   border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  z-index: 11;
-  margin-top: clamp(-300px, -22vh, -250px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.10);
+}
+
+/* Título */
+.login-title {
+  color: $text-main;
+  text-align: center;
+  margin-bottom: 22px; /* no Figma parece menor que 44 */
+  font-weight: 700;
+  font-size: 20px; /* menor para “des-zoom” */
+  line-height: 1.2;
 }
 
 .form-container {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  position: relative;
+  gap: 14px;
+}
 
-  .input-group {
-    text-align: left;
+/* Select “solto” em cima */
+.input-wrapper {
+  margin-bottom: 6px;
+}
 
-    label {
-      display: block;
-      color: #2e4a67;
-      font-weight: 700;
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
-  }
+/* Labels e inputs */
+.input-group {
+  text-align: left;
 
-  input, .institution-select {
-    width: 100%;
-    padding: 15px;
-    border: 2px solid $border-color;
-    border-radius: 10px;
-    font-size: 16px;
-    color: #2e4a67;
-    outline: none;
-    box-sizing: border-box;
-    transition: all 0.3s ease;
-
-    &::placeholder {
-      color: #a0a0a0;
-    }
-
-    &:hover {
-      border-color: $primary-deep;
-    }
-
-    &:focus {
-      border-color: $primary-deep;
-      box-shadow: 0 0 8px rgba(23, 6, 69, 0.2);
-    }
-  }
-
-  .institution-select {
-    border-radius: 0 !important;
-  }
-
-  .forgot-link {
+  label {
     display: block;
-    text-align: right;
-    color: #5a96d2;
-    font-size: 12px;
-    text-decoration: underline;
-    margin-top: -10px;
-    transition: color 0.2s;
-
-    &:hover {
-      color: $primary-deep;
-    }
-  }
-
-  .btn-login {
-    background-color: $light-blue;
-    color: white;
-    border: none;
-    padding: 16px;
-    border-radius: 0 !important;
-    font-size: 18px;
-    font-weight: 600;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: all 0.3s ease;
-
-    &:hover {
-      background-color: $primary-deep;
-      transform: translateY(-2px);
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    &:active {
-      transform: translateY(0);
-    }
+    color: $text-main;
+    font-weight: 700;
+    font-size: 12px;  /* menor como no Figma */
+    margin-bottom: 6px;
   }
 }
 
-/* SOMENTE 2 LINHAS ABAIXO DO BOTÃO */
+/* Campos: mais baixos e com borda mais leve */
+input,
+.institution-select {
+  width: 100%;
+  height: 42px;            /* fixa altura parecida com Figma */
+  padding: 0 12px;         /* em vez de 15px em todas as direções */
+  border: 1.5px solid $border-color; /* em vez de 2px */
+  border-radius: 10px;     /* inputs arredondados como no print */
+  font-size: 13px;
+  color: $text-main;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder {
+    color: #a0a0a0;
+  }
+
+  &:hover {
+    border-color: rgba(23, 6, 69, 0.7);
+  }
+
+  &:focus {
+    border-color: $primary-deep;
+    box-shadow: 0 0 0 3px rgba(23, 6, 69, 0.12);
+  }
+}
+
+/* No Figma o select parece mais “quadrado” */
+.institution-select {
+  border-radius: 0;
+  background: #fff;
+}
+
+/* Link “problemas...” */
+.form-footer {
+  margin-top: -2px;
+}
+
+.forgot-link {
+  display: block;
+  text-align: right;
+  color: #5a96d2;
+  font-size: 11px;
+  text-decoration: underline;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $primary-deep;
+  }
+}
+
+/* Botão igual Figma (retângulo, sem radius) */
+.btn-login {
+  margin-top: 8px;
+  width: 100%;
+  height: 46px;
+  background-color: $light-blue;
+  color: #fff;
+  border: none;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+
+  &:hover {
+    background-color: $primary-deep;
+    transform: translateY(-1px);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+/* 2 linhas abaixo do botão */
 .bottom-lines {
   width: 100%;
   height: 1px;
-  background: #E5E5E5;
+  background: #e5e5e5;
   position: relative;
-  margin-top: 20px;
+  margin-top: 18px;
 
   &::after {
     content: "";
     width: 100%;
     height: 1px;
-    background: #E5E5E5;
+    background: #e5e5e5;
     position: absolute;
-    top: 20px;
+    top: 18px;
     left: 0;
   }
 }
 
+/* Ilustração canto inferior direito */
 .illustration-container {
   position: absolute;
   bottom: 0;
@@ -180,12 +211,13 @@ $border-color: #8f89a080;
   z-index: 5;
 
   .agenda-img {
-    width: min(550px, 30vw);
+    width: min(520px, 30vw);
     height: auto;
     display: block;
   }
 }
 
+/* Bolhas decorativas */
 .corner-decoration {
   position: absolute;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.05) 70%);
@@ -216,17 +248,4 @@ $border-color: #8f89a080;
   bottom: -50px;
   left: -100px;
   opacity: 0.7;
-}
-
-
-.form-container .institution-select {
-  margin-bottom: 30px; 
-}
-
-
-.login-title {
-  color: rgb(46, 74, 103);
-  text-align: center;
-  margin-bottom: 44px;
-  font-weight: 700;
 }
