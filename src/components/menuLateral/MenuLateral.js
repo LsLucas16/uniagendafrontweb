@@ -12,13 +12,6 @@ const MenuLateral = ({ currentUserId = 201 }) => {
   const user = data.usuarios.find(u => u.id === currentUserId);
   const instituicao = data.instituicoes.find(i => i.id === user?.faculdadeId);
 
-  // Lógica para saudação dinâmica (Imagem {DA3F10F5...})
-  useEffect(() => {
-    const hora = new Date().getHours();
-    if (hora >= 5 && hora < 12) setSaudacao('Bom dia');
-    else if (hora >= 12 && hora < 18) setSaudacao('Boa tarde');
-    else setSaudacao('Boa noite');
-  }, []);
 
   if (!user) return null;
 
@@ -27,7 +20,7 @@ const MenuLateral = ({ currentUserId = 201 }) => {
 
   const handleLogout = (e) => {
     e.stopPropagation(); 
-    localStorage.removeItem('userLogado'); 
+    localStorage.removeItem('token'); 
     navigate('/'); 
   };
 
