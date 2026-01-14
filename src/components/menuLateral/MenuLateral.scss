@@ -199,3 +199,98 @@
     }
   }
 }
+
+
+.menuLateral {
+  // ---------- ALUNO ----------
+  &__materias {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  &__materiaWrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  &__materiaItem {
+    width: 100%;
+    border: 1px solid #e8eff5;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 12px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    transition: all .2s ease;
+
+    &:hover {
+      background: #f8fbff;
+      border-color: #dbe7f3;
+    }
+
+    &.open {
+      border-color: rgba(118, 168, 217, 0.7);
+      box-shadow: 0 6px 16px rgba(46, 74, 103, 0.08);
+    }
+  }
+
+  &__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: var(--discColor);
+    flex-shrink: 0;
+  }
+
+  &__materiaTitle {
+    flex: 1;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 700;
+    color: #2e4a67;
+    line-height: 1.2;
+  }
+
+  &__chev {
+    color: #94a3b8;
+    flex-shrink: 0;
+    transition: transform .18s ease;
+  }
+
+  &__materiaItem.open &__chev {
+    transform: rotate(90deg);
+  }
+
+  &__materiaDetails {
+    border: 1px solid #e8eff5;
+    border-left: 4px solid var(--discColor);
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px 12px;
+
+    .menuLateral__detailsTitle {
+      font-size: 12px;
+      font-weight: 800;
+      color: #2e4a67;
+      margin-bottom: 6px;
+    }
+
+    .menuLateral__detailsLine {
+      font-size: 12px;
+      color: #526a82;
+      margin-top: 4px;
+
+      strong {
+        color: #2e4a67;
+        font-weight: 800;
+      }
+    }
+  }
+}

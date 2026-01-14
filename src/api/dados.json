@@ -13,7 +13,7 @@
       "contato": "(99)99999-9999",
       "tipo": "aluno",
       "faculdadeId": 1,
-      "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"]
+      "disciplinas": [1, 6, 3 , 4]
       
     },
     {
@@ -24,7 +24,7 @@
       "contato": "professor@faculdade.br",
       "tipo": "professor",
       "faculdadeId": 1,
-      "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"] 
+      "disciplinas": [1, 6, 3 , 4] 
         
     },
     {
@@ -35,7 +35,7 @@
       "contato": "coordenador@faculdade.br",
       "tipo": "coordenador",
       "faculdadeId": 1,
-      "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"] 
+      "disciplinas": [1, 6, 3 , 4] 
       
     },
     {
@@ -46,7 +46,7 @@
       "contato": "(99)99999-9999",
       "tipo": "responsavel",
       "faculdadeId": 1,
-      "disciplinas": ["Calculo I - Turma 8", "Matematica basica - Turma 1", "Introduçao aos modelos matemáaticos" , "Monitoria do curso de matematica e exatas"]
+      "disciplinas": [1, 6, 3 , 4]
       
     },
     {
@@ -57,7 +57,7 @@
       "contato": "(99)99999-9999",
       "tipo": "aluno",
       "faculdadeId": 3,
-      "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
+      "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
       
   },
   {
@@ -68,7 +68,7 @@
       "contato": "coordenador@faculdade.br",
       "tipo": "coordenador",
       "faculdadeId": 3,
-      "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
+      "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
   },
   {
       "id": 302,
@@ -78,7 +78,7 @@
       "contato": "professor@faculdade.br",
       "tipo": "professor",
       "faculdadeId": 3,
-      "disciplinas": ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
+      "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
 
   },
   {
@@ -89,8 +89,108 @@
       "contato": "(99)99999-9999",
       "tipo": "responsavel",
       "faculdadeId": 3,
-      "disciplinas":  ["Calculo I - Turma 8", "Matematica Básica - Turma 1", "Introduçao aos Modelos Matematicos", "Algebra Linear I - Turma 6", "Geometria Analitica", "Estatistica Aplicada", "Logica Matematica", "Monitoria do Curso de Matematica e Exatas"]
+      "disciplinas":  [1, 2, 3, 8, 9, 10, 11, 4]
       
      } 
-   ]
+   ],
+   "disciplinas": [
+  {
+    "id": 1,
+    "nome": "Cálculo I - Turma 8",
+    "cor": "#3B82F6",
+    "instituicaoId": 1,
+    "professorId": 201,
+    "responsavelId": 401
+  },
+  {
+    "id": 2,
+    "nome": "Matemática Básica - Turma 1",
+    "cor": "#22C55E",
+    "instituicaoId": 1,
+    "professorId": 201,
+    "responsavelId": 401
+  },
+  {
+    "id": 3,
+    "nome": "Introdução aos Modelos Matemáticos",
+    "cor": "#A855F7",
+    "instituicaoId": 1,
+    "professorId": 201,
+    "responsavelId": 401
+  },
+  {
+    "id": 4,
+    "nome": "Monitoria do Curso de Matemática e Exatas",
+    "cor": "#F59E0B",
+    "instituicaoId": 1,
+    "professorId": 201,
+    "responsavelId": 401
+  },
+
+  {
+    "id": 5,
+    "nome": "Cálculo I - Turma 8",
+    "cor": "#3B82F6",
+    "instituicaoId": 3,
+    "professorId": 302,
+    "responsavelId": 402
+  },
+  {
+    "id": 6,
+    "nome": "Matemática Básica - Turma 1",
+    "cor": "#22C55E",
+    "instituicaoId": 3,
+    "professorId": 302,
+    "responsavelId": 402
+  },
+  {
+    "id": 7,
+    "nome": "Introdução aos Modelos Matemáticos",
+    "cor": "#A855F7",
+    "instituicaoId": 3,
+    "professorId": 302,
+    "responsavelId": 402
+  },
+  {
+    "id": 8,
+    "nome": "Álgebra Linear I - Turma 6",
+    "cor": "#EF4444",
+    "instituicaoId": 3,
+    "professorId": 302,
+    "responsavelId": 402
+  },
+  {
+    "id": 9,
+    "nome": "Geometria Analítica",
+    "cor": "#14B8A6",
+    "instituicaoId": 3,
+    "professorId": 302,
+    "responsavelId": 402
+  },
+  {
+    "id": 10,
+    "nome": "Estatística Aplicada",
+    "cor": "#8B5CF6",
+    "instituicaoId": 3,
+    "professorId": 302,
+    "responsavelId": 402
+  },
+  {
+    "id": 11,
+    "nome": "Lógica Matemática",
+    "cor": "#84CC16",
+    "instituicaoId": 3,
+    "professorId": 302,
+    "responsavelId": 402
+  },
+  {
+    "id": 12,
+    "nome": "Monitoria do Curso de Matemática e Exatas",
+    "cor": "#F59E0B",
+    "instituicaoId": 3,
+    "professorId": 302,
+    "responsavelId": 402
+  }
+]
+
  }
