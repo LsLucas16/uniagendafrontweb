@@ -179,3 +179,23 @@
     }
   }
 }
+
+.menuLateral__btn {
+  background-color: rgba(238, 242, 255, 1);
+  color: rgba(46, 74, 103, 1); // azul escuro na letra
+  border-radius: 30px;
+  transition: all .2s ease;
+
+  svg {
+    color: rgba(46, 74, 103, 1);
+  }
+
+  &.active {
+    background-color: rgba(118, 168, 217, 1); // azul mais escuro
+    color: rgba(238, 242, 255, 1); // letra clara
+
+    svg {
+      color: rgba(238, 242, 255, 1);
+    }
+  }
+}
