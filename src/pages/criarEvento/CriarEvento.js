@@ -34,7 +34,7 @@ const CriarEvento = () => {
     if (!titulo || !startDate) {
       Swal.fire({
         title: 'Campos obrigatórios',
-        text: 'Por favor, preencha o título e a data do evento.',
+        text: 'Por favor, preencha todos os campos.',
         icon: 'warning',
         confirmButtonText: 'Entendido',
         confirmButtonColor: '#2E4A67', // Azul marinho do seu Header
@@ -88,6 +88,7 @@ const CriarEvento = () => {
               className="input-estilizado"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
+              required
             />
           </div>
 
@@ -99,6 +100,7 @@ const CriarEvento = () => {
               className="input-estilizado"
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
+              required
             ></textarea>
           </div>
 
