@@ -1,110 +1,126 @@
 .menuLateral {
-  width: 300px;
-  background: #fff;
-  padding: 24px;
+  width: 250px;
   height: 100vh;
-  border-right: 1px solid #f0f0f0;
-  color: #556080;
+  background-color: #ffffff;
+  border-right: 1px solid #f0f4f8;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  font-family: 'Inter', sans-serif;
 
   &__header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 24px;
-    font-size: 13px;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 0 4px;
   }
 
   &__avatar {
-    width: 42px;
+    min-width: 42px;
     height: 42px;
-    background: #7fb0df;
-    border-radius: 50%;
+    background-color: #7db0db; // Azul celeste da imagem
     color: white;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: bold;
+    font-weight: 600;
     font-size: 18px;
   }
 
+  &__brand {
+    font-size: 12.5px;
+    color: #6a7c92;
+    line-height: 1.2;
+    strong { color: #4a5d73; font-weight: 700; }
+  }
+
   &__uni-card {
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
+    border: 1px solid #e8eff5;
+    border-radius: 10px;
     padding: 12px;
-    margin-bottom: 20px;
-    
-    span { font-size: 11px; color: #94a3b8; display: block; }
-    strong { font-size: 15px; color: #334155; }
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 5px;
+  }
+
+  &__uni-logo {
+    width: 38px;
+    display: flex;
+    align-items: center;
+    img { width: 100%; height: auto; object-fit: contain; }
+  }
+
+  &__uni-info {
+    display: flex;
+    flex-direction: column;
+    .menuLateral__uni-label { font-size: 11px; color: #94a3b8; }
+    .menuLateral__uni-name { font-size: 15px; color: #3b4d61; font-weight: 600; }
   }
 
   &__divider {
-    border: none;
-    border-top: 1px dashed #e2e8f0;
-    margin: 20px 0;
+    border: 0;
+    border-top: 1.5px dashed #e2e8f0; // Linha pontilhada da imagem
+    margin: 15px 0;
+    width: 100%;
   }
 
   &__label {
+    font-size: 14px;
     font-weight: 600;
-    font-size: 16px;
-    display: block;
+    color: #5d7285;
     margin-bottom: 8px;
+    display: block;
   }
 
   &__select {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
-    background: #f8fafc;
     border: 1px solid #e2e8f0;
-    margin-bottom: 24px;
-    color: #475569;
+    background-color: #f8fafc;
+    color: #4a5d6e;
+    font-size: 15px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+    &:focus { border-color: #7db0db; }
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 
   &__btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 25px;
-    border: none;
-    margin-bottom: 12px;
-    cursor: pointer;
-    font-weight: 500;
-    text-align: left;
-    background: transparent;
-
-    &--primary {
-      background: #7fb0df;
-      color: white;
-      text-align: center;
-      box-shadow: 0 4px 12px rgba(127, 176, 223, 0.3);
-    }
-
-    &:hover:not(&--primary) {
-      background: #f1f5f9;
-    }
-  }
-
-  &__item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 14px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 10px;
-    margin-bottom: 8px;
-    font-size: 14px;
+    gap: 14px;
+    padding: 12px 18px;
+    border: none;
+    background: transparent;
+    color: #4a5d73;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 30px; // Botão oval conforme imagem
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    svg { color: #6a7c92; }
 
-    &-left { display: flex; align-items: center; gap: 10px; }
-  }
+    &:hover { background-color: #f1f5f9; }
 
-  .dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    &--0 { background: #5d9cec; }
-    &--1 { background: #f1c40f; }
-    &--2 { background: #e74c3c; }
-    &--3 { background: #2ecc71; }
-    &--purple { background: #9b59b6; }
+    &--primary {
+      background-color: #7db0db; // Cor exata do botão azul
+      color: white;
+      margin-bottom: 10px;
+      box-shadow: 0 4px 10px rgba(125, 176, 219, 0.3);
+      
+      svg { color: white; }
+      &:hover { background-color: #699cc9; }
+    }
   }
 }

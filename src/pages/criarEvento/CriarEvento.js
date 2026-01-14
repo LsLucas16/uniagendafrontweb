@@ -1,21 +1,77 @@
 import React, { useState } from 'react';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import ptBR from 'date-fns/locale/pt-BR';
+import Swal from 'sweetalert2'; // Importe o SweetAlert2
 import "react-datepicker/dist/react-datepicker.css";
 import './CriarEvento.scss';
 
 registerLocale('pt-BR', ptBR);
 
 const CriarEvento = () => {
+  const [titulo, setTitulo] = useState("");
+  const [descricao, setDescricao] = useState("");
   const [startDate, setStartDate] = useState(null);
-  // Estado para gerenciar as notificações de forma independente
   const [notificacoes, setNotificacoes] = useState({
     calendario: true,
     destaque: false
   });
 
+  // Configuração Global para alertas sérios
+  const Toast = Swal.mixin({
+    customClass: {
+      confirmButton: 'btn-confirm-swal',
+      cancelButton: 'btn-cancel-swal'
+    },
+    buttonsStyling: false // Permite usar o CSS do seu projeto
+  });
+
   const handleCheckbox = (tipo) => {
     setNotificacoes(prev => ({ ...prev, [tipo]: !prev[tipo] }));
+  };
+
+  const handleSalvar = async () => {
+    // Validação básica
+    if (!titulo || !startDate) {
+      Swal.fire({
+        title: 'Campos obrigatórios',
+        text: 'Por favor, preencha o título e a data do evento.',
+        icon: 'warning',
+        confirmButtonText: 'Entendido',
+        confirmButtonColor: '#2E4A67', // Azul marinho do seu Header
+      });
+      return;
+    }
+
+    try {
+      // Simulação de carregamento
+      Swal.fire({
+        title: 'Publicando evento...',
+        allowOutsideClick: false,
+        didOpen: () => { Swal.showLoading(); }
+      });
+
+      // Simulação de API
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Sucesso Profissional
+      Swal.fire({
+        title: 'Sucesso!',
+        text: 'O evento foi publicado e já está disponível.',
+        icon: 'success',
+        confirmButtonText: 'Ótimo',
+        confirmButtonColor: '#2E4A67',
+      });
+
+    } catch (error) {
+      // Erro Profissional
+      Swal.fire({
+        title: 'Erro ao publicar',
+        text: 'Não foi possível salvar o evento. Tente novamente em instantes.',
+        icon: 'error',
+        confirmButtonText: 'Fechar',
+        confirmButtonColor: '#d33',
+      });
+    }
   };
 
   return (
@@ -26,12 +82,24 @@ const CriarEvento = () => {
         <div className="formulario">
           <div className="campo">
             <label>Título</label>
-            <input type="text" placeholder="Digite o título do evento" className="input-estilizado" />
+            <input 
+              type="text" 
+              placeholder="Digite o título do evento" 
+              className="input-estilizado"
+              value={titulo}
+              onChange={(e) => setTitulo(e.target.value)}
+            />
           </div>
 
           <div className="campo">
             <label>Descrição</label>
-            <textarea rows="4" placeholder="Descreva os detalhes do evento" className="input-estilizado"></textarea>
+            <textarea 
+              rows="4" 
+              placeholder="Descreva os detalhes do evento" 
+              className="input-estilizado"
+              value={descricao}
+              onChange={(e) => setDescricao(e.target.value)}
+            ></textarea>
           </div>
 
           <div className="campo">
@@ -66,7 +134,9 @@ const CriarEvento = () => {
           </div>
 
           <div className="container-btn">
-            <button className="btn-publicar">Publicar</button>
+            <button className="btn-publicar" onClick={handleSalvar}>
+              Publicar
+            </button>
           </div>
         </div>
       </div>

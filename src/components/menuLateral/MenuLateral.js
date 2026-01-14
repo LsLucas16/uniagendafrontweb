@@ -1,73 +1,73 @@
 import React from 'react';
 import './MenuLateral.scss';
-import data from '../../api/dados.json' 
+import data from '../../api/dados.json';
+import { SquarePen, ClipboardList, Settings } from 'lucide-react';
 
-const MenuLateral = ({ currentUserId = 202 }) => {
-  // 1. Busca o usuário logado
+const MenuLateral = ({ currentUserId = 201 }) => {
+  // Busca o usuário logado
   const user = data.usuarios.find(u => u.id === currentUserId);
   
-  // 2. Busca a instituição desse usuário
-  const instituicao = data.instituicoes.find(i => i.id === user.faculdadeId);
+  // Busca a instituição usando o faculdadeId do usuário
+  const instituicao = data.instituicoes.find(i => i.id === user?.faculdadeId);
 
   if (!user) return null;
 
+  // Pega apenas a primeira letra do nome
+  const primeiraLetra = user.nome.trim().charAt(0).toUpperCase();
+
   return (
     <aside className="menuLateral">
-      {/* Header fixo */}
+      {/* Avatar e Slogan */}
       <header className="menuLateral__header">
-        <div className="menuLateral__avatar">{user.nome.charAt(0)}</div>
+        <div className="menuLateral__avatar">{primeiraLetra}</div>
         <p className="menuLateral__brand">
           <strong>UniAgenda</strong> - Sua rotina acadêmica sob controle!
         </p>
       </header>
 
-      {/* Nome da Faculdade vindo do dados.js */}
+      {/* Card da Instituição com Logo dinâmico */}
       <div className="menuLateral__uni-card">
+        <div className="menuLateral__uni-logo">
+          <img src={instituicao?.logo} alt="Logo Instituição" />
+        </div>
         <div className="menuLateral__uni-info">
-          <span>{instituicao?.nome}</span>
-          <strong>{instituicao?.nome.split(' ').pop().replace('(', '').replace(')', '')}</strong>
+          <span className="menuLateral__uni-label">Universidade de Brasília</span>
+          <strong className="menuLateral__uni-name">UNB</strong>
         </div>
       </div>
 
       <hr className="menuLateral__divider" />
 
-      {/* CONTEÚDO PARA PROFESSOR / COORDENADOR */}
-      {(user.tipo === 'professor' || user.tipo === 'coordenador') && (
-        <nav className="menuLateral__menu">
+      {/* Navegação */}
+      <nav className="menuLateral__menu">
+        <div className="menuLateral__group">
           <label className="menuLateral__label">Turma atual</label>
           <select className="menuLateral__select">
             {user.disciplinas.map((disc, index) => (
               <option key={index} value={disc}>{disc}</option>
             ))}
           </select>
+        </div>
 
-          <button className="menuLateral__btn menuLateral__btn--primary">Criar evento</button>
-          <button className="menuLateral__btn">Eventos Publicados</button>
-          <button className="menuLateral__btn">Editar turma</button>
-        </nav>
-      )}
+        <hr className="menuLateral__divider" />
 
-      {/* CONTEÚDO PARA ALUNO / RESPONSÁVEL */}
-      {(user.tipo === 'aluno' || user.tipo === 'responsavel') && (
-        <nav className="menuLateral__menu">
-          <div className="menuLateral__list">
-            {user.disciplinas.map((disc, index) => (
-              <div key={index} className="menuLateral__item">
-                <div className="menuLateral__item-left">
-                  <span className={`dot dot--${index % 4}`}></span>
-                  <span className="menuLateral__item-name">{disc.split(' - ')[0]}</span>
-                </div>
-                <span className="menuLateral__plus">+</span>
-              </div>
-            ))}
-          </div>
+        <div className="menuLateral__actions">
+          <button className="menuLateral__btn menuLateral__btn--primary">
+            <SquarePen size={20} strokeWidth={2.5} />
+            <span>Criar evento</span>
+          </button>
           
-          <p className="menuLateral__label-small">Extensões acadêmicas</p>
-          <div className="menuLateral__item menuLateral__item--extensao">
-             <span className="dot dot--purple"></span> Monitoria
-          </div>
-        </nav>
-      )}
+          <button className="menuLateral__btn">
+            <ClipboardList size={20} />
+            <span>Eventos Publicados</span>
+          </button>
+          
+          <button className="menuLateral__btn">
+            <Settings size={20} />
+            <span>Editar turma</span>
+          </button>
+        </div>
+      </nav>
     </aside>
   );
 };

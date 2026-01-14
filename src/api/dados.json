@@ -1,8 +1,8 @@
 {
   "instituicoes": [
-    { "id": 1, "nome": "Universidade Catolica de Brasilia" },
-    { "id": 2, "nome": "Universidade de Brasilia (UNB)" },
-    { "id": 3, "nome": "Centro Universitario de Brasilia (CEUB)" }
+    { "id": 1, "nome": "Universidade Catolica de Brasilia", "logo":"http://cen.unb.br/wp-content/uploads/2025/02/logo_unb_oficial_2025.png" },
+    { "id": 2, "nome": "Universidade de Brasilia (UNB)", "logo":"http://cen.unb.br/wp-content/uploads/2025/02/logo_unb_oficial_2025.png" },
+    { "id": 3, "nome": "Centro Universitario de Brasilia (CEUB)", "logo":"http://cen.unb.br/wp-content/uploads/2025/02/logo_unb_oficial_2025.png" }
   ],
   "usuarios": [
     {

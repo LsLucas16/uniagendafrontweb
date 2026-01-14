@@ -148,3 +148,27 @@ $branco: #FFFFFF;
   cursor: pointer;
   &:hover { background-color: darken($azul-claro, 5%); }
 }
+
+// Personalização do SweetAlert2 para ser mais "clean"
+.swal2-popup {
+  font-family: 'Inter', sans-serif !important; // Use a mesma fonte do seu Header
+  border-radius: 12px !important;
+  padding: 2rem !important;
+}
+
+.swal2-title {
+  color: #2E4A67 !important; // Azul marinho do Header
+  font-size: 22px !important;
+}
+
+.swal2-html-container {
+  color: #6A7B89 !important; // Cinza da data do Header
+}
+
+.swal2-confirm {
+  padding: 10px 30px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 14px !important;
+}
