@@ -1,8 +1,8 @@
 {
   "instituicoes": [
-    { "id": 1, "nome": "Universidade Catolica de Brasilia", "logo":"http://cen.unb.br/wp-content/uploads/2025/02/logo_unb_oficial_2025.png" },
-    { "id": 2, "nome": "Universidade de Brasilia (UNB)", "logo":"http://cen.unb.br/wp-content/uploads/2025/02/logo_unb_oficial_2025.png" },
-    { "id": 3, "nome": "Centro Universitario de Brasilia (CEUB)", "logo":"http://cen.unb.br/wp-content/uploads/2025/02/logo_unb_oficial_2025.png" }
+    { "id": 1, "nome": "Universidade Catolica de Brasilia","sigla":"UCB", "logo":"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmx796x7No9FLIvs_62qMpSlF0zhkjeYlJ9A&s" },
+    { "id": 2, "nome": "Universidade de Brasilia (UNB)","sigla":"UNB", "logo":"http://cen.unb.br/wp-content/uploads/2025/02/logo_unb_oficial_2025.png" },
+    { "id": 3, "nome": "Centro Universitario de Brasilia (CEUB)","sigla":"CEUB", "logo":"https://institucional.uniceub.br/hubfs/BrandCenter/img/logo-ceub-uso-incorreto-aplicar-efeitos.png" }
   ],
   "usuarios": [
     {
