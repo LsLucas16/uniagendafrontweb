@@ -8,18 +8,74 @@
   padding: 16px;
   font-family: 'Inter', sans-serif;
 
+  // Header e Card de Perfil (Baseado na imagem {2C3C819A...})
   &__header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-bottom: 20px;
-    padding: 0 4px;
+    padding: 8px;
+    cursor: pointer;
+    border-radius: 12px;
+    transition: all 0.2s ease-in-out;
+
+    &.active {
+      background-color: #ebf1f9; // Azul muito claro da imagem de perfil
+      border: 1px solid #d9e2ec;
+      flex-direction: column;
+      padding: 16px;
+      margin-top: 10px;
+
+      .menuLateral__avatar {
+        margin-bottom: 8px;
+        width: 48px;
+        height: 48px;
+      }
+    }
+  }
+
+  &__user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+
+    strong {
+      font-size: 14px;
+      color: #3e5166;
+      font-weight: 700;
+      margin-bottom: 2px;
+    }
+
+    span {
+      font-size: 11px;
+      color: #7a8ba1;
+      margin-bottom: 12px;
+    }
+
+    .btn-sair {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: #f87171; // Vermelho suave da imagem
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      
+      &:hover {
+        background-color: rgba(248, 113, 113, 0.05);
+        border-radius: 4px;
+      }
+    }
   }
 
   &__avatar {
-    min-width: 42px;
+    width: 42px;
     height: 42px;
-    background-color: #7db0db; // Azul celeste da imagem
+    background-color: #7db0db;
     color: white;
     border-radius: 50%;
     display: flex;
@@ -27,49 +83,45 @@
     justify-content: center;
     font-weight: 600;
     font-size: 18px;
+    flex-shrink: 0;
   }
 
   &__brand {
-    font-size: 12.5px;
-    color: #6a7c92;
-    line-height: 1.2;
-    strong { color: #4a5d73; font-weight: 700; }
+    font-size: 12px;
+    color: #7a8ba1;
+    line-height: 1.3;
+    strong { color: #3e5166; font-weight: 700; }
   }
 
+  // Card da Instituição
   &__uni-card {
     border: 1px solid #e8eff5;
     border-radius: 10px;
-    padding: 12px;
+    padding: 10px;
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 5px;
+    gap: 10px;
   }
 
-  &__uni-logo {
-    width: 38px;
-    display: flex;
-    align-items: center;
-    img { width: 100%; height: auto; object-fit: contain; }
-  }
+  &__uni-logo img { width: 32px; height: auto; }
 
   &__uni-info {
     display: flex;
     flex-direction: column;
-    .menuLateral__uni-label { font-size: 11px; color: #94a3b8; }
-    .menuLateral__uni-name { font-size: 15px; color: #3b4d61; font-weight: 600; }
+    .menuLateral__uni-label { font-size: 10px; color: #94a3b8; }
+    .menuLateral__uni-name { font-size: 14px; color: #3e5166; font-weight: 700; }
   }
 
   &__divider {
     border: 0;
-    border-top: 1.5px dashed #e2e8f0; // Linha pontilhada da imagem
-    margin: 15px 0;
+    border-top: 1.5px dashed #e2e8f0;
+    margin: 18px 0;
     width: 100%;
   }
 
   &__label {
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+    font-weight: 700;
     color: #5d7285;
     margin-bottom: 8px;
     display: block;
@@ -77,50 +129,53 @@
 
   &__select {
     width: 100%;
-    padding: 12px;
+    padding: 10px 12px;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
     background-color: #f8fafc;
-    color: #4a5d6e;
-    font-size: 15px;
+    color: #3e5166;
+    font-size: 14px;
     cursor: pointer;
-    outline: none;
-    transition: border-color 0.2s;
-    &:focus { border-color: #7db0db; }
   }
 
   &__actions {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
   }
 
+  // Botões e Hovers (Baseado na imagem {2C3C819A...})
   &__btn {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 12px 18px;
+    gap: 12px;
+    padding: 12px 20px;
     border: none;
     background: transparent;
     color: #4a5d73;
     font-size: 15px;
-    font-weight: 500;
-    border-radius: 30px; // Botão oval conforme imagem
+    font-weight: 600;
+    border-radius: 30px;
     cursor: pointer;
-    transition: all 0.2s;
-    
-    svg { color: #6a7c92; }
+    transition: all 0.2s ease;
 
-    &:hover { background-color: #f1f5f9; }
+    svg { color: #7a8ba1; transition: color 0.2s; }
+
+    // Hover dos botões secundários (Fundo azul lavanda claro)
+    &--secondary:hover {
+      background-color: #eff4ff; // Azul suave do hover enviado
+      color: #5a88c0;
+      svg { color: #5a88c0; }
+    }
 
     &--primary {
-      background-color: #7db0db; // Cor exata do botão azul
+      background-color: #7db0db;
       color: white;
-      margin-bottom: 10px;
-      box-shadow: 0 4px 10px rgba(125, 176, 219, 0.3);
+      margin-bottom: 4px;
+      box-shadow: 0 4px 10px rgba(125, 176, 219, 0.25);
       
       svg { color: white; }
-      &:hover { background-color: #699cc9; }
+      &:hover { background-color: #6da0cf; }
     }
   }
 }
