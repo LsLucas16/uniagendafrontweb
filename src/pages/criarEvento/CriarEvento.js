@@ -95,7 +95,7 @@ const CriarEvento = () => {
           <div className="campo">
             <label>Descrição</label>
             <textarea 
-              rows="4" 
+              rows="10" 
               placeholder="Descreva os detalhes do evento" 
               className="input-estilizado"
               value={descricao}

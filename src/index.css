@@ -1,0 +1,9 @@
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;           /* remove a borda branca padrão */
+  padding: 0;
+  background: #F7FAFC; /* opcional: já pinta o fundo da página toda */
+}
