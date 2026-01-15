@@ -1,9 +1,11 @@
 html, body, #root {
   height: 100%;
+  width: 100%;
+  overflow-x: hidden; 
 }
 
 body {
-  margin: 0;           /* remove a borda branca padrão */
+  margin: 0;
   padding: 0;
-  background: #F7FAFC; /* opcional: já pinta o fundo da página toda */
+  background: #F7FAFC;
 }

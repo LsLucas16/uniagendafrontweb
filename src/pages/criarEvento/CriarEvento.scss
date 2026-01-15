@@ -13,28 +13,29 @@ $branco: #FFFFFF;
   background: $fundo;
   font-family: 'Inter', sans-serif;
 
-  padding: 2px 24px 24px;  // top menor
+  /* 👇 diminui o espaço do lado esquerdo */
+  padding: 0px 0px 0px 0px;
 
   display: flex;
+  align-items: flex-start;
   justify-content: center;
-  align-items: flex-start;  // garante topo
+  overflow-x: hidden;
 }
 
-
 .card-form {
-  width: 1128px;
+  /* ✅ em telas grandes fica “próximo do figma”, mas nunca estoura */
+  width: min(1128px, calc(100% - 10px));  /* 48px = 24px + 24px do padding do container */
   min-height: 658px;
 
   background: #fff;
-
-  /* Figma */
   border-radius: 20px 0 0 20px;
   box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.04);
 
   padding: 34px 42px;
   align-self: flex-start;
-}
 
+  margin-left: 0; /* ✅ remova o -12px para não empurrar pra fora */
+}
 
 
 .titulo-sessao {
