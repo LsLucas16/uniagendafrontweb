@@ -209,19 +209,19 @@ const MenuLateral = () => {
       </button>
 
       <button
-        className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
-        onClick={() => navigate("/editar-turma")}
-      >
-        <Settings size={20} />
-        <span>Editar Turmas</span>
-      </button>
-
-      <button
         className={`menuLateral__btn ${isActive("/eventos") ? "active" : ""}`}
         onClick={() => navigate("/eventos")}
       >
         <ClipboardList size={20} />
         <span>Eventos Publicados</span>
+      </button>
+
+      <button
+        className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
+        onClick={() => navigate("/editar-turma")}
+      >
+        <Settings size={20} />
+        <span>Editar Turmas</span>
       </button>
 
       <button
@@ -245,14 +245,6 @@ const MenuLateral = () => {
       </button>
 
       <button
-        className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
-        onClick={() => navigate("/editar-turma")}
-      >
-        <Settings size={20} />
-        <span>Editar Turmas</span>
-      </button>
-
-      <button
         className={`menuLateral__btn ${isActive("/eventos") ? "active" : ""}`}
         onClick={() => navigate("/eventos")}
       >
@@ -261,11 +253,11 @@ const MenuLateral = () => {
       </button>
 
       <button
-        className={`menuLateral__btn ${isActive("/calendario") ? "active" : ""}`}
-        onClick={() => navigate("/calendario")}
+        className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
+        onClick={() => navigate("/editar-turma")}
       >
-        <Calendar size={20} />
-        <span>Ver Calendário</span>
+        <Settings size={20} />
+        <span>Editar Turmas</span>
       </button>
     </>
   )}
