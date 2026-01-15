@@ -326,6 +326,35 @@
 }
 
 .menuLateral {
+  $sidePad: 16px;
+
+  &__turmaBox {
+    margin-top: 8px;
+    margin-bottom: 22px; /* vai ser controlado pela linha abaixo */
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    position: relative;
+    padding-bottom: 18px; /* espaço até a linha pontilhada */
+  }
+
+  /* ✅ linha pontilhada full-bleed DEPOIS do “Turma atual” */
+  &__turmaBox::after {
+    content: "";
+    position: absolute;
+    left: -$sidePad;
+    right: -$sidePad;
+    bottom: 0;
+    border-bottom: 1px dashed #DCDDE3;
+  }
+
+  /* para os botões não colarem na linha */
+  &__actions {
+    padding-top: 12px;
+  }
+
+
   &__turmaSelect {
     width: 100%;
     height: 40px;
