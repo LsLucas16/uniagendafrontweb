@@ -326,55 +326,120 @@
 }
 
 .menuLateral {
+  &__turmaSelect {
+    width: 100%;
+    height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid #D7DEE8;
+    background: #FFFFFF;
+    color: #334E68;
+    font-size: 14px;
+    outline: none;
+
+    /* ✅ quando clica (focus) */
+    &:focus {
+      border-color: #76A8D9;
+      box-shadow: 0 0 0 3px rgba(118, 168, 217, 0.22);
+    }
+
+    /* ✅ melhora o “clique” no Chrome/Edge */
+    &:focus-visible {
+      border-color: #76A8D9;
+      box-shadow: 0 0 0 3px rgba(118, 168, 217, 0.22);
+    }
+
+    /* ✅ (opcional) deixa o “anel” mais suave */
+    &:active {
+      border-color: #76A8D9;
+    }
+  }
+
+  /* ⚠️ Options: funciona em alguns navegadores, não em todos */
+  &__turmaSelect option:checked {
+    background: #76A8D9;
+    color: #fff;
+  }
+
   $sidePad: 16px;
 
-  // HEADER (frase) + linha reta abaixo
+  /* garante que o <hr> não interfira */
+  &__divider {
+    display: none;
+    margin: 0;
+    height: 0;
+    border: 0;
+  }
+
+  /* =========================
+     HEADER (frase) + linha reta
+     ========================= */
   &__header {
+    /* zera os espaçamentos antigos para não “brigar” */
+    margin: 0;
+    border: 0;
+
+    /* mantém seu layout */
     display: flex;
     align-items: center;
     gap: 12px;
-
     cursor: pointer;
     transition: all 0.2s ease-in-out;
 
-    /* ✅ FULL-BLEED da linha (encosta nas bordas) */
-    margin-left: -$sidePad;
-    margin-right: -$sidePad;
-    padding-left: $sidePad;
-    padding-right: $sidePad;
+    /* Quando NÃO está aberto, vira “faixa” full-bleed com linha reta */
+    &:not(.active) {
+      position: relative;
 
-    /* ⬆️ SOBE a frase */
-    padding-top: 2px;        // diminui mais (subiu)
-    padding-bottom: 6px;     // aproxima a linha
-    margin-bottom: 10px;     // aproxima do card da faculdade
+      /* full-bleed */
+      margin-left: -$sidePad;
+      margin-right: -$sidePad;
+      padding-left: $sidePad;
+      padding-right: $sidePad;
 
-    border-radius: 0;        // linha reta, sem cantos arredondados
-    border-bottom: 1.5px solid #E1E6EF;
+      /* ⬆️ sobe a frase e aproxima a linha */
+      padding-top: 0px;     /* diminua para 0px se quiser subir mais */
+      padding-bottom: 9px; /* diminua para “colar” mais na linha */
 
+      border-radius: 0;     /* linha reta sem arredondado */
+    }
+
+    /* linha reta */
+    &:not(.active)::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: #E1E6EF;
+    }
+
+    /* Quando está active (perfil aberto), mantém seu “card” e tira a linha full-bleed */
     &.active {
-      /* quando abre perfil, você pode manter o visual do card */
-      background-color: #ebf1f9;
-      border: 1px solid #d9e2ec;
-      border-radius: 12px;
-
-      flex-direction: column;
-      padding: 16px;
       margin-top: 10px;
+      border-radius: 12px;
+      border: 1px solid #d9e2ec;
+      background-color: #ebf1f9;
 
-      /* IMPORTANTE: anula full-bleed no estado active */
+      /* importante: não usar full-bleed no active */
       margin-left: 0;
       margin-right: 0;
 
-      .menuLateral__avatar {
-        margin-bottom: 8px;
-        width: 48px;
-        height: 48px;
+      /* o padding do active você já tinha */
+      padding: 16px;
+      flex-direction: column;
+
+      &::after {
+        display: none;
       }
     }
   }
 
-  // CARD DA FACULDADE + linha pontilhada abaixo
+  /* =========================
+     CARD FACULDADE + linha pontilhada abaixo
+     ========================= */
   &__uni-card {
+    /* mantém seu card */
     border: 1px solid #e8eff5;
     border-radius: 10px;
     padding: 10px;
@@ -382,19 +447,25 @@
     align-items: center;
     gap: 10px;
 
-    /* ✅ linha pontilhada abaixo (full-bleed) */
-    margin-left: -$sidePad;
-    margin-right: -$sidePad;
-    padding-left: $sidePad;
-    padding-right: $sidePad;
+    /* espaço acima menor e estável */
+    margin-top: 10px;
 
-    padding-bottom: 16px;
-    margin-bottom: 16px;
-    border-bottom: 1px dashed #DCDDE3;
+    /* cria um “gap” até a linha pontilhada (igual Figma) */
+    margin-bottom: 18px;
+
+    position: relative;
   }
 
-  // garante que o <hr> não interfere
-  &__divider {
-    display: none;
+  /* linha pontilhada full-bleed abaixo do card */
+  &__uni-card::after {
+    content: "";
+    position: absolute;
+    left: -$sidePad;
+    right: -$sidePad;
+
+    /* distância da linha em relação ao card (ajuste fino) */
+    bottom: -12px;
+
+    border-bottom: 1px dashed #DCDDE3;
   }
 }

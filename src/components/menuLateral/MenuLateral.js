@@ -121,6 +121,26 @@ const MenuLateral = () => {
 
       <nav className="menuLateral__menu">
         <div className="menuLateral__actions">
+
+          {/* ✅ TURMA ATUAL (coordenador / professor / responsável) */}
+{!perfilAberto && !isAluno && (
+  <div className="menuLateral__turmaBox">
+    <span className="menuLateral__turmaLabel">Turma atual</span>
+
+    <select
+      className="menuLateral__turmaSelect"
+      value={disciplinaAtualId}
+      onChange={(e) => setDisciplinaAtualId(e.target.value)}
+    >
+      {disciplinasDoUsuario.map((d) => (
+        <option key={d.id} value={String(d.id)}>
+          {d.nome}
+        </option>
+      ))}
+    </select>
+  </div>
+)}
+
   {/* ===================== ALUNO ===================== */}
   {isAluno ? (
     <div className="menuLateral__materias">
