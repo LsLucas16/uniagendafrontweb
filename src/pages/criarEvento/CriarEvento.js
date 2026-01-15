@@ -121,7 +121,7 @@ const CriarEvento = () => {
           <div className="campo">
             <label>Data do evento</label>
             <div className="input-calendario-wrapper">
-              <DatePicker
+             <DatePicker
                 selected={startDate}
                 onChange={(date) => setStartDate(date)}
                 locale="pt-BR"
@@ -130,8 +130,45 @@ const CriarEvento = () => {
                 placeholderText="Escolha uma data"
                 className="input-data"
                 calendarClassName="calendario-customizado"
+                popperClassName="popper-calendario"
                 showPopperArrow={false}
+                renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => (
+  <div className="cal-header cal-header--figma">
+    <button
+      type="button"
+      className="cal-nav cal-nav--figma"
+      onClick={decreaseMonth}
+      aria-label="Mês anterior"
+    >
+      ‹
+    </button>
+
+    <div className="cal-title cal-title--figma">
+      {date
+        .toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+        .replace(/^./, (c) => c.toUpperCase())}
+    </div>
+
+    <button
+      type="button"
+      className="cal-nav cal-nav--figma"
+      onClick={increaseMonth}
+      aria-label="Próximo mês"
+    >
+      ›
+    </button>
+  </div>
+)}
+
+                formatWeekDay={(nameOfDay) =>
+                  nameOfDay
+                    .slice(0, 3)
+                    .toUpperCase()
+                    .normalize("NFD")
+                    .replace(/[\u0300-\u036f]/g, "") // tira acento
+                }
               />
+
             </div>
           </div>
 

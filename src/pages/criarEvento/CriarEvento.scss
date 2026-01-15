@@ -169,3 +169,183 @@ textarea.input-estilizado {
     border-radius: 20px; /* em telas menores fica natural */
   }
 }
+
+
+/* ===============================
+   CALENDÁRIO (react-datepicker)
+   =============================== */
+
+.popper-calendario {
+  z-index: 9999;
+}
+
+/* Card do calendário */
+.calendario-customizado.react-datepicker {
+  border: 0;
+  background: transparent;
+  font-family: 'Inter', sans-serif;
+}
+
+/* Container “card” */
+.calendario-customizado .react-datepicker__month-container {
+  background: #F3F5F7;              /* fundo cinza claro do Figma */
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.10);
+}
+
+/* Header do calendário (mês/ano + setas) */
+.calendario-customizado .react-datepicker__header {
+  background: transparent;
+  border-bottom: 0;
+  padding: 0;
+}
+
+/* nosso header custom */
+.calendario-customizado .cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 2px 0 10px;
+}
+
+.calendario-customizado .cal-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2E4A67;                   /* azul do figma */
+  letter-spacing: -0.2px;
+}
+
+.calendario-customizado .cal-nav {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  background: transparent;
+  color: #9AA4B2;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 8px;
+
+  &:hover {
+    background: rgba(118, 168, 217, 0.16);
+    color: #76A8D9;
+  }
+}
+
+/* Linha dos dias da semana (SEG TER ...) */
+.calendario-customizado .react-datepicker__day-names {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0;
+  padding: 8px 4px 6px;
+}
+
+.calendario-customizado .react-datepicker__day-name {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9AA4B2;
+  letter-spacing: 0.12em;
+}
+
+/* Grade do mês */
+.calendario-customizado .react-datepicker__month {
+  margin: 0;
+  padding: 0 4px 4px;
+}
+
+.calendario-customizado .react-datepicker__week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+/* Células dos dias */
+.calendario-customizado .react-datepicker__day {
+  margin: 0;
+  width: 36px;
+  height: 34px;
+  line-height: 34px;
+  border-radius: 8px;
+  text-align: center;
+
+  font-size: 14px;
+  font-weight: 600;
+  color: #2E4A67;
+
+  &:hover {
+    background: rgba(118, 168, 217, 0.22);
+    color: #2E4A67;
+  }
+}
+
+/* Dias fora do mês */
+.calendario-customizado .react-datepicker__day--outside-month {
+  color: rgba(46, 74, 103, 0.35);
+}
+
+/* Hoje (sem “bolinha”, só leve destaque) */
+.calendario-customizado .react-datepicker__day--today {
+  box-shadow: inset 0 0 0 1px rgba(46, 74, 103, 0.12);
+  font-weight: 700;
+}
+
+/* Dia selecionado (25 azul no Figma) */
+.calendario-customizado .react-datepicker__day--selected,
+.calendario-customizado .react-datepicker__day--keyboard-selected {
+  background: #76A8D9 !important;
+  color: #FFFFFF !important;
+  box-shadow: none;
+}
+
+/* Remove triângulos/bordas do popper */
+.react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle {
+  display: none;
+}
+
+
+/* ===== Header igual Figma (mês mais à esquerda + setas azuis nas pontas) ===== */
+
+.calendario-customizado .cal-header.cal-header--figma {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px; /* setas “largas” */
+  align-items: center;
+
+  padding: 2px 2px 10px; /* leve respiro igual ao figma */
+}
+
+.calendario-customizado .cal-title.cal-title--figma {
+  justify-self: start;     /* mês vai pra esquerda */
+  text-align: left;
+
+  font-size: 14px;
+  font-weight: 700;
+  color: #2E4A67;
+  letter-spacing: -0.2px;
+
+  padding-left: 6px;       /* empurra um pouco pra esquerda como no figma */
+}
+
+.calendario-customizado .cal-nav.cal-nav--figma {
+  width: 44px;             /* mais largo */
+  height: 30px;            /* mais “achatado” como no figma */
+  border: 0;
+  background: transparent;
+
+  color: #76A8D9;          /* setas azuis */
+  font-size: 26px;         /* seta maior */
+  font-weight: 700;
+  line-height: 1;
+
+  cursor: pointer;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendario-customizado .cal-nav.cal-nav--figma:hover {
+  background: rgba(118, 168, 217, 0.16);
+}
