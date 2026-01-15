@@ -182,23 +182,45 @@
   }
 }
 
+/* ===== BOTÕES (coordenador / professor / responsável) ===== */
 .menuLateral__btn {
   background-color: rgba(238, 242, 255, 1);
-  color: rgba(46, 74, 103, 1); // azul escuro na letra
+  color: rgba(46, 74, 103, 1);
   border-radius: 30px;
-  transition: all .2s ease;
+  transition: background-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
 
   svg {
     color: rgba(46, 74, 103, 1);
+    transition: color .2s ease;
   }
 
-  &.active {
-    background-color: rgba(118, 168, 217, 1); // azul mais escuro
-    color: rgba(238, 242, 255, 1); // letra clara
+  /* ✅ Hover igual ao "active", com efeito */
+  &:hover {
+    background-color: rgba(118, 168, 217, 1);
+    color: rgba(238, 242, 255, 1);
+
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(46, 74, 103, 0.14);
 
     svg {
       color: rgba(238, 242, 255, 1);
     }
+  }
+
+  /* ✅ Active (clicado) */
+  &.active {
+    background-color: rgba(118, 168, 217, 1);
+    color: rgba(238, 242, 255, 1);
+    box-shadow: 0 6px 14px rgba(46, 74, 103, 0.14);
+
+    svg {
+      color: rgba(238, 242, 255, 1);
+    }
+  }
+
+  /* ✅ Quando está active e passa o mouse, mantém igual (sem “piscar”) */
+  &.active:hover {
+    transform: translateY(-1px);
   }
 }
 
