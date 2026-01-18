@@ -3,7 +3,7 @@
 $azul-primario: #334E68;
 $azul-claro: #7FB3D5;
 $cinza-borda: #E2E8F0;
-$fundo: #F7FAFC;
+$fundo: #F4F4F4;
 $branco: #FFFFFF;
 
 * { box-sizing: border-box; }
@@ -65,7 +65,7 @@ $branco: #FFFFFF;
   border: 1px solid $cinza-borda;
   border-radius: 6px;
 
-  background: $fundo;   /* ✅ Figma: #F7FAFC dentro do campo */
+  background: $fundo;   /* ✅ Figma: #F4F4F4 dentro do campo */
   color: $azul-primario;
 
   font-family: 'Inter', sans-serif;
