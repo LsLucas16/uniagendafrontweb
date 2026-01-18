@@ -9,7 +9,8 @@ $branco: #FFFFFF;
 * { box-sizing: border-box; }
 
 .painel-evento {
-  min-height: 100vh;
+  min-height: 100vh; 
+  min-height: 100dvh;
   background: $fundo;
   font-family: 'Inter', sans-serif;
 
