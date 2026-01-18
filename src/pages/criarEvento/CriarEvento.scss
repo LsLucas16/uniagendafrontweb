@@ -65,7 +65,7 @@ $branco: #FFFFFF;
   border: 1px solid $cinza-borda;
   border-radius: 6px;
 
-  background: $fundo;   /* ✅ Figma: #F4F4F4 dentro do campo */
+  background: #F3F5F7;   /* ✅ Figma: #F4F4F4 dentro do campo */
   color: $azul-primario;
 
   font-family: 'Inter', sans-serif;
@@ -491,4 +491,122 @@ textarea.input-estilizado {
     background: $azul-claro;     /* <<< bolinha toda preenchida */
     border-color: $azul-claro;
   }
+}
+
+/* ===============================
+   HOVERS + PADRÃO VISUAL (FORM)
+   =============================== */
+
+/* cor do hover/foco (mesma linha do botão) */
+$hover-border: rgba(127, 179, 213, 0.95);
+$hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
+
+/* Inputs padrões (titulo/descricao) - hover */
+.input-estilizado:hover {
+  border-color: $hover-border;
+}
+
+/* ===============================
+   NOTIFICAÇÕES (bolinha) - hover em tudo
+   =============================== */
+
+.item-bolinha {
+  padding: 4px 6px;
+  border-radius: 8px;
+  transition: background 0.15s ease, transform 0.05s ease;
+
+  &:hover {
+    background: rgba(127, 179, 213, 0.12);
+  }
+
+  &:active {
+    transform: translateY(0.5px);
+  }
+}
+
+/* bolinha: hover com borda azul */
+.item-bolinha:hover .circular-check {
+  border-color: $hover-border;
+}
+
+/* ===============================
+   DATE INPUT (Escolha uma data)
+   - fundo igual inputs (#F3F5F7)
+   - hover/foco com borda azul
+   =============================== */
+
+.date-input {
+  background: #F3F5F7; /* <<< igual aos inputs acima */
+  border: 1px solid $cinza-borda;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease,
+    background 0.15s ease;
+
+  &:hover {
+    border-color: $hover-border;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $hover-border;
+    box-shadow: $hover-shadow;
+  }
+}
+
+/* ícone (quadradinho) seguindo o estilo do input */
+.date-input__icon {
+  background: #F3F5F7; /* <<< igual ao campo */
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+/* quando hover no campo, o ícone acompanha */
+.date-input:hover .date-input__icon {
+  border-color: $hover-border;
+  color: rgba(51, 78, 104, 0.85);
+}
+
+/* placeholder e valor com leve transição */
+.date-input__placeholder,
+.date-input__value {
+  transition: color 0.15s ease;
+}
+
+.date-input:hover .date-input__placeholder {
+  color: rgba(46, 74, 103, 0.75);
+}
+
+/* ===============================
+   DatePicker wrapper - garante width 100% sem conflito
+   =============================== */
+
+.input-calendario-wrapper {
+  width: 100%;
+}
+
+.input-calendario-wrapper .react-datepicker-wrapper,
+.input-calendario-wrapper .react-datepicker__input-container {
+  width: 100%;
+}
+
+/* ===============================
+   Botão Publicar - hover mais evidente
+   =============================== */
+
+.btn-publicar {
+  transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
+  }
+
+  &:active {
+    transform: translateY(0.5px);
+  }
+}
+
+/* ===============================
+   Calendário (dias) - hover mais suave (mantém seu estilo)
+   =============================== */
+
+.calendario-customizado .react-datepicker__day:hover {
+  background: rgba(127, 179, 213, 0.22);
 }
