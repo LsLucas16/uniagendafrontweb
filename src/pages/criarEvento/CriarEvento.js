@@ -17,19 +17,6 @@ const CriarEvento = () => {
     destaque: false,
   });
 
-  const handleCheckbox = (tipo) => {
-    setNotificacoes((prev) => {
-      const next = { ...prev, [tipo]: !prev[tipo] };
-
-      // Se desmarcar "calendário", limpa a data e esconde o campo
-      if (tipo === "calendario" && prev.calendario === true) {
-        setStartDate(null);
-      }
-
-      return next;
-    });
-  };
-
   const handleSalvar = async () => {
     // Título sempre obrigatório
     if (!titulo) {

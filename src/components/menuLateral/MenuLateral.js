@@ -58,11 +58,6 @@ const MenuLateral = () => {
     }
   }, [disciplinaAtualId, disciplinasDoUsuario]);
 
-  const disciplinaAtual = useMemo(() => {
-    if (!disciplinaAtualId) return null;
-    return (data.disciplinas || []).find((d) => d.id === Number(disciplinaAtualId)) || null;
-  }, [disciplinaAtualId]);
-
   const getUsuarioById = (id) => data.usuarios.find((u) => u.id === id);
 
   // Depois de TODOS os hooks, aí sim podemos "retornar null"
@@ -71,7 +66,6 @@ const MenuLateral = () => {
   const primeiraLetra = user.nome.trim().charAt(0).toUpperCase();
   const isAluno = user.tipo === "aluno";
   const isCoordenador = user.tipo === "coordenador";
-  const isProfessorOuResponsavel = user.tipo === "professor" || user.tipo === "responsavel";
 
   const handleLogout = (e) => {
     e.stopPropagation();
