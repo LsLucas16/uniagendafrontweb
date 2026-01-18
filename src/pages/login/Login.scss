@@ -249,3 +249,32 @@ input,
   left: -100px;
   opacity: 0.7;
 }
+
+
+.form-footer{
+  margin-top: -2px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.forgot-link{
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+
+  font-size: 11px;
+  line-height: 1;
+  color: #5a96d2;
+  text-decoration: underline;
+
+  &:hover{
+    color: $primary-deep;
+  }
+
+  &:focus-visible{
+    outline: 2px solid rgba(23, 6, 69, 0.35);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}

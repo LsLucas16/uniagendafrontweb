@@ -2,11 +2,11 @@ import React, { useState } from "react";
 import "./Login.scss";
 import Swal from "sweetalert2";
 
-import dados from "../../api/dados.json"; 
+import dados from "../../api/dados.json";
 
-import logo from "../../assets/logo.webp"; 
-import agenda from "../../assets/agenda.webp"; 
-import sombra from "../../assets/sombra.webp"; 
+import logo from "../../assets/logo.webp";
+import agenda from "../../assets/agenda.webp";
+import sombra from "../../assets/sombra.webp";
 
 export const Login = () => {
   // Estados para capturar os inputs
@@ -14,54 +14,60 @@ export const Login = () => {
   const [senhaDigitada, setSenhaDigitada] = useState("");
   const [idInstSelecionada, setIdInstSelecionada] = useState("");
 
-const handleLogin = (e) => {
-  e.preventDefault();
+  const handleLogin = (e) => {
+    e.preventDefault();
 
-  const usuarioAuth = dados.usuarios.find((u) => {
-    return (
-      u.user === loginDigitado && 
-      u.senha === senhaDigitada && 
-      u.faculdadeId === parseInt(idInstSelecionada)
-    );
-  });
-
-  if (usuarioAuth) {
-    Swal.fire({
-      icon: "success",
-      title: "Acesso autorizado",
-      text: `Bem-vindo, ${usuarioAuth.nome}.`,
-      showConfirmButton: false,
-      timer: 1500,
+    const usuarioAuth = dados.usuarios.find((u) => {
+      return (
+        u.user === loginDigitado &&
+        u.senha === senhaDigitada &&
+        u.faculdadeId === parseInt(idInstSelecionada)
+      );
     });
 
-    // Armazena dados relevantes para uso interno
-    localStorage.setItem("token", "ok");
-    localStorage.setItem("usuario", JSON.stringify({
-      id: usuarioAuth.id,
-      nome: usuarioAuth.nome,
-      tipo: usuarioAuth.tipo,
-      faculdadeId: usuarioAuth.faculdadeId
-    }));
+    if (usuarioAuth) {
+      Swal.fire({
+        icon: "success",
+        title: "Acesso autorizado",
+        text: `Bem-vindo, ${usuarioAuth.nome}.`,
+        showConfirmButton: false,
+        timer: 1500,
+      });
 
-    // Regras de redirecionamento
-    const ehResponsavel = ["coordenador", "professor", "responsavel"].includes(usuarioAuth.tipo.toLowerCase());
+      // Armazena dados relevantes para uso interno
+      localStorage.setItem("token", "ok");
+      localStorage.setItem(
+        "usuario",
+        JSON.stringify({
+          id: usuarioAuth.id,
+          nome: usuarioAuth.nome,
+          tipo: usuarioAuth.tipo,
+          faculdadeId: usuarioAuth.faculdadeId,
+        }),
+      );
 
-    if (ehResponsavel) {
-      window.location.href = "/criar-evento";
+      // Regras de redirecionamento
+      const ehResponsavel = [
+        "coordenador",
+        "professor",
+        "responsavel",
+      ].includes(usuarioAuth.tipo.toLowerCase());
+
+      if (ehResponsavel) {
+        window.location.href = "/criar-evento";
+      } else {
+        window.location.href = "/dashboard";
+      }
     } else {
-      window.location.href = "/dashboard";
+      Swal.fire({
+        title: "Não foi possível acessar",
+        text: "Verifique se a unidade selecionada está correta e se as credenciais estão válidas.",
+        icon: "error",
+        confirmButtonText: "Entendido",
+        confirmButtonColor: "#170645",
+      });
     }
-
-  } else {
-    Swal.fire({
-      title: "Não foi possível acessar",
-      text: "Verifique se a unidade selecionada está correta e se as credenciais estão válidas.",
-      icon: "error",
-      confirmButtonText: "Entendido",
-      confirmButtonColor: "#170645",
-    });
-  }
-};
+  };
 
   return (
     <div className="login-screen">
@@ -77,10 +83,10 @@ const handleLogin = (e) => {
       <main className="content-wrapper">
         <section className="login-box">
           <h2 className="login-title">Acesse sua conta</h2>
-          
+
           <form className="form-container" onSubmit={handleLogin}>
             <div className="input-wrapper">
-              <select 
+              <select
                 className="institution-select"
                 required
                 onChange={(e) => setIdInstSelecionada(e.target.value)}
@@ -96,9 +102,9 @@ const handleLogin = (e) => {
 
             <div className="input-group">
               <label>Login</label>
-              <input 
-                type="text" 
-                placeholder="Digite seu login" 
+              <input
+                type="text"
+                placeholder="Digite seu login"
                 required
                 value={loginDigitado}
                 onChange={(e) => setLoginDigitado(e.target.value)}
@@ -107,9 +113,9 @@ const handleLogin = (e) => {
 
             <div className="input-group">
               <label>Senha</label>
-              <input 
-                type="password" 
-                placeholder="Digite sua senha" 
+              <input
+                type="password"
+                placeholder="Digite sua senha"
                 required
                 value={senhaDigitada}
                 onChange={(e) => setSenhaDigitada(e.target.value)}
@@ -117,10 +123,26 @@ const handleLogin = (e) => {
             </div>
 
             <div className="form-footer">
-              <a href="#" className="forgot-link">Problemas com login e/ou senha?</a>
+              <button
+                type="button"
+                className="forgot-link"
+                onClick={() => {
+                  Swal.fire({
+                    title: "Suporte",
+                    text: "Entre em contato com a secretaria/suporte da sua instituição para recuperar o acesso.",
+                    icon: "info",
+                    confirmButtonText: "Entendido",
+                    confirmButtonColor: "#2E4A67",
+                  });
+                }}
+              >
+                Problemas com login e/ou senha?
+              </button>
             </div>
 
-            <button type="submit" className="btn-login">Entrar</button>
+            <button type="submit" className="btn-login">
+              Entrar
+            </button>
             <div className="bottom-lines"></div>
           </form>
         </section>
