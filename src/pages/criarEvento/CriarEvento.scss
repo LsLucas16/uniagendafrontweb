@@ -349,3 +349,146 @@ textarea.input-estilizado {
 .calendario-customizado .cal-nav.cal-nav--figma:hover {
   background: rgba(118, 168, 217, 0.16);
 }
+
+
+/* ===== Corrigir largura do input custom do DatePicker ===== */
+
+.input-calendario-wrapper--direita {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* wrapper automático do react-datepicker */
+.input-calendario-wrapper--direita
+  .react-datepicker-wrapper,
+.input-calendario-wrapper--direita
+  .react-datepicker__input-container {
+  width: 560px; /* <<< CONTROLE REAL DA LARGURA */
+  max-width: 100%;
+}
+
+/* seu botão custom */
+.input-data--largo {
+  width: 100%;
+}
+
+/* ===== Radios iguais ao print ===== */
+.opcoes-radio {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.radio-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+
+  span {
+    color: $azul-primario;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  input[type="radio"] {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+/* ===== Campo data igual ao print (FULL WIDTH) ===== */
+.input-calendario-wrapper {
+  width: 100%;
+}
+
+/* wrappers do react-datepicker ocupando 100% */
+.input-calendario-wrapper .react-datepicker-wrapper,
+.input-calendario-wrapper .react-datepicker__input-container {
+  width: 100%;
+}
+
+/* botão que parece input */
+.date-input {
+  width: 100%;
+  height: 48px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border: 1px solid $cinza-borda;
+  border-radius: 6px;
+  background: #fff;
+
+  padding: 0 14px;
+  cursor: pointer;
+  text-align: left;
+
+  &:focus {
+    outline: none;
+    border-color: rgba(127,179,213,0.9);
+    box-shadow: 0 0 0 3px rgba(127,179,213,0.18);
+  }
+}
+
+.date-input__icon {
+  width: 28px;
+  height: 28px;
+
+  display: grid;
+  place-items: center;
+
+  border: 1px solid $cinza-borda;
+  border-radius: 6px;
+  background: #fff;
+
+  color: rgba(51, 78, 104, 0.65);
+}
+
+.date-input__placeholder {
+  color: #9AA4B2;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.date-input__value {
+  color: $azul-primario;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.opcoes-bolinha {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.item-bolinha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+
+  span {
+    color: $azul-primario;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+.circular-check {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(51,78,104,0.35);
+  background: #fff;
+  flex: 0 0 auto;
+
+  &.active {
+    background: $azul-claro;     /* <<< bolinha toda preenchida */
+    border-color: $azul-claro;
+  }
+}
