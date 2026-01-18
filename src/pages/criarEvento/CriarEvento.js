@@ -101,7 +101,7 @@ const CriarEvento = () => {
 
         <div className="formulario">
           <div className="campo">
-            <label>Título</label>
+            <label className="titulo-evento">Título</label>
             <input
               type="text"
               placeholder="Digite o título do evento"
