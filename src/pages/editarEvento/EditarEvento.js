@@ -110,14 +110,39 @@ const EditarEvento = () => {
       destaque: !!evento.destaque,
     });
 
-    // Se existir data salva no evento, popula. Se não, deixa null.
-    // (Se você tiver outro campo pra data, troque aqui)
-    if (evento.dataEvento) {
-      const dt = new Date(evento.dataEvento);
-      setStartDate(Number.isNaN(dt.getTime()) ? null : dt);
-    } else {
-      setStartDate(null);
+    function parseDataEvento(evento) {
+      if (!evento) return null;
+
+      // tente nos campos mais prováveis
+      const raw =
+        evento.dataEvento ??
+        evento.data ??
+        evento.dataInicio ??
+        evento.data_inicio ??
+        evento.inicio ??
+        evento.startDate ??
+        null;
+
+      if (!raw) return null;
+
+      // 1) se já for ISO / Date parseável
+      const isoTry = new Date(raw);
+      if (!Number.isNaN(isoTry.getTime())) return isoTry;
+
+      // 2) se vier "dd/MM/yyyy"
+      if (typeof raw === "string" && raw.includes("/")) {
+        const [dd, mm, yyyy] = raw.split("/").map(Number);
+        if (dd && mm && yyyy) {
+          const dt = new Date(yyyy, mm - 1, dd);
+          return Number.isNaN(dt.getTime()) ? null : dt;
+        }
+      }
+
+      return null;
     }
+
+    setStartDate(parseDataEvento(evento));
+
   }, [id, navigate, usuarioLogado]);
 
   const handleSalvar = async () => {
