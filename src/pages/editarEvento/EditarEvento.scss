@@ -1,22 +1,24 @@
 @import "../criarEvento/CriarEvento.scss";
 
 .painel-evento.editar-evento {
-  justify-content: flex-start;
-  align-items: flex-start;
+    justify-content: flex-start;
+    align-items: flex-start;
+    margin-top: -12px;
 }
 
 .painel-evento.editar-evento .editar-wrapper {
-  width: min(1128px, calc(100% - 10px));
-  margin: 0 auto; 
-  display: flex;
-  flex-direction: column;
+    width: min(1128px, calc(100% - 10px));
+    margin: 0 auto; 
+    display: flex;
+    flex-direction: column;
+    padding-top: 8px;
 }
 
 .painel-evento.editar-evento .editar-topbar {
   width: min(1128px, calc(100% - 10px));
   margin: 0 auto;           
   padding-top: 0px;         
-  padding-bottom: 0px;     
+  padding-bottom: 15px;     
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -32,7 +34,7 @@
   align-items: center;
   gap: 10px;
 
-  padding: 8px 0;
+  padding: 0px 0;
 
   color: rgba(51, 78, 104, 0.85);
 
