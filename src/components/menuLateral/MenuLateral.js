@@ -9,7 +9,7 @@ import {
   LogOut,
   Plus,
   Calendar,
-  ChevronRight
+  ChevronRight,
 } from "lucide-react";
 
 const MenuLateral = () => {
@@ -54,7 +54,11 @@ const MenuLateral = () => {
   // Define disciplinaAtualId quando existir lista
   useEffect(() => {
     if (!disciplinaAtualId && disciplinasDoUsuario.length > 0) {
-      setDisciplinaAtualId(String(disciplinasDoUsuario[0].id));
+      const first = String(disciplinasDoUsuario[0].id);
+      setDisciplinaAtualId(first);
+
+      localStorage.setItem("disciplinaAtualId", first);
+      window.dispatchEvent(new Event("disciplinaAtual:changed"));
     }
   }, [disciplinaAtualId, disciplinasDoUsuario]);
 
@@ -106,7 +110,9 @@ const MenuLateral = () => {
           </div>
           <div className="menuLateral__uni-info">
             <span className="menuLateral__uni-label">{instituicao?.nome}</span>
-            <strong className="menuLateral__uni-name">{instituicao?.sigla}</strong>
+            <strong className="menuLateral__uni-name">
+              {instituicao?.sigla}
+            </strong>
           </div>
         </div>
       )}
@@ -115,148 +121,164 @@ const MenuLateral = () => {
 
       <nav className="menuLateral__menu">
         <div className="menuLateral__actions">
-
           {/* ✅ TURMA ATUAL (coordenador / professor / responsável) */}
-{!perfilAberto && !isAluno && (
-  <div className="menuLateral__turmaBox">
-    <span className="menuLateral__turmaLabel">Turma atual</span>
+          {!perfilAberto && !isAluno && (
+            <div className="menuLateral__turmaBox">
+              <span className="menuLateral__turmaLabel">Turma atual</span>
 
-    <select
-      className="menuLateral__turmaSelect"
-      value={disciplinaAtualId}
-      onChange={(e) => setDisciplinaAtualId(e.target.value)}
-    >
-      {disciplinasDoUsuario.map((d) => (
-        <option key={d.id} value={String(d.id)}>
-          {d.nome}
-        </option>
-      ))}
-    </select>
-  </div>
-)}
+              <select
+                className="menuLateral__turmaSelect"
+                value={disciplinaAtualId}
+                onChange={(e) => {
+                  const next = e.target.value;
+                  setDisciplinaAtualId(next);
 
-  {/* ===================== ALUNO ===================== */}
-  {isAluno ? (
-    <div className="menuLateral__materias">
-      {disciplinasDoUsuario.map((disc) => {
-        const open = disciplinaAbertaId === disc.id;
-        const professor = getUsuarioById(disc.professorId);
-        const responsavel = getUsuarioById(disc.responsavelId);
-        const tituloCurto = disc.nome.split(" - ")[0];
+                  // Persistência e broadcast para o restante do app
+                  localStorage.setItem("disciplinaAtualId", next);
+                  window.dispatchEvent(new Event("disciplinaAtual:changed"));
+                }}
+              >
+                {disciplinasDoUsuario.map((d) => (
+                  <option key={d.id} value={String(d.id)}>
+                    {d.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-        return (
-          <div key={disc.id} className="menuLateral__materiaWrap">
-            <button
-              type="button"
-              className={`menuLateral__materiaItem ${open ? "open" : ""}`}
-              onClick={() => setDisciplinaAbertaId(open ? null : disc.id)}
-              style={{ "--discColor": disc.cor }}
-            >
-              <span className="menuLateral__dot" />
-              <span className="menuLateral__materiaTitle">{tituloCurto}</span>
-              <ChevronRight size={18} className="menuLateral__chev" />
-            </button>
+          {/* ===================== ALUNO ===================== */}
+          {isAluno ? (
+            <div className="menuLateral__materias">
+              {disciplinasDoUsuario.map((disc) => {
+                const open = disciplinaAbertaId === disc.id;
+                const professor = getUsuarioById(disc.professorId);
+                const responsavel = getUsuarioById(disc.responsavelId);
+                const tituloCurto = disc.nome.split(" - ")[0];
 
-            {open && (
-              <div className="menuLateral__materiaDetails" style={{ "--discColor": disc.cor }}>
-                <div className="menuLateral__detailsTitle">{disc.nome}</div>
+                return (
+                  <div key={disc.id} className="menuLateral__materiaWrap">
+                    <button
+                      type="button"
+                      className={`menuLateral__materiaItem ${open ? "open" : ""}`}
+                      onClick={() =>
+                        setDisciplinaAbertaId(open ? null : disc.id)
+                      }
+                      style={{ "--discColor": disc.cor }}
+                    >
+                      <span className="menuLateral__dot" />
+                      <span className="menuLateral__materiaTitle">
+                        {tituloCurto}
+                      </span>
+                      <ChevronRight size={18} className="menuLateral__chev" />
+                    </button>
 
-                <div className="menuLateral__detailsLine">
-                  <strong>Professor:</strong>{" "}
-                  <span>
-                    {professor?.nome || "—"}
-                    {professor?.contato ? ` | ${professor.contato}` : ""}
-                  </span>
-                </div>
+                    {open && (
+                      <div
+                        className="menuLateral__materiaDetails"
+                        style={{ "--discColor": disc.cor }}
+                      >
+                        <div className="menuLateral__detailsTitle">
+                          {disc.nome}
+                        </div>
 
-                <div className="menuLateral__detailsLine">
-                  <strong>Responsável:</strong>{" "}
-                  <span>
-                    {responsavel?.nome || "—"}
-                    {responsavel?.contato ? ` | ${responsavel.contato}` : ""}
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
+                        <div className="menuLateral__detailsLine">
+                          <strong>Professor:</strong>{" "}
+                          <span>
+                            {professor?.nome || "—"}
+                            {professor?.contato
+                              ? ` | ${professor.contato}`
+                              : ""}
+                          </span>
+                        </div>
 
-  /* ===================== COORDENADOR ===================== */
-  ) : isCoordenador ? (
-    <>
-      <button
-        className={`menuLateral__btn ${isActive("/nova-turma") ? "active" : ""}`}
-        onClick={() => navigate("/nova-turma")}
-      >
-        <Plus size={20} />
-        <span>Novas Turmas</span>
-      </button>
+                        <div className="menuLateral__detailsLine">
+                          <strong>Responsável:</strong>{" "}
+                          <span>
+                            {responsavel?.nome || "—"}
+                            {responsavel?.contato
+                              ? ` | ${responsavel.contato}`
+                              : ""}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : /* ===================== COORDENADOR ===================== */
+          isCoordenador ? (
+            <>
+              <button
+                className={`menuLateral__btn ${isActive("/nova-turma") ? "active" : ""}`}
+                onClick={() => navigate("/nova-turma")}
+              >
+                <Plus size={20} />
+                <span>Novas Turmas</span>
+              </button>
 
-      <button
-        className={`menuLateral__btn ${isActive("/criar-evento") ? "active" : ""}`}
-        onClick={() => navigate("/criar-evento")}
-      >
-        <SquarePen size={20} />
-        <span>Criar Eventos</span>
-      </button>
+              <button
+                className={`menuLateral__btn ${isActive("/criar-evento") ? "active" : ""}`}
+                onClick={() => navigate("/criar-evento")}
+              >
+                <SquarePen size={20} />
+                <span>Criar Eventos</span>
+              </button>
 
-      <button
-        className={`menuLateral__btn ${isActive("/eventos") ? "active" : ""}`}
-        onClick={() => navigate("/eventos")}
-      >
-        <ClipboardList size={20} />
-        <span>Eventos Publicados</span>
-      </button>
+              <button
+                className={`menuLateral__btn ${isActive("/eventos") ? "active" : ""}`}
+                onClick={() => navigate("/eventos")}
+              >
+                <ClipboardList size={20} />
+                <span>Eventos Publicados</span>
+              </button>
 
-      <button
-        className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
-        onClick={() => navigate("/editar-turma")}
-      >
-        <Settings size={20} />
-        <span>Editar Turmas</span>
-      </button>
+              <button
+                className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
+                onClick={() => navigate("/editar-turma")}
+              >
+                <Settings size={20} />
+                <span>Editar Turmas</span>
+              </button>
 
-      <button
-        className={`menuLateral__btn ${isActive("/calendario") ? "active" : ""}`}
-        onClick={() => navigate("/calendario")}
-      >
-        <Calendar size={20} />
-        <span>Ver Calendário</span>
-      </button>
-    </>
+              <button
+                className={`menuLateral__btn ${isActive("/calendario") ? "active" : ""}`}
+                onClick={() => navigate("/calendario")}
+              >
+                <Calendar size={20} />
+                <span>Ver Calendário</span>
+              </button>
+            </>
+          ) : (
+            /* ===================== PROFESSOR / RESPONSÁVEL ===================== */
+            <>
+              <button
+                className={`menuLateral__btn ${isActive("/criar-evento") ? "active" : ""}`}
+                onClick={() => navigate("/criar-evento")}
+              >
+                <SquarePen size={20} />
+                <span>Criar Eventos</span>
+              </button>
 
-  /* ===================== PROFESSOR / RESPONSÁVEL ===================== */
-  ) : (
-    <>
-      <button
-        className={`menuLateral__btn ${isActive("/criar-evento") ? "active" : ""}`}
-        onClick={() => navigate("/criar-evento")}
-      >
-        <SquarePen size={20} />
-        <span>Criar Eventos</span>
-      </button>
+              <button
+                className={`menuLateral__btn ${isActive("/eventos") ? "active" : ""}`}
+                onClick={() => navigate("/eventos")}
+              >
+                <ClipboardList size={20} />
+                <span>Eventos Publicados</span>
+              </button>
 
-      <button
-        className={`menuLateral__btn ${isActive("/eventos") ? "active" : ""}`}
-        onClick={() => navigate("/eventos")}
-      >
-        <ClipboardList size={20} />
-        <span>Eventos Publicados</span>
-      </button>
-
-      <button
-        className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
-        onClick={() => navigate("/editar-turma")}
-      >
-        <Settings size={20} />
-        <span>Editar Turmas</span>
-      </button>
-    </>
-  )}
-</div>
-
+              <button
+                className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
+                onClick={() => navigate("/editar-turma")}
+              >
+                <Settings size={20} />
+                <span>Editar Turmas</span>
+              </button>
+            </>
+          )}
+        </div>
       </nav>
     </aside>
   );

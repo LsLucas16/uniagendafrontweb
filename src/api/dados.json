@@ -191,6 +191,231 @@
     "professorId": 302,
     "responsavelId": 402
   }
+],
+"eventos": [
+  {
+    "id": 1,
+    "titulo": "Prova web",
+    "descricao": "Não se esqueçam da avaliação sobre derivadas e integrais. Finaliza hoje, a entrega deve ser feita pela plataforma.",
+    "ultimaAtualizacao": "2025-11-15T10:30:00.000Z",
+    "criadoPorId": 201,
+    "instituicaoId": 1,
+    "disciplinaId": 1,
+    "calendario": true,
+    "destaque": true
+  },
+  {
+    "id": 2,
+    "titulo": "Avaliativa hoje",
+    "descricao": "Não se esqueçam da avaliação. Entrega pela plataforma até 23:59.",
+    "ultimaAtualizacao": "2025-11-15T09:10:00.000Z",
+    "criadoPorId": 201,
+    "instituicaoId": 1,
+    "disciplinaId": 3,
+    "calendario": false,
+    "destaque": true
+  },
+  {
+    "id": 3,
+    "titulo": "Reposição de aula",
+    "descricao": "Reposição na sexta às 18:30. Conteúdo: revisão e lista de exercícios.",
+    "ultimaAtualizacao": "2025-11-10T14:00:00.000Z",
+    "criadoPorId": 301,
+    "instituicaoId": 1,
+    "disciplinaId": 2,
+    "calendario": true,
+    "destaque": false
+  },
+  {
+    "id": 4,
+    "titulo": "Prazo final do trabalho",
+    "descricao": "Entrega do trabalho final até 23:59. Sem extensão de prazo.",
+    "ultimaAtualizacao": "2025-11-12T18:45:00.000Z",
+    "criadoPorId": 302,
+    "instituicaoId": 3,
+    "disciplinaId": 10,
+    "calendario": true,
+    "destaque": true
+  },
+  {
+    "id": 5,
+    "titulo": "Aviso geral da disciplina",
+    "descricao": "Material complementar disponível no ambiente virtual. Leiam antes da próxima aula.",
+    "ultimaAtualizacao": "2025-11-09T08:20:00.000Z",
+    "criadoPorId": 202,
+    "instituicaoId": 3,
+    "disciplinaId": 11,
+    "calendario": false,
+    "destaque": false
+  },
+  {
+    "id": 6,
+    "titulo": "Plantão de dúvidas",
+    "descricao": "Plantão hoje às 16:00 na sala virtual. Participação recomendada.",
+    "ultimaAtualizacao": "2025-11-15T12:05:00.000Z",
+    "criadoPorId": 201,
+    "instituicaoId": 1,
+    "disciplinaId": 4,
+    "calendario": true,
+    "destaque": false
+  },
+
+  {
+    "id": 7,
+    "titulo": "Lista 2 liberada",
+    "descricao": "A Lista 2 já está disponível. Entrega até domingo 23:59.",
+    "ultimaAtualizacao": "2025-11-13T11:20:00.000Z",
+    "criadoPorId": 201,
+    "instituicaoId": 1,
+    "disciplinaId": 1,
+    "calendario": false,
+    "destaque": true
+  },
+  {
+    "id": 8,
+    "titulo": "Mudança de sala",
+    "descricao": "A aula de amanhã será na sala B204. Cheguem 10 minutos antes.",
+    "ultimaAtualizacao": "2025-11-14T17:40:00.000Z",
+    "criadoPorId": 301,
+    "instituicaoId": 1,
+    "disciplinaId": 3,
+    "calendario": true,
+    "destaque": false
+  },
+  {
+    "id": 9,
+    "titulo": "Simulado rápido",
+    "descricao": "Simulado com duração de 30 minutos no início da aula. Conteúdo: capítulos 1 e 2.",
+    "ultimaAtualizacao": "2025-11-14T08:05:00.000Z",
+    "criadoPorId": 201,
+    "instituicaoId": 1,
+    "disciplinaId": 2,
+    "calendario": true,
+    "destaque": true
+  },
+  {
+    "id": 10,
+    "titulo": "Atividade extra",
+    "descricao": "Atividade extra (opcional) valendo bônus. Prazo até quarta 23:59.",
+    "ultimaAtualizacao": "2025-11-11T19:12:00.000Z",
+    "criadoPorId": 201,
+    "instituicaoId": 1,
+    "disciplinaId": 4,
+    "calendario": false,
+    "destaque": false
+  },
+
+  {
+    "id": 11,
+    "titulo": "Seminário da turma",
+    "descricao": "Seminário na próxima semana. Grupos devem enviar tema até sexta.",
+    "ultimaAtualizacao": "2025-11-13T15:30:00.000Z",
+    "criadoPorId": 302,
+    "instituicaoId": 3,
+    "disciplinaId": 8,
+    "calendario": true,
+    "destaque": true
+  },
+  {
+    "id": 12,
+    "titulo": "Prova 1 - Álgebra Linear",
+    "descricao": "Prova 1 confirmada. Conteúdo: sistemas lineares e matrizes.",
+    "ultimaAtualizacao": "2025-11-15T07:55:00.000Z",
+    "criadoPorId": 302,
+    "instituicaoId": 3,
+    "disciplinaId": 8,
+    "calendario": true,
+    "destaque": false
+  },
+  {
+    "id": 13,
+    "titulo": "Entrega do projeto (Estatística)",
+    "descricao": "Entrega do projeto via plataforma. Anexar relatório e planilha.",
+    "ultimaAtualizacao": "2025-11-12T10:00:00.000Z",
+    "criadoPorId": 202,
+    "instituicaoId": 3,
+    "disciplinaId": 10,
+    "calendario": false,
+    "destaque": true
+  },
+  {
+    "id": 14,
+    "titulo": "Monitoria extraordinária",
+    "descricao": "Monitoria extra no sábado às 09:00. Foco: exercícios mais cobrados.",
+    "ultimaAtualizacao": "2025-11-14T20:10:00.000Z",
+    "criadoPorId": 302,
+    "instituicaoId": 3,
+    "disciplinaId": 12,
+    "calendario": true,
+    "destaque": false
+  },
+  {
+    "id": 15,
+    "titulo": "Aviso: material atualizado",
+    "descricao": "Slides atualizados (capítulo 3). Baixem a nova versão antes da aula.",
+    "ultimaAtualizacao": "2025-11-09T13:25:00.000Z",
+    "criadoPorId": 202,
+    "instituicaoId": 3,
+    "disciplinaId": 11,
+    "calendario": false,
+    "destaque": false
+  },
+
+  {
+    "id": 16,
+    "titulo": "Atividade no calendário (teste)",
+    "descricao": "Evento somente para testar exibição de tag Calendário.",
+    "ultimaAtualizacao": "2025-11-08T08:00:00.000Z",
+    "criadoPorId": 201,
+    "instituicaoId": 1,
+    "disciplinaId": 2,
+    "calendario": true,
+    "destaque": false
+  },
+  {
+    "id": 17,
+    "titulo": "Destaque (teste)",
+    "descricao": "Evento somente para testar exibição de tag Destaque.",
+    "ultimaAtualizacao": "2025-11-08T09:00:00.000Z",
+    "criadoPorId": 301,
+    "instituicaoId": 1,
+    "disciplinaId": 3,
+    "calendario": false,
+    "destaque": true
+  },
+  {
+    "id": 18,
+    "titulo": "Sem tags (teste)",
+    "descricao": "Evento sem tags para testar layout sem chips.",
+    "ultimaAtualizacao": "2025-11-08T10:00:00.000Z",
+    "criadoPorId": 302,
+    "instituicaoId": 3,
+    "disciplinaId": 9,
+    "calendario": false,
+    "destaque": false
+  },
+  {
+    "id": 19,
+    "titulo": "Ambos (teste)",
+    "descricao": "Evento com Calendário e Destaque para validar exibição dos dois chips.",
+    "ultimaAtualizacao": "2025-11-08T11:00:00.000Z",
+    "criadoPorId": 202,
+    "instituicaoId": 3,
+    "disciplinaId": 7,
+    "calendario": true,
+    "destaque": true
+  },
+  {
+    "id": 20,
+    "titulo": "Mudança de prazo",
+    "descricao": "O prazo foi ajustado. Verifiquem a nova data no cronograma.",
+    "ultimaAtualizacao": "2025-11-15T13:40:00.000Z",
+    "criadoPorId": 301,
+    "instituicaoId": 1,
+    "disciplinaId": 1,
+    "calendario": true,
+    "destaque": true
+  }
 ]
 
  }

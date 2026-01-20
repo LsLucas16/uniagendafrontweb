@@ -6,19 +6,18 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/dashboard/Dashboard";
 import CriarEvento from "./pages/criarEvento/CriarEvento";
 import PaginaTemporaria from "./pages/temp/PaginaTemporaria";
+import EventosPublicados from "./pages/eventosPublicados/EventosPublicados";
 
 function App() {
   return (
     <Router>
       <Routes>
-
         {/* Público */}
         <Route path="/" element={<Login />} />
 
-        {/* Privado (todos autenticados) */}
+        {/* Privado */}
         <Route element={<PrivateRoute />}>
-
-          {/* Acessível para todos */}
+          {/* Todos autenticados */}
           <Route
             path="/dashboard"
             element={
@@ -28,13 +27,23 @@ function App() {
             }
           />
 
-          {/* Criar Evento: professor, coordenador, responsável */}
+          {/* professor, coordenador, responsável */}
           <Route element={<RoleRoute allowed={["professor", "coordenador", "responsavel"]} />}>
             <Route
               path="/criar-evento"
               element={
                 <Layout>
                   <CriarEvento />
+                </Layout>
+              }
+            />
+
+            {/* ✅ ROTA ÚNICA PARA EVENTOS PUBLICADOS */}
+            <Route
+              path="/eventos"
+              element={
+                <Layout>
+                  <EventosPublicados />
                 </Layout>
               }
             />
@@ -60,14 +69,8 @@ function App() {
               }
             />
 
-            <Route
-              path="/eventos"
-              element={
-                <Layout>
-                  <PaginaTemporaria titulo="Eventos Publicados (Em desenvolvimento)" />
-                </Layout>
-              }
-            />
+            {/* ❌ REMOVER ESTA ROTA /eventos daqui
+                porque ela conflita com a rota real de eventos publicados */}
 
             <Route
               path="/calendario"
@@ -78,7 +81,6 @@ function App() {
               }
             />
           </Route>
-
         </Route>
       </Routes>
     </Router>
