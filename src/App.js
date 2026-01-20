@@ -7,6 +7,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import CriarEvento from "./pages/criarEvento/CriarEvento";
 import PaginaTemporaria from "./pages/temp/PaginaTemporaria";
 import EventosPublicados from "./pages/eventosPublicados/EventosPublicados";
+import EditarEvento from "./pages/editarEvento/EditarEvento";
 
 function App() {
   return (
@@ -28,7 +29,13 @@ function App() {
           />
 
           {/* professor, coordenador, responsável */}
-          <Route element={<RoleRoute allowed={["professor", "coordenador", "responsavel"]} />}>
+          <Route
+            element={
+              <RoleRoute
+                allowed={["professor", "coordenador", "responsavel"]}
+              />
+            }
+          >
             <Route
               path="/criar-evento"
               element={
@@ -44,6 +51,15 @@ function App() {
               element={
                 <Layout>
                   <EventosPublicados />
+                </Layout>
+              }
+            />
+
+            <Route
+              path="/eventos/:id/editar"
+              element={
+                <Layout>
+                  <EditarEvento />
                 </Layout>
               }
             />

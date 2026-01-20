@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./EventosPublicados.scss";
 import data from "../../api/dados.json";
 
@@ -23,25 +24,31 @@ function getDisciplinaAtualId() {
 
 export default function EventosPublicados() {
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
+  const navigate = useNavigate();
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
-    getDisciplinaAtualId()
+    getDisciplinaAtualId(),
   );
 
   // escuta troca de disciplina feita no MenuLateral
   useEffect(() => {
-    const onDisciplinaChanged = () => setDisciplinaAtualId(getDisciplinaAtualId());
+    const onDisciplinaChanged = () =>
+      setDisciplinaAtualId(getDisciplinaAtualId());
 
     // caso você altere usuário/disciplina em outra aba (não é obrigatório)
     const onStorage = (e) => {
       if (e.key === "usuario") setUsuarioLogado(getUsuarioLogado());
-      if (e.key === "disciplinaAtualId") setDisciplinaAtualId(getDisciplinaAtualId());
+      if (e.key === "disciplinaAtualId")
+        setDisciplinaAtualId(getDisciplinaAtualId());
     };
 
     window.addEventListener("disciplinaAtual:changed", onDisciplinaChanged);
     window.addEventListener("storage", onStorage);
 
     return () => {
-      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
+      window.removeEventListener(
+        "disciplinaAtual:changed",
+        onDisciplinaChanged,
+      );
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -66,7 +73,9 @@ export default function EventosPublicados() {
 
   const instituicao = useMemo(() => {
     if (!user) return null;
-    return (data.instituicoes || []).find((i) => i.id === user.faculdadeId) || null;
+    return (
+      (data.instituicoes || []).find((i) => i.id === user.faculdadeId) || null
+    );
   }, [user]);
 
   const tituloDisciplinaAtual = useMemo(() => {
@@ -97,8 +106,7 @@ export default function EventosPublicados() {
   }, [user, disciplinaAtualId]);
 
   const handleEditar = (eventoId) => {
-    // rota futura de edição
-    window.location.href = `/eventos/${eventoId}/editar`;
+    navigate(`/eventos/${eventoId}/editar`);
   };
 
   if (!user) {
@@ -146,7 +154,9 @@ export default function EventosPublicados() {
 
                     <div className="evento-card-chips">
                       {temCalendario && (
-                        <span className="chip chip--calendario">Calendário</span>
+                        <span className="chip chip--calendario">
+                          Calendário
+                        </span>
                       )}
                       {temDestaque && (
                         <span className="chip chip--destaque">Destaque</span>
