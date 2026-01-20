@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./EventosPublicados.scss";
-
-const API_BASE = "http://localhost:3001"; // json-server
+import data from "../../api/dados.json";
 
 function formatarDataPtBR(iso) {
   if (!iso) return "";
@@ -10,7 +9,7 @@ function formatarDataPtBR(iso) {
   return dt.toLocaleDateString("pt-BR");
 }
 
-function getUsuarioLogadoFromStorage() {
+function getUsuarioLogado() {
   try {
     return JSON.parse(localStorage.getItem("usuario")) || null;
   } catch {
@@ -18,105 +17,57 @@ function getUsuarioLogadoFromStorage() {
   }
 }
 
-function getDisciplinaAtualFromStorage() {
+function getDisciplinaAtualId() {
   return localStorage.getItem("disciplinaAtualId") || "";
 }
 
 export default function EventosPublicados() {
-  const [loading, setLoading] = useState(true);
-
-  const [eventos, setEventos] = useState([]);
-  const [usuarios, setUsuarios] = useState([]);
-  const [disciplinas, setDisciplinas] = useState([]);
-
-  const [usuarioLogado, setUsuarioLogado] = useState(() =>
-    getUsuarioLogadoFromStorage()
-  );
+  const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
-    getDisciplinaAtualFromStorage()
+    getDisciplinaAtualId()
   );
 
-  // Ouve mudanças disparadas pelo MenuLateral
+  // escuta troca de disciplina feita no MenuLateral
   useEffect(() => {
-    const onDisciplinaChanged = () => {
-      setDisciplinaAtualId(getDisciplinaAtualFromStorage());
-    };
+    const onDisciplinaChanged = () => setDisciplinaAtualId(getDisciplinaAtualId());
 
-    const onStorageChanged = (e) => {
-      if (e.key === "usuario") setUsuarioLogado(getUsuarioLogadoFromStorage());
-      if (e.key === "disciplinaAtualId")
-        setDisciplinaAtualId(getDisciplinaAtualFromStorage());
+    // caso você altere usuário/disciplina em outra aba (não é obrigatório)
+    const onStorage = (e) => {
+      if (e.key === "usuario") setUsuarioLogado(getUsuarioLogado());
+      if (e.key === "disciplinaAtualId") setDisciplinaAtualId(getDisciplinaAtualId());
     };
 
     window.addEventListener("disciplinaAtual:changed", onDisciplinaChanged);
-    window.addEventListener("storage", onStorageChanged);
+    window.addEventListener("storage", onStorage);
 
     return () => {
       window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
-      window.removeEventListener("storage", onStorageChanged);
-    };
-  }, []);
-
-  useEffect(() => {
-    let alive = true;
-
-    async function load() {
-      try {
-        setLoading(true);
-        const [resEventos, resUsuarios, resDisciplinas] = await Promise.all([
-          fetch(`${API_BASE}/eventos`),
-          fetch(`${API_BASE}/usuarios`),
-          fetch(`${API_BASE}/disciplinas`),
-        ]);
-
-        const [dataEventos, dataUsuarios, dataDisciplinas] = await Promise.all([
-          resEventos.json(),
-          resUsuarios.json(),
-          resDisciplinas.json(),
-        ]);
-
-        if (!alive) return;
-
-        // Ordena por ultimaAtualizacao desc
-        const ordenado = [...(dataEventos || [])].sort((a, b) => {
-          const ta = new Date(a.ultimaAtualizacao || 0).getTime();
-          const tb = new Date(b.ultimaAtualizacao || 0).getTime();
-          return tb - ta;
-        });
-
-        setEventos(ordenado);
-        setUsuarios(dataUsuarios || []);
-        setDisciplinas(dataDisciplinas || []);
-      } catch {
-        if (!alive) return;
-        setEventos([]);
-        setUsuarios([]);
-        setDisciplinas([]);
-      } finally {
-        if (!alive) return;
-        setLoading(false);
-      }
-    }
-
-    load();
-    return () => {
-      alive = false;
+      window.removeEventListener("storage", onStorage);
     };
   }, []);
 
   const usuariosById = useMemo(() => {
     const map = new Map();
-    for (const u of usuarios) map.set(u.id, u);
+    (data.usuarios || []).forEach((u) => map.set(u.id, u));
     return map;
-  }, [usuarios]);
+  }, []);
 
   const disciplinasById = useMemo(() => {
     const map = new Map();
-    for (const d of disciplinas) map.set(String(d.id), d);
+    (data.disciplinas || []).forEach((d) => map.set(String(d.id), d));
     return map;
-  }, [disciplinas]);
+  }, []);
 
-  const instituicaoIdLogada = usuarioLogado?.faculdadeId ?? null;
+  const user = useMemo(() => {
+    const id = usuarioLogado?.id;
+    if (!id) return null;
+    return (data.usuarios || []).find((u) => u.id === id) || null;
+  }, [usuarioLogado]);
+
+  const instituicao = useMemo(() => {
+    if (!user) return null;
+    return (data.instituicoes || []).find((i) => i.id === user.faculdadeId) || null;
+  }, [user]);
 
   const tituloDisciplinaAtual = useMemo(() => {
     if (!disciplinaAtualId) return "";
@@ -124,25 +75,33 @@ export default function EventosPublicados() {
   }, [disciplinaAtualId, disciplinasById]);
 
   const eventosFiltrados = useMemo(() => {
-    if (!usuarioLogado) return [];
-    if (!instituicaoIdLogada) return [];
+    if (!user) return [];
 
+    const instId = user.faculdadeId;
     const discIdNum = disciplinaAtualId ? Number(disciplinaAtualId) : null;
 
-    return eventos
-      .filter((ev) => ev.instituicaoId === instituicaoIdLogada)
+    const lista = (data.eventos || [])
+      .filter((ev) => ev.instituicaoId === instId)
       .filter((ev) => {
-        // Se não tiver disciplina selecionada (edge), mostra tudo da instituição
+        // se não tiver disciplina selecionada, mostra tudo da instituição
         if (!discIdNum) return true;
         return ev.disciplinaId === discIdNum;
+      })
+      .sort((a, b) => {
+        const ta = new Date(a.ultimaAtualizacao || 0).getTime();
+        const tb = new Date(b.ultimaAtualizacao || 0).getTime();
+        return tb - ta;
       });
-  }, [eventos, usuarioLogado, instituicaoIdLogada, disciplinaAtualId]);
+
+    return lista;
+  }, [user, disciplinaAtualId]);
 
   const handleEditar = (eventoId) => {
+    // rota futura de edição
     window.location.href = `/eventos/${eventoId}/editar`;
   };
 
-  if (!usuarioLogado) {
+  if (!user) {
     return (
       <div className="eventos-publicados-page">
         <div className="eventos-publicados-container">
@@ -150,6 +109,7 @@ export default function EventosPublicados() {
             <h1>Eventos Publicados</h1>
             <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
           </header>
+
           <div className="eventos-publicados-loading">
             Usuário não identificado. Faça login novamente.
           </div>
@@ -164,82 +124,68 @@ export default function EventosPublicados() {
         <header className="eventos-publicados-header">
           <h1>Eventos Publicados</h1>
           <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
-
-          {/* (Opcional) linha discreta mostrando o contexto atual */}
-          {!!tituloDisciplinaAtual && (
-            <div className="eventos-publicados-contexto">
-              Turma atual: <strong>{tituloDisciplinaAtual}</strong>
-            </div>
-          )}
         </header>
 
-        {loading ? (
-          <div className="eventos-publicados-loading">Carregando...</div>
-        ) : (
-          <div className="eventos-publicados-list">
-            {eventosFiltrados.map((ev) => {
-              const criadoPor = usuariosById.get(ev.criadoPorId)?.nome || "—";
-              const data = formatarDataPtBR(ev.ultimaAtualizacao);
+        <div className="eventos-publicados-list">
+          {eventosFiltrados.map((ev) => {
+            const criadoPor = usuariosById.get(ev.criadoPorId)?.nome || "—";
+            const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
-              const podeEditar = !!ev.calendario; // REGRA: só calendário (inclui ambos)
-              const temCalendario = !!ev.calendario;
-              const temDestaque = !!ev.destaque;
+            const podeEditar = !!ev.calendario; // REGRA: só calendário (inclui ambos)
+            const temCalendario = !!ev.calendario;
+            const temDestaque = !!ev.destaque;
 
-              return (
-                <article key={ev.id} className="evento-card">
-                  <div className="evento-card-top">
-                    <div className="evento-card-titleblock">
-                      <div className="evento-card-title">{ev.titulo}</div>
-                      <div className="evento-card-updated">
-                        Última atualização: {data}
-                      </div>
-
-                      <div className="evento-card-chips">
-                        {temCalendario && (
-                          <span className="chip chip--calendario">
-                            Calendário
-                          </span>
-                        )}
-                        {temDestaque && (
-                          <span className="chip chip--destaque">Destaque</span>
-                        )}
-                      </div>
+            return (
+              <article key={ev.id} className="evento-card">
+                <div className="evento-card-top">
+                  <div className="evento-card-titleblock">
+                    <div className="evento-card-title">{ev.titulo}</div>
+                    <div className="evento-card-updated">
+                      Última atualização: {dataAtual}
                     </div>
 
-                    {/* Botão só se for calendário */}
-                    {podeEditar && (
-                      <button
-                        type="button"
-                        className="btn-editar"
-                        onClick={() => handleEditar(ev.id)}
-                        aria-label={`Editar ${ev.titulo}`}
-                      >
-                        <span className="btn-editar-icon" aria-hidden="true">
-                          ✎
-                        </span>
-                        Editar
-                      </button>
-                    )}
+                    <div className="evento-card-chips">
+                      {temCalendario && (
+                        <span className="chip chip--calendario">Calendário</span>
+                      )}
+                      {temDestaque && (
+                        <span className="chip chip--destaque">Destaque</span>
+                      )}
+                    </div>
                   </div>
 
-                  <div className="evento-card-desc">{ev.descricao}</div>
+                  {podeEditar && (
+                    <button
+                      type="button"
+                      className="btn-editar"
+                      onClick={() => handleEditar(ev.id)}
+                      aria-label={`Editar ${ev.titulo}`}
+                    >
+                      <span className="btn-editar-icon" aria-hidden="true">
+                        ✎
+                      </span>
+                      Editar
+                    </button>
+                  )}
+                </div>
 
-                  <div className="evento-card-footer">
-                    <span className="evento-card-createdby">
-                      Criado por: <strong>{criadoPor}</strong>
-                    </span>
-                  </div>
-                </article>
-              );
-            })}
+                <div className="evento-card-desc">{ev.descricao}</div>
 
-            {!eventosFiltrados.length && (
-              <div className="eventos-publicados-empty">
-                Nenhum evento publicado para a turma selecionada.
-              </div>
-            )}
-          </div>
-        )}
+                <div className="evento-card-footer">
+                  <span className="evento-card-createdby">
+                    Criado por: <strong>{criadoPor}</strong>
+                  </span>
+                </div>
+              </article>
+            );
+          })}
+
+          {!eventosFiltrados.length && (
+            <div className="eventos-publicados-empty">
+              Nenhum evento publicado para a turma selecionada.
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
