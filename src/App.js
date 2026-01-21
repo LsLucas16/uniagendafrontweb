@@ -1,8 +1,14 @@
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import dados from "./api/dados.json"; // ajuste o caminho se necessário
+import { bootstrapLocalStorage } from "./services/bootstrapLocalStorage"; // ajuste o caminho
+
 import { Login } from "./pages/login/Login";
 import { PrivateRoute } from "./PrivateRoute";
 import { RoleRoute } from "./RoleRoute";
 import Layout from "./components/Layout";
+
 import Dashboard from "./pages/dashboard/Dashboard";
 import CriarEvento from "./pages/criarEvento/CriarEvento";
 import PaginaTemporaria from "./pages/temp/PaginaTemporaria";
@@ -11,6 +17,10 @@ import EditarEvento from "./pages/editarEvento/EditarEvento";
 import EditarTurma from "./pages/editarTurma/EditarTurma";
 
 function App() {
+  useEffect(() => {
+    bootstrapLocalStorage(dados);
+  }, []);
+
   return (
     <Router>
       <Routes>
@@ -32,9 +42,7 @@ function App() {
           {/* professor, coordenador, responsável */}
           <Route
             element={
-              <RoleRoute
-                allowed={["professor", "coordenador", "responsavel"]}
-              />
+              <RoleRoute allowed={["professor", "coordenador", "responsavel"]} />
             }
           >
             <Route
@@ -46,7 +54,6 @@ function App() {
               }
             />
 
-            {/* ✅ ROTA ÚNICA PARA EVENTOS PUBLICADOS */}
             <Route
               path="/eventos"
               element={
@@ -65,7 +72,8 @@ function App() {
               }
             />
 
-          <Route
+            {/* deixe a rota real aqui */}
+            <Route
               path="/editar-turma"
               element={
                 <Layout>
@@ -86,17 +94,17 @@ function App() {
               }
             />
 
+            {/* MUDEI o path para não conflitar com /editar-turma real */}
             <Route
-              path="/editar-turma"
+              path="/editar-turma-dev"
               element={
                 <Layout>
-                  <PaginaTemporaria titulo="Editar Turma (Em desenvolvimento)" />
+                  <PaginaTemporaria
+                    titulo="Editar Turma (Em desenvolvimento)"
+                  />
                 </Layout>
               }
             />
-
-            {/* ❌ REMOVER ESTA ROTA /eventos daqui
-                porque ela conflita com a rota real de eventos publicados */}
 
             <Route
               path="/calendario"
