@@ -60,29 +60,11 @@ export default function EventosPublicados() {
     return map;
   }, []);
 
-  const disciplinasById = useMemo(() => {
-    const map = new Map();
-    (data.disciplinas || []).forEach((d) => map.set(String(d.id), d));
-    return map;
-  }, []);
-
   const user = useMemo(() => {
     const id = usuarioLogado?.id;
     if (!id) return null;
     return (data.usuarios || []).find((u) => u.id === id) || null;
   }, [usuarioLogado]);
-
-  const instituicao = useMemo(() => {
-    if (!user) return null;
-    return (
-      (data.instituicoes || []).find((i) => i.id === user.faculdadeId) || null
-    );
-  }, [user]);
-
-  const tituloDisciplinaAtual = useMemo(() => {
-    if (!disciplinaAtualId) return "";
-    return disciplinasById.get(String(disciplinaAtualId))?.nome || "";
-  }, [disciplinaAtualId, disciplinasById]);
 
   const eventosFiltrados = useMemo(() => {
     if (!user) return [];

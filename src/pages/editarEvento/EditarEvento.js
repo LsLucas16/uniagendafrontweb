@@ -11,11 +11,6 @@ import "./EditarEvento.scss";
 
 registerLocale("pt-BR", ptBR);
 
-/**
- * Enquanto não existe backend:
- * - dados.json é read-only em runtime
- * - então salvamos alterações em localStorage e damos override no evento.
- */
 const STORAGE_KEY = "eventos_override";
 
 function getOverrideMap() {
@@ -47,6 +42,7 @@ const EditarEvento = () => {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [startDate, setStartDate] = useState(null);
+
 
   const [notificacoes, setNotificacoes] = useState({
     calendario: true,
