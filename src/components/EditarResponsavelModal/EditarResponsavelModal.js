@@ -40,11 +40,6 @@ export default function EditarResponsavelModal({
       .map((u) => ({ id: u.id, nome: u.nome, tipo: u.tipo, contato: u.contato || "" }));
   }, [usuarios]);
 
-  const usuarioSelecionado = useMemo(() => {
-    if (!draft?.userId) return null;
-    return opcoes.find((o) => Number(o.id) === Number(draft.userId)) || null;
-  }, [draft?.userId, opcoes]);
-
   if (!open) return null;
   if (!draft) return null;
 

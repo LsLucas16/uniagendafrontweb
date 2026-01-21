@@ -278,41 +278,6 @@ export default function EditarTurma() {
     });
   };
 
-  const handleEditarResponsavel = (index) => {
-    Swal.fire({
-      title: "Editar responsável",
-      html: `
-        <div style="display:flex;flex-direction:column;gap:10px;text-align:left">
-          <label style="font-size:12px;color:#556; font-weight:600">Cargo</label>
-          <input id="swalCargo" class="swal2-input" style="margin:0" value="${responsaveis[index]?.cargo ?? ""}" />
-          <label style="font-size:12px;color:#556; font-weight:600">Contato</label>
-          <input id="swalContato" class="swal2-input" style="margin:0" value="${responsaveis[index]?.contato ?? ""}" />
-        </div>
-      `,
-      focusConfirm: false,
-      showCancelButton: true,
-      confirmButtonText: "Salvar",
-      cancelButtonText: "Cancelar",
-      preConfirm: () => {
-        const cargo = document.getElementById("swalCargo")?.value ?? "";
-        const contato = document.getElementById("swalContato")?.value ?? "";
-        return { cargo, contato };
-      },
-    }).then((res) => {
-      if (!res.isConfirmed) return;
-
-      const next = [...responsaveis];
-      next[index] = {
-        ...next[index],
-        cargo: res.value.cargo,
-        contato: res.value.contato,
-      };
-      setResponsaveis(next);
-
-      persistTurma({ responsaveis: next });
-    });
-  };
-
   const handleAdicionarResponsavel = () => {
     const options = baseUsuarios
       .filter(
