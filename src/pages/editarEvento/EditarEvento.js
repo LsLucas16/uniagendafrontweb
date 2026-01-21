@@ -5,6 +5,7 @@ import Swal from "sweetalert2";
 import { Calendar } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
+import { ReactComponent as ArrowLeftIcon } from "../../assets/seta.svg";
 import data from "../../api/dados.json";
 import "./EditarEvento.scss";
 
@@ -142,7 +143,6 @@ const EditarEvento = () => {
     }
 
     setStartDate(parseDataEvento(evento));
-
   }, [id, navigate, usuarioLogado]);
 
   const handleSalvar = async () => {
@@ -247,7 +247,10 @@ const EditarEvento = () => {
             className="btn-voltar"
             onClick={() => navigate(-1)}
           >
-            <span className="btn-voltar__seta">←</span>
+            <span className="btn-voltar__seta" aria-hidden="true">
+              <ArrowLeftIcon className="icon-arrow" />
+            </span>
+
             <span>Voltar</span>
           </button>
         </div>
