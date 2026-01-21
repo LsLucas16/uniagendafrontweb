@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Pencil } from "lucide-react";
 import "./EventosPublicados.scss";
 import data from "../../api/dados.json";
 
@@ -169,10 +170,9 @@ export default function EventosPublicados() {
                       type="button"
                       className="btn-editar"
                       onClick={() => handleEditar(ev.id)}
-                      aria-label={`Editar ${ev.titulo}`}
                     >
                       <span className="btn-editar-icon" aria-hidden="true">
-                        ✎
+                        <Pencil size={14} />
                       </span>
                       Editar
                     </button>
