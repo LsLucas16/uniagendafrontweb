@@ -8,6 +8,7 @@ import CriarEvento from "./pages/criarEvento/CriarEvento";
 import PaginaTemporaria from "./pages/temp/PaginaTemporaria";
 import EventosPublicados from "./pages/eventosPublicados/EventosPublicados";
 import EditarEvento from "./pages/editarEvento/EditarEvento";
+import EditarTurma from "./pages/editarTurma/EditarTurma";
 
 function App() {
   return (
@@ -60,6 +61,15 @@ function App() {
               element={
                 <Layout>
                   <EditarEvento />
+                </Layout>
+              }
+            />
+
+          <Route
+              path="/editar-turma"
+              element={
+                <Layout>
+                  <EditarTurma />
                 </Layout>
               }
             />
