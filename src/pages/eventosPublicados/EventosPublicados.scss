@@ -1,15 +1,18 @@
-/* Página inteira */
 .eventos-publicados-page {
-  background: #f3f5f7;
-  min-height: 100vh;
-  padding: 24px 0 36px;
+  background: #f3f5f7; /* pode manter cinza fora */
+  min-height: 300vh;
+  padding: 4px 0 6px;
 }
 
-/* Container central */
 .eventos-publicados-container {
-  width: min(980px, calc(100% - 72px));
+  width: min(1200px, calc(100% - 2px));
   margin: 0 auto;
+
+  background: #ffffff;     /* aqui entra o branco do figma */
+  border-radius: 16px;
+  padding: 18px;           /* respiro interno (igual sensação do figma) */
 }
+
 
 /* Cabeçalho */
 .eventos-publicados-header {
