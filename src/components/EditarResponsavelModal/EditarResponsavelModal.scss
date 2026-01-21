@@ -216,18 +216,25 @@
 .erm__footer {
   margin-top: 16px;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center; 
   gap: 12px;
 }
 
+
 .erm__btn {
-  height: 32px;
-  padding: 0 14px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 800;
-  cursor: pointer;
-  border: 1px solid transparent;
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    border: 1px solid transparent;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1;
 
   &--ghost {
     background: #f8fafc;
