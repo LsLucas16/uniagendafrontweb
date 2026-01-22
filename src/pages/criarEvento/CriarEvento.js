@@ -1,4 +1,4 @@
-import React, { useState, forwardRef } from "react";
+import React, { useState, forwardRef, useMemo } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ptBR from "date-fns/locale/pt-BR";
 import Swal from "sweetalert2";
@@ -8,18 +8,31 @@ import "./CriarEvento.scss";
 
 registerLocale("pt-BR", ptBR);
 
+const TITULO_MAX = 60;
+const DESCRICAO_MAX = 800;
+
+function capitalizeFirst(str) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 const CriarEvento = () => {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [startDate, setStartDate] = useState(null);
+
+  // ✅ inicia com os dois desmarcados
   const [notificacoes, setNotificacoes] = useState({
-    calendario: true,
+    calendario: false,
     destaque: false,
   });
 
+  const tituloCount = useMemo(() => titulo.length, [titulo]);
+  const descricaoCount = useMemo(() => descricao.length, [descricao]);
+
   const handleSalvar = async () => {
-    // Título sempre obrigatório
-    if (!titulo) {
+    // ✅ Título obrigatório
+    if (!titulo.trim()) {
       Swal.fire({
         title: "Campos obrigatórios",
         text: "Por favor, preencha o título do evento.",
@@ -30,7 +43,19 @@ const CriarEvento = () => {
       return;
     }
 
-    // Data só é obrigatória se "Aviso no calendário" estiver marcado
+    // ✅ Descrição obrigatória
+    if (!descricao.trim()) {
+      Swal.fire({
+        title: "Campos obrigatórios",
+        text: "Por favor, preencha a descrição do evento.",
+        icon: "warning",
+        confirmButtonText: "Entendido",
+        confirmButtonColor: "#2E4A67",
+      });
+      return;
+    }
+
+    // ✅ Data só é obrigatória se "Aviso no calendário" estiver marcado
     if (notificacoes.calendario && !startDate) {
       Swal.fire({
         title: "Campos obrigatórios",
@@ -71,28 +96,19 @@ const CriarEvento = () => {
     }
   };
 
-  const InputDataComIcone = forwardRef(
-    ({ value, onClick, placeholder }, ref) => {
-      return (
-        <button
-          type="button"
-          className="date-input"
-          onClick={onClick}
-          ref={ref}
-        >
-          <span className="date-input__icon" aria-hidden="true">
-            <Calendar size={16} />
-          </span>
+  const InputDataComIcone = forwardRef(({ value, onClick, placeholder }, ref) => {
+    return (
+      <button type="button" className="date-input" onClick={onClick} ref={ref}>
+        <span className="date-input__icon" aria-hidden="true">
+          <Calendar size={16} />
+        </span>
 
-          <span
-            className={value ? "date-input__value" : "date-input__placeholder"}
-          >
-            {value || placeholder}
-          </span>
-        </button>
-      );
-    },
-  );
+        <span className={value ? "date-input__value" : "date-input__placeholder"}>
+          {value || placeholder}
+        </span>
+      </button>
+    );
+  });
 
   return (
     <div className="painel-evento">
@@ -107,9 +123,17 @@ const CriarEvento = () => {
               placeholder="Digite o título do evento"
               className="input-estilizado"
               value={titulo}
-              onChange={(e) => setTitulo(e.target.value)}
+              maxLength={TITULO_MAX}
+              onChange={(e) => {
+                const raw = e.target.value || "";
+                const limited = raw.slice(0, TITULO_MAX);
+                setTitulo(capitalizeFirst(limited));
+              }}
               required
             />
+            <div className="contador-campo">
+              {tituloCount}/{TITULO_MAX}
+            </div>
           </div>
 
           <div className="campo">
@@ -119,14 +143,22 @@ const CriarEvento = () => {
               placeholder="Descreva os detalhes do evento"
               className="input-estilizado"
               value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-            ></textarea>
+              maxLength={DESCRICAO_MAX}
+              onChange={(e) => {
+                const raw = e.target.value || "";
+                setDescricao(raw.slice(0, DESCRICAO_MAX));
+              }}
+              required
+            />
+            <div className="contador-campo">
+              {descricaoCount}/{DESCRICAO_MAX}
+            </div>
           </div>
 
           <div className="campo">
             <label className="label-notificacao">Tipo de notificação</label>
 
-            <div className="opcoes-bolinha">
+            <div className="opcoes-bolinha opcoes-bolinha--compacta">
               <div
                 className="item-bolinha"
                 onClick={() => {
@@ -150,9 +182,7 @@ const CriarEvento = () => {
                   }
                 }}
               >
-                <div
-                  className={`circular-check ${notificacoes.calendario ? "active" : ""}`}
-                />
+                <div className={`circular-check ${notificacoes.calendario ? "active" : ""}`} />
                 <span>Aviso no calendário</span>
               </div>
 
@@ -177,9 +207,7 @@ const CriarEvento = () => {
                   }
                 }}
               >
-                <div
-                  className={`circular-check ${notificacoes.destaque ? "active" : ""}`}
-                />
+                <div className={`circular-check ${notificacoes.destaque ? "active" : ""}`} />
                 <span>Aviso em destaque</span>
               </div>
             </div>
@@ -198,30 +226,17 @@ const CriarEvento = () => {
                   dateFormat="dd/MM/yyyy"
                   minDate={new Date()}
                   placeholderText="Escolha uma data"
-                  customInput={
-                    <InputDataComIcone placeholder="Escolha uma data" />
-                  }
+                  customInput={<InputDataComIcone placeholder="Escolha uma data" />}
                   calendarClassName="calendario-customizado"
                   popperClassName="popper-calendario"
                   showPopperArrow={false}
-                  renderCustomHeader={({
-                    date,
-                    decreaseMonth,
-                    increaseMonth,
-                  }) => {
+                  // ✅ mantém o calendário com altura/grade consistente
+                  fixedHeight
+                  renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => {
                     const hoje = new Date();
-                    const firstOfCurrentMonth = new Date(
-                      hoje.getFullYear(),
-                      hoje.getMonth(),
-                      1,
-                    );
-                    const firstOfShownMonth = new Date(
-                      date.getFullYear(),
-                      date.getMonth(),
-                      1,
-                    );
-                    const prevDisabled =
-                      firstOfShownMonth <= firstOfCurrentMonth;
+                    const firstOfCurrentMonth = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+                    const firstOfShownMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+                    const prevDisabled = firstOfShownMonth <= firstOfCurrentMonth;
 
                     return (
                       <div className="cal-header cal-header--figma">
@@ -239,10 +254,7 @@ const CriarEvento = () => {
 
                         <div className="cal-title cal-title--figma">
                           {date
-                            .toLocaleDateString("pt-BR", {
-                              month: "long",
-                              year: "numeric",
-                            })
+                            .toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
                             .replace(/^./, (c) => c.toUpperCase())}
                         </div>
 

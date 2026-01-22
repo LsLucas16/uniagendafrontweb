@@ -616,3 +616,34 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
 .calendario-customizado .react-datepicker__day:hover {
   background: rgba(127, 179, 213, 0.22);
 }
+
+
+/* ===== Contador abaixo dos campos ===== */
+.contador-campo {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(46, 74, 103, 0.65);
+  text-align: right;
+}
+
+/* ===== Aproximar as opções (calendário/destaque) ===== */
+.opcoes-bolinha--compacta {
+  gap: 6px;        /* antes 10px */
+  margin-top: 4px; /* antes 6px */
+
+  .item-bolinha {
+    padding: 2px 6px; /* levemente menor para “aproximar” visualmente */
+  }
+}
+
+/* ===== Calendário: manter padrão visual estável e dias fora do mês cinza ===== */
+/* (dias fora do mês já ficam cinza no seu CSS, mas reforçamos para manter mesmo clicável) */
+.calendario-customizado .react-datepicker__day--outside-month {
+  color: rgba(46, 74, 103, 0.35) !important;
+}
+
+/* opcional: se quiser diminuir a “diferença” visual do mês fora */
+.calendario-customizado .react-datepicker__day--outside-month:hover {
+  background: rgba(127, 179, 213, 0.14);
+}
