@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import dados from "./api/dados.json"; // ajuste o caminho se necessário
-import { bootstrapLocalStorage } from "./services/bootstrapLocalStorage"; // ajuste o caminho
+import dados from "./data/dados.json"; // ajuste o caminho se necessário
 
 import { Login } from "./pages/login/Login";
 import { PrivateRoute } from "./PrivateRoute";
@@ -17,9 +16,6 @@ import EditarEvento from "./pages/editarEvento/EditarEvento";
 import EditarTurma from "./pages/editarTurma/EditarTurma";
 
 function App() {
-  useEffect(() => {
-    bootstrapLocalStorage(dados);
-  }, []);
 
   return (
     <Router>

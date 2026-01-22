@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./MenuLateral.scss";
-import data from "../../api/dados.json";
+import data from "../../data/dados.json";
 import {
   SquarePen,
   ClipboardList,

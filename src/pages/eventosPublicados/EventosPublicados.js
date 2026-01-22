@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil } from "lucide-react";
 import "./EventosPublicados.scss";
-import data from "../../api/dados.json";
+import data from "../../data/dados.json";
 
 function formatarDataPtBR(iso) {
   if (!iso) return "";

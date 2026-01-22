@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Pencil, Upload, Search, X } from "lucide-react";
 import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
 import Swal from "sweetalert2";
-import data from "../../api/dados.json";
+import data from "../../data/dados.json";
 import "./EditarTurma.scss";
 
 /**

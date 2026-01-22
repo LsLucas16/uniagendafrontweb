@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./Login.scss";
 import Swal from "sweetalert2";
 
-import dados from "../../api/dados.json";
+import dados from "../../data/dados.json";
 
 import logo from "../../assets/logo.webp";
 import agenda from "../../assets/agenda.webp";

@@ -6,7 +6,7 @@ import { Calendar } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { ReactComponent as ArrowLeftIcon } from "../../assets/seta.svg";
-import data from "../../api/dados.json";
+import data from "../../data/dados.json";
 import "./EditarEvento.scss";
 
 registerLocale("pt-BR", ptBR);
