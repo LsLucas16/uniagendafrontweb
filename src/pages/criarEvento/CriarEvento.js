@@ -96,19 +96,28 @@ const CriarEvento = () => {
     }
   };
 
-  const InputDataComIcone = forwardRef(({ value, onClick, placeholder }, ref) => {
-    return (
-      <button type="button" className="date-input" onClick={onClick} ref={ref}>
-        <span className="date-input__icon" aria-hidden="true">
-          <Calendar size={16} />
-        </span>
+  const InputDataComIcone = forwardRef(
+    ({ value, onClick, placeholder }, ref) => {
+      return (
+        <button
+          type="button"
+          className="date-input"
+          onClick={onClick}
+          ref={ref}
+        >
+          <span className="date-input__icon" aria-hidden="true">
+            <Calendar size={16} />
+          </span>
 
-        <span className={value ? "date-input__value" : "date-input__placeholder"}>
-          {value || placeholder}
-        </span>
-      </button>
-    );
-  });
+          <span
+            className={value ? "date-input__value" : "date-input__placeholder"}
+          >
+            {value || placeholder}
+          </span>
+        </button>
+      );
+    },
+  );
 
   return (
     <div className="painel-evento">
@@ -182,7 +191,9 @@ const CriarEvento = () => {
                   }
                 }}
               >
-                <div className={`circular-check ${notificacoes.calendario ? "active" : ""}`} />
+                <div
+                  className={`circular-check ${notificacoes.calendario ? "active" : ""}`}
+                />
                 <span>Aviso no calendário</span>
               </div>
 
@@ -207,7 +218,9 @@ const CriarEvento = () => {
                   }
                 }}
               >
-                <div className={`circular-check ${notificacoes.destaque ? "active" : ""}`} />
+                <div
+                  className={`circular-check ${notificacoes.destaque ? "active" : ""}`}
+                />
                 <span>Aviso em destaque</span>
               </div>
             </div>
@@ -226,17 +239,35 @@ const CriarEvento = () => {
                   dateFormat="dd/MM/yyyy"
                   minDate={new Date()}
                   placeholderText="Escolha uma data"
-                  customInput={<InputDataComIcone placeholder="Escolha uma data" />}
+                  customInput={
+                    <InputDataComIcone placeholder="Escolha uma data" />
+                  }
                   calendarClassName="calendario-customizado"
                   popperClassName="popper-calendario"
                   showPopperArrow={false}
-                  // ✅ mantém o calendário com altura/grade consistente
                   fixedHeight
-                  renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => {
+                  // ✅ não manter "foco" do teclado grudado no mesmo dia (22) ao mudar mês
+                  disabledKeyboardNavigation
+                  // ✅ quando abrir, abre no mês atual (hoje) se não tem data selecionada
+                  openToDate={startDate ?? new Date()}
+                  renderCustomHeader={({
+                    date,
+                    decreaseMonth,
+                    increaseMonth,
+                  }) => {
                     const hoje = new Date();
-                    const firstOfCurrentMonth = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-                    const firstOfShownMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-                    const prevDisabled = firstOfShownMonth <= firstOfCurrentMonth;
+                    const firstOfCurrentMonth = new Date(
+                      hoje.getFullYear(),
+                      hoje.getMonth(),
+                      1,
+                    );
+                    const firstOfShownMonth = new Date(
+                      date.getFullYear(),
+                      date.getMonth(),
+                      1,
+                    );
+                    const prevDisabled =
+                      firstOfShownMonth <= firstOfCurrentMonth;
 
                     return (
                       <div className="cal-header cal-header--figma">
@@ -254,7 +285,10 @@ const CriarEvento = () => {
 
                         <div className="cal-title cal-title--figma">
                           {date
-                            .toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+                            .toLocaleDateString("pt-BR", {
+                              month: "long",
+                              year: "numeric",
+                            })
                             .replace(/^./, (c) => c.toUpperCase())}
                         </div>
 

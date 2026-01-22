@@ -297,13 +297,21 @@ textarea.input-estilizado {
   font-weight: 700;
 }
 
-/* Dia selecionado (25 azul no Figma) */
-.calendario-customizado .react-datepicker__day--selected,
-.calendario-customizado .react-datepicker__day--keyboard-selected {
+/* Dia selecionado (somente quando o usuário clicar) */
+.calendario-customizado .react-datepicker__day--selected {
   background: #76A8D9 !important;
   color: #FFFFFF !important;
   box-shadow: none;
 }
+
+/* "Foco" do teclado (não é seleção) — não deixe azul */
+.calendario-customizado .react-datepicker__day--keyboard-selected {
+  background: transparent !important;
+  color: #2E4A67 !important;
+  box-shadow: inset 0 0 0 1px rgba(46, 74, 103, 0.12);
+  border-radius: 8px;
+}
+
 
 /* Remove triângulos/bordas do popper */
 .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle {
