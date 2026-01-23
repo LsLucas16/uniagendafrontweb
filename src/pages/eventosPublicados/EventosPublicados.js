@@ -94,14 +94,14 @@ export default function EventosPublicados() {
 
   if (!user) {
     return (
-      <div className="eventos-publicados-page">
-        <div className="eventos-publicados-container">
+      <div className="painel-evento">
+        <div className="card-form">
           <header className="eventos-publicados-header">
             <h1>Eventos Publicados</h1>
             <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
           </header>
 
-          <div className="eventos-publicados-loading">
+          <div className="eventos-publicados-list">
             Usuário não identificado. Faça login novamente.
           </div>
         </div>

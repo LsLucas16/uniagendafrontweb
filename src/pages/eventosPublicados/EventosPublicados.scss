@@ -1,29 +1,36 @@
 .eventos-publicados-page {
-  background: #f3f5f7; /* pode manter cinza fora */
-  min-height: 300vh;
-  padding: 4px 0 6px;
+  background: #F4F4F4;     /* igual ao CriarEvento */
+  min-height: 100vh;       /* remove o “estica” */
+  padding: 0;              /* igual ao CriarEvento */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  overflow-x: hidden;
 }
 
 .eventos-publicados-container {
-  width: min(1200px, calc(100% - 2px));
-  margin: 0 auto;
-
-  background: #ffffff;     /* aqui entra o branco do figma */
-  border-radius: 16px;
-  padding: 18px;           /* respiro interno (igual sensação do figma) */
+  width: min(1128px, calc(100% - 10px)); /* igual ao card-form */
+  min-height: 658px;                      /* igual ao card-form (opcional) */
+  margin: 0;
+  background: #fff;
+  border-radius: 20px;                    /* alinhar com CriarEvento */
+  box-shadow: 0 4px 4px rgba(0,0,0,0.04); /* aproximar do CriarEvento */
+  padding: 34px 42px;                     /* igual ao card-form */
+  align-self: flex-start;
 }
+
 
 
 /* Cabeçalho */
 .eventos-publicados-header {
-  margin-bottom: 14px;
+  margin-bottom: 24px;
 
   h1 {
     margin: 0;
     font-size: 28px;
     line-height: 1.2;
     font-weight: 800;
-    color: #2b3a4a;
+    color: rgba(46, 74, 103, 1);
     letter-spacing: -0.2px;
   }
 
