@@ -28,11 +28,11 @@ function setOverrideMap(map) {
 function getEventoById(id) {
   const base = Array.isArray(data.eventos) ? data.eventos : [];
   const override = getOverrideMap();
-  return (
-    override[String(id)] ||
-    base.find((e) => String(e.id) === String(id)) ||
-    null
-  );
+
+  const ov = override[String(id)];
+  if (ov && ov.__deleted) return null; // ✅ se foi excluído
+
+  return ov || base.find((e) => String(e.id) === String(id)) || null;
 }
 
 const EditarEvento = () => {
@@ -42,7 +42,6 @@ const EditarEvento = () => {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [startDate, setStartDate] = useState(null);
-
 
   const [notificacoes, setNotificacoes] = useState({
     calendario: true,
@@ -57,7 +56,6 @@ const EditarEvento = () => {
     }
   }, []);
 
-  // Carrega evento ao abrir a página
   useEffect(() => {
     const evento = getEventoById(id);
 
@@ -72,7 +70,7 @@ const EditarEvento = () => {
       return;
     }
 
-    // Regra do seu sistema: só pode editar se for calendário
+    // ✅ mantém sua regra: só entra aqui se o evento for calendário
     if (!evento.calendario) {
       Swal.fire({
         title: "Ação não permitida",
@@ -84,7 +82,6 @@ const EditarEvento = () => {
       return;
     }
 
-    // Segurança: impedir editar evento de outra instituição (opcional, mas recomendado)
     if (
       usuarioLogado?.faculdadeId &&
       evento.instituicaoId !== usuarioLogado.faculdadeId
@@ -102,31 +99,29 @@ const EditarEvento = () => {
     setTitulo(evento.titulo || "");
     setDescricao(evento.descricao || "");
 
+    // ✅ agora pode “desafixar” depois, mas inicializa ligado
     setNotificacoes({
-      calendario: true, // mantém true, pois só existe edição para calendário
+      calendario: true,
       destaque: !!evento.destaque,
     });
 
-    function parseDataEvento(evento) {
-      if (!evento) return null;
+    function parseDataEvento(ev) {
+      if (!ev) return null;
 
-      // tente nos campos mais prováveis
       const raw =
-        evento.dataEvento ??
-        evento.data ??
-        evento.dataInicio ??
-        evento.data_inicio ??
-        evento.inicio ??
-        evento.startDate ??
+        ev.dataEvento ??
+        ev.data ??
+        ev.dataInicio ??
+        ev.data_inicio ??
+        ev.inicio ??
+        ev.startDate ??
         null;
 
       if (!raw) return null;
 
-      // 1) se já for ISO / Date parseável
       const isoTry = new Date(raw);
       if (!Number.isNaN(isoTry.getTime())) return isoTry;
 
-      // 2) se vier "dd/MM/yyyy"
       if (typeof raw === "string" && raw.includes("/")) {
         const [dd, mm, yyyy] = raw.split("/").map(Number);
         if (dd && mm && yyyy) {
@@ -142,7 +137,6 @@ const EditarEvento = () => {
   }, [id, navigate, usuarioLogado]);
 
   const handleSalvar = async () => {
-    // Título sempre obrigatório
     if (!titulo) {
       Swal.fire({
         title: "Campos obrigatórios",
@@ -154,8 +148,7 @@ const EditarEvento = () => {
       return;
     }
 
-    // Data só é obrigatória se "Aviso no calendário" estiver marcado
-    // (no editar, calendario fica sempre true)
+    // ✅ data só obrigatória se calendário estiver marcado
     if (notificacoes.calendario && !startDate) {
       Swal.fire({
         title: "Campos obrigatórios",
@@ -183,9 +176,10 @@ const EditarEvento = () => {
         ...original,
         titulo,
         descricao,
-        calendario: true, // mantém true
+        calendario: !!notificacoes.calendario, // ✅ agora grava o valor real
         destaque: !!notificacoes.destaque,
-        dataEvento: startDate ? startDate.toISOString() : null,
+        dataEvento:
+          notificacoes.calendario && startDate ? startDate.toISOString() : null,
         ultimaAtualizacao: new Date().toISOString(),
       };
 
@@ -204,6 +198,59 @@ const EditarEvento = () => {
       Swal.fire({
         title: "Erro ao salvar",
         text: "Não foi possível salvar as alterações. Tente novamente em instantes.",
+        icon: "error",
+        confirmButtonText: "Fechar",
+        confirmButtonColor: "#d33",
+      });
+    }
+  };
+
+  const handleExcluir = async () => {
+    const confirm = await Swal.fire({
+      title: "Excluir evento?",
+      text: "Essa ação não pode ser desfeita.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#2E4A67",
+      reverseButtons: true,
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const original = getEventoById(id);
+      if (!original) {
+        Swal.fire({
+          title: "Evento não encontrado",
+          text: "Esse evento já não está disponível.",
+          icon: "info",
+          confirmButtonColor: "#2E4A67",
+        }).then(() => navigate("/eventos"));
+        return;
+      }
+
+      const map = getOverrideMap();
+      map[String(id)] = {
+        __deleted: true,
+        id: String(id),
+        deletedAt: new Date().toISOString(),
+      };
+      setOverrideMap(map);
+
+      Swal.fire({
+        title: "Excluído",
+        text: "O evento foi excluído com sucesso.",
+        icon: "success",
+        confirmButtonText: "Ok",
+        confirmButtonColor: "#2E4A67",
+      }).then(() => navigate("/eventos"));
+    } catch {
+      Swal.fire({
+        title: "Erro ao excluir",
+        text: "Não foi possível excluir o evento. Tente novamente.",
         icon: "error",
         confirmButtonText: "Fechar",
         confirmButtonColor: "#d33",
@@ -246,7 +293,6 @@ const EditarEvento = () => {
             <span className="btn-voltar__seta" aria-hidden="true">
               <ArrowLeftIcon className="icon-arrow" />
             </span>
-
             <span>Voltar</span>
           </button>
         </div>
@@ -282,14 +328,37 @@ const EditarEvento = () => {
               <label className="label-notificacao">Tipo de notificação</label>
 
               <div className="opcoes-bolinha">
+                {/* ✅ Agora é clicável */}
                 <div
-                  className="item-bolinha item-bolinha--disabled"
+                  className="item-bolinha"
+                  onClick={() => {
+                    setNotificacoes((prev) => {
+                      const nextCalendario = !prev.calendario;
+
+                      // se DESLIGOU calendário, limpa data
+                      if (!nextCalendario) setStartDate(null);
+
+                      return { ...prev, calendario: nextCalendario };
+                    });
+                  }}
                   role="checkbox"
-                  aria-checked={true}
-                  tabIndex={-1}
-                  title="Este evento é de calendário e isso não pode ser alterado"
+                  aria-checked={notificacoes.calendario}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+
+                      setNotificacoes((prev) => {
+                        const nextCalendario = !prev.calendario;
+                        if (!nextCalendario) setStartDate(null);
+                        return { ...prev, calendario: nextCalendario };
+                      });
+                    }
+                  }}
                 >
-                  <div className="circular-check active" />
+                  <div
+                    className={`circular-check ${notificacoes.calendario ? "active" : ""}`}
+                  />
                   <span>Aviso no calendário</span>
                 </div>
 
@@ -322,83 +391,95 @@ const EditarEvento = () => {
               </div>
             </div>
 
-            <div className="campo">
-              <label>Data do evento</label>
+            {notificacoes.calendario && (
+              <div className="campo">
+                <label>Data do evento</label>
 
-              <div className="input-calendario-wrapper">
-                <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  locale="pt-BR"
-                  dateFormat="dd/MM/yyyy"
-                  minDate={new Date()}
-                  placeholderText="Escolha uma data"
-                  customInput={
-                    <InputDataComIcone placeholder="Escolha uma data" />
-                  }
-                  calendarClassName="calendario-customizado"
-                  popperClassName="popper-calendario"
-                  showPopperArrow={false}
-                  renderCustomHeader={({
-                    date,
-                    decreaseMonth,
-                    increaseMonth,
-                  }) => {
-                    const hoje = new Date();
-                    const firstOfCurrentMonth = new Date(
-                      hoje.getFullYear(),
-                      hoje.getMonth(),
-                      1,
-                    );
-                    const firstOfShownMonth = new Date(
-                      date.getFullYear(),
-                      date.getMonth(),
-                      1,
-                    );
-                    const prevDisabled =
-                      firstOfShownMonth <= firstOfCurrentMonth;
+                <div className="input-calendario-wrapper">
+                  <DatePicker
+                    fixedHeight
+                    selected={startDate}
+                    onChange={(date) => setStartDate(date)}
+                    locale="pt-BR"
+                    dateFormat="dd/MM/yyyy"
+                    minDate={new Date()}
+                    placeholderText="Escolha uma data"
+                    customInput={
+                      <InputDataComIcone placeholder="Escolha uma data" />
+                    }
+                    calendarClassName="calendario-customizado"
+                    popperClassName="popper-calendario"
+                    showPopperArrow={false}
+                    renderCustomHeader={({
+                      date,
+                      decreaseMonth,
+                      increaseMonth,
+                    }) => {
+                      const hoje = new Date();
+                      const firstOfCurrentMonth = new Date(
+                        hoje.getFullYear(),
+                        hoje.getMonth(),
+                        1,
+                      );
+                      const firstOfShownMonth = new Date(
+                        date.getFullYear(),
+                        date.getMonth(),
+                        1,
+                      );
+                      const prevDisabled =
+                        firstOfShownMonth <= firstOfCurrentMonth;
 
-                    return (
-                      <div className="cal-header cal-header--figma">
-                        <button
-                          type="button"
-                          className={`cal-nav cal-nav--figma ${prevDisabled ? "is-disabled" : ""}`}
-                          onClick={() => {
-                            if (!prevDisabled) decreaseMonth();
-                          }}
-                          aria-label="Mês anterior"
-                          disabled={prevDisabled}
-                        >
-                          ‹
-                        </button>
+                      return (
+                        <div className="cal-header cal-header--figma">
+                          <button
+                            type="button"
+                            className={`cal-nav cal-nav--figma ${prevDisabled ? "is-disabled" : ""}`}
+                            onClick={() => {
+                              if (!prevDisabled) decreaseMonth();
+                            }}
+                            aria-label="Mês anterior"
+                            disabled={prevDisabled}
+                          >
+                            ‹
+                          </button>
 
-                        <div className="cal-title cal-title--figma">
-                          {date
-                            .toLocaleDateString("pt-BR", {
-                              month: "long",
-                              year: "numeric",
-                            })
-                            .replace(/^./, (c) => c.toUpperCase())}
+                          <div className="cal-title cal-title--figma">
+                            {date
+                              .toLocaleDateString("pt-BR", {
+                                month: "long",
+                                year: "numeric",
+                              })
+                              .replace(/^./, (c) => c.toUpperCase())}
+                          </div>
+
+                          <button
+                            type="button"
+                            className="cal-nav cal-nav--figma"
+                            onClick={increaseMonth}
+                            aria-label="Próximo mês"
+                          >
+                            ›
+                          </button>
                         </div>
-
-                        <button
-                          type="button"
-                          className="cal-nav cal-nav--figma"
-                          onClick={increaseMonth}
-                          aria-label="Próximo mês"
-                        >
-                          ›
-                        </button>
-                      </div>
-                    );
-                  }}
-                />
+                      );
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
 
             <div className="container-btn">
               <button className="btn-publicar" onClick={handleSalvar}>
                 Salvar alterações
+              </button>
+
+              {/* ✅ Botão no canto inferior direito, como no print */}
+              <button
+                type="button"
+                className="btn-excluir"
+                onClick={handleExcluir}
+              >
+                Excluir evento
               </button>
             </div>
           </div>

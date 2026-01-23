@@ -66,3 +66,66 @@
 
   &:hover { background: transparent; }
 }
+
+/* mantém seu import */
+@import "../criarEvento/CriarEvento.scss";
+
+/* ...seu CSS atual fica... */
+
+.painel-evento.editar-evento .container-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* botão salvar fica central */
+  margin-top: 12px;
+}
+
+/* Botão excluir no canto direito, estilo “pill” com borda vermelha */
+.painel-evento.editar-evento .btn-excluir {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  background: transparent;
+  border: 1px solid #d33;
+  color: #d33;
+
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.15s ease;
+
+  &:hover {
+    background: rgba(211, 51, 51, 0.08);
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.98);
+  }
+}
+
+/* Quando “Aviso no calendário” estiver desmarcado, desabilita o datepicker */
+.painel-evento.editar-evento .input-calendario-wrapper.is-disabled {
+  opacity: 0.55;
+}
+
+/* Se você quiser impedir clique totalmente via wrapper também (além do disabled do DatePicker) */
+.painel-evento.editar-evento .input-calendario-wrapper.is-disabled .date-input {
+  cursor: not-allowed;
+}
+
+
+/* Garante alinhamento e não “encolhe” */
+.calendario-customizado .react-datepicker__week {
+  display: flex;
+}
+
+
+.popper-calendario {
+  margin-top: 0px; /* desce um pouco */
+}
+
