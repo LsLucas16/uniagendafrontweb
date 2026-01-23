@@ -174,3 +174,42 @@
   font-size: 14px;
   color: #9aa6b2;
 }
+
+
+.eventos-publicados-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;          /* garante base */
+}
+
+/* força o card a não ocupar tudo */
+.eventos-publicados-list .evento-card {
+  width: min(980px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.eventos-publicados-list {
+  width: 100%;
+}
+
+.eventos-publicados-list .evento-card {
+  width: min(980px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.evento-card-chips .chip {
+  background: #76A8D9 !important;
+  color: #ffffff !important;
+  border: 0 !important;
+}
+
+.evento-card-chips .chip--calendario {
+  background: #76A8D9 !important;
+}
+
+.evento-card-chips .chip--destaque {
+  background: #6EA8D9 !important;
+}
