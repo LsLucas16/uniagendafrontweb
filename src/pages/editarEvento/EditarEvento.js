@@ -12,6 +12,13 @@ import "./EditarEvento.scss";
 registerLocale("pt-BR", ptBR);
 
 const STORAGE_KEY = "eventos_override";
+const TITULO_MAX = 60;
+const DESCRICAO_MAX = 800;
+
+function capitalizeFirst(str) {
+  if (!str) return "";
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 function getOverrideMap() {
   try {
@@ -42,6 +49,9 @@ const EditarEvento = () => {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [startDate, setStartDate] = useState(null);
+
+  const tituloCount = useMemo(() => titulo.length, [titulo]);
+  const descricaoCount = useMemo(() => descricao.length, [descricao]);
 
   const [notificacoes, setNotificacoes] = useState({
     calendario: true,
@@ -141,6 +151,17 @@ const EditarEvento = () => {
       Swal.fire({
         title: "Campos obrigatórios",
         text: "Por favor, preencha o título do evento.",
+        icon: "warning",
+        confirmButtonText: "Entendido",
+        confirmButtonColor: "#2E4A67",
+      });
+      return;
+    }
+
+    if (!descricao.trim()) {
+      Swal.fire({
+        title: "Campos obrigatórios",
+        text: "Por favor, preencha a descrição do evento.",
         icon: "warning",
         confirmButtonText: "Entendido",
         confirmButtonColor: "#2E4A67",
@@ -308,9 +329,17 @@ const EditarEvento = () => {
                 placeholder="Digite o título do evento"
                 className="input-estilizado"
                 value={titulo}
-                onChange={(e) => setTitulo(e.target.value)}
+                maxLength={TITULO_MAX}
+                onChange={(e) => {
+                  const raw = e.target.value || "";
+                  const limited = raw.slice(0, TITULO_MAX);
+                  setTitulo(capitalizeFirst(limited));
+                }}
                 required
               />
+              <div className="contador-campo">
+                {tituloCount}/{TITULO_MAX}
+              </div>
             </div>
 
             <div className="campo">
@@ -320,8 +349,16 @@ const EditarEvento = () => {
                 placeholder="Descreva os detalhes do evento"
                 className="input-estilizado"
                 value={descricao}
-                onChange={(e) => setDescricao(e.target.value)}
+                maxLength={DESCRICAO_MAX}
+                onChange={(e) => {
+                  const raw = e.target.value || "";
+                  setDescricao(raw.slice(0, DESCRICAO_MAX));
+                }}
+                required
               />
+              <div className="contador-campo">
+                {descricaoCount}/{DESCRICAO_MAX}
+              </div>
             </div>
 
             <div className="campo">
