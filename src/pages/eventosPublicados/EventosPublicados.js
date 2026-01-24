@@ -122,6 +122,11 @@ export default function EventosPublicados() {
             const criadoPor = usuariosById.get(ev.criadoPorId)?.nome || "—";
             const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
+            const temDataEvento = !!ev.dataEvento;
+            const dataEventoFmt = temDataEvento
+              ? formatarDataPtBR(ev.dataEvento)
+              : "";
+
             const podeEditar = !!ev.calendario; // REGRA: só calendário (inclui ambos)
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
@@ -131,9 +136,18 @@ export default function EventosPublicados() {
                 <div className="evento-card-top">
                   <div className="evento-card-titleblock">
                     <div className="evento-card-title">{ev.titulo}</div>
-                    <div className="evento-card-updated">
-                      Última atualização: {dataAtual}
-                    </div>
+
+                    {/* ✅ Se tiver dataEvento, mostra "Data do evento" (igual figma).
+              ❌ Se não tiver, mantém "Última atualização" aqui (como está hoje). */}
+                    {temDataEvento ? (
+                      <div className="evento-card-eventdate">
+                        Data do evento: {dataEventoFmt}
+                      </div>
+                    ) : (
+                      <div className="evento-card-updated">
+                        Última atualização: {dataAtual}
+                      </div>
+                    )}
 
                     <div className="evento-card-chips">
                       {temCalendario && (
@@ -167,6 +181,13 @@ export default function EventosPublicados() {
                   <span className="evento-card-createdby">
                     Criado por: <strong>{criadoPor}</strong>
                   </span>
+
+                  {/* ✅ Quando tem dataEvento, joga a "Última atualização" pro rodapé (direita) */}
+                  {temDataEvento && (
+                    <span className="evento-card-footer-updated">
+                      Última atualização: {dataAtual}
+                    </span>
+                  )}
                 </div>
               </article>
             );

@@ -213,3 +213,26 @@
 .evento-card-chips .chip--destaque {
   background: #6EA8D9 !important;
 }
+
+
+/* Linha "Data do evento" (quando existir dataEvento) */
+.evento-card-eventdate {
+  font-size: 11px;
+  color: #98a2b3;
+  margin-bottom: 6px;
+}
+
+/* Rodapé vira 2 colunas (esq: criado por / dir: ultima atualização) */
+.evento-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.evento-card-footer-updated {
+  font-size: 11px;
+  color: #98a2b3;
+  white-space: nowrap;
+}
