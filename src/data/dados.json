@@ -6,6 +6,15 @@
   ],
   "usuarios": [
     {
+      "id": 501,
+      "user": "teste.responsavel",
+      "senha": "123",
+      "nome": "Julia Maria Neto",
+      "tipo": "responsavel",
+      "faculdadeId": 1,
+      "disciplinas": [1, 2, 3 , 4]
+    },
+    {
       "id": 101,
       "user": "aluno",
       "senha": "123",
@@ -96,7 +105,7 @@
    "disciplinas": [
   {
     "id": 1,
-    "nome": "Cálculo I - Turma 8",
+    "nome": "Calculo I - Turma 8",
     "cor": "#3B82F6",
     "instituicaoId": 1,
     "professorId": 201,
@@ -129,7 +138,7 @@
 
   {
     "id": 5,
-    "nome": "Cálculo I - Turma 8",
+    "nome": 1,
     "cor": "#3B82F6",
     "instituicaoId": 3,
     "professorId": 302,

@@ -6,6 +6,9 @@ import { Calendar } from "lucide-react";
 import "react-datepicker/dist/react-datepicker.css";
 import "./CriarEvento.scss";
 
+import dados from "../../data/dados.json";
+import { nextEventoId, upsertEvento } from "../../services/eventosStore";
+
 registerLocale("pt-BR", ptBR);
 
 const TITULO_MAX = 60;
@@ -21,7 +24,6 @@ const CriarEvento = () => {
   const [descricao, setDescricao] = useState("");
   const [startDate, setStartDate] = useState(null);
 
-  // ✅ inicia com os dois desmarcados
   const [notificacoes, setNotificacoes] = useState({
     calendario: false,
     destaque: false,
@@ -31,7 +33,6 @@ const CriarEvento = () => {
   const descricaoCount = useMemo(() => descricao.length, [descricao]);
 
   const handleSalvar = async () => {
-    // ✅ Título obrigatório
     if (!titulo.trim()) {
       Swal.fire({
         title: "Campos obrigatórios",
@@ -43,7 +44,6 @@ const CriarEvento = () => {
       return;
     }
 
-    // ✅ Descrição obrigatória
     if (!descricao.trim()) {
       Swal.fire({
         title: "Campos obrigatórios",
@@ -55,7 +55,6 @@ const CriarEvento = () => {
       return;
     }
 
-    // ✅ Data só é obrigatória se "Aviso no calendário" estiver marcado
     if (notificacoes.calendario && !startDate) {
       Swal.fire({
         title: "Campos obrigatórios",
@@ -71,12 +70,39 @@ const CriarEvento = () => {
       Swal.fire({
         title: "Publicando evento...",
         allowOutsideClick: false,
-        didOpen: () => {
-          Swal.showLoading();
-        },
+        didOpen: () => Swal.showLoading(),
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      const id = nextEventoId(dados.eventos);
+
+      const dataEventoISO = notificacoes.calendario
+        ? new Date(
+            startDate.getFullYear(),
+            startDate.getMonth(),
+            startDate.getDate(),
+          ).toISOString()
+        : null;
+
+      const agoraISO = new Date().toISOString();
+
+      const criadoPorId = 201;
+      const instituicaoId = 1;
+      const disciplinaId = 1;
+
+      const novoEvento = {
+        id,
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        ultimaAtualizacao: agoraISO,
+        ...(dataEventoISO ? { dataEvento: dataEventoISO } : {}),
+        criadoPorId,
+        instituicaoId,
+        disciplinaId,
+        calendario: notificacoes.calendario,
+        destaque: notificacoes.destaque,
+      };
+
+      upsertEvento(novoEvento);
 
       Swal.fire({
         title: "Sucesso!",
@@ -85,6 +111,11 @@ const CriarEvento = () => {
         confirmButtonText: "Ótimo",
         confirmButtonColor: "#2E4A67",
       });
+
+      setTitulo("");
+      setDescricao("");
+      setStartDate(null);
+      setNotificacoes({ calendario: false, destaque: false });
     } catch (error) {
       Swal.fire({
         title: "Erro ao publicar",
@@ -192,7 +223,9 @@ const CriarEvento = () => {
                 }}
               >
                 <div
-                  className={`circular-check ${notificacoes.calendario ? "active" : ""}`}
+                  className={`circular-check ${
+                    notificacoes.calendario ? "active" : ""
+                  }`}
                 />
                 <span>Aviso no calendário</span>
               </div>
@@ -219,14 +252,15 @@ const CriarEvento = () => {
                 }}
               >
                 <div
-                  className={`circular-check ${notificacoes.destaque ? "active" : ""}`}
+                  className={`circular-check ${
+                    notificacoes.destaque ? "active" : ""
+                  }`}
                 />
                 <span>Aviso em destaque</span>
               </div>
             </div>
           </div>
 
-          {/* ✅ Só mostra a data se "Aviso no calendário" estiver marcado */}
           {notificacoes.calendario && (
             <div className="campo">
               <label>Data do evento</label>
@@ -246,9 +280,7 @@ const CriarEvento = () => {
                   popperClassName="popper-calendario"
                   showPopperArrow={false}
                   fixedHeight
-                  // ✅ não manter "foco" do teclado grudado no mesmo dia (22) ao mudar mês
                   disabledKeyboardNavigation
-                  // ✅ quando abrir, abre no mês atual (hoje) se não tem data selecionada
                   openToDate={startDate ?? new Date()}
                   renderCustomHeader={({
                     date,
@@ -273,7 +305,9 @@ const CriarEvento = () => {
                       <div className="cal-header cal-header--figma">
                         <button
                           type="button"
-                          className={`cal-nav cal-nav--figma ${prevDisabled ? "is-disabled" : ""}`}
+                          className={`cal-nav cal-nav--figma ${
+                            prevDisabled ? "is-disabled" : ""
+                          }`}
                           onClick={() => {
                             if (!prevDisabled) decreaseMonth();
                           }}

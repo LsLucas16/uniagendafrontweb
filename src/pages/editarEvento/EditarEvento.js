@@ -6,12 +6,13 @@ import { Calendar } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { ReactComponent as ArrowLeftIcon } from "../../assets/seta.svg";
-import data from "../../data/dados.json";
+import dados from "../../data/dados.json";
 import "./EditarEvento.scss";
+
+import { getEventos, upsertEvento, deleteEvento } from "../../services/eventosStore";
 
 registerLocale("pt-BR", ptBR);
 
-const STORAGE_KEY = "eventos_override";
 const TITULO_MAX = 60;
 const DESCRICAO_MAX = 800;
 
@@ -20,26 +21,32 @@ function capitalizeFirst(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function getOverrideMap() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
-  } catch {
-    return {};
+function parseDataEvento(ev) {
+  if (!ev) return null;
+
+  const raw =
+    ev.dataEvento ??
+    ev.data ??
+    ev.dataInicio ??
+    ev.data_inicio ??
+    ev.inicio ??
+    ev.startDate ??
+    null;
+
+  if (!raw) return null;
+
+  const isoTry = new Date(raw);
+  if (!Number.isNaN(isoTry.getTime())) return isoTry;
+
+  if (typeof raw === "string" && raw.includes("/")) {
+    const [dd, mm, yyyy] = raw.split("/").map(Number);
+    if (dd && mm && yyyy) {
+      const dt = new Date(yyyy, mm - 1, dd);
+      return Number.isNaN(dt.getTime()) ? null : dt;
+    }
   }
-}
 
-function setOverrideMap(map) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
-}
-
-function getEventoById(id) {
-  const base = Array.isArray(data.eventos) ? data.eventos : [];
-  const override = getOverrideMap();
-
-  const ov = override[String(id)];
-  if (ov && ov.__deleted) return null; // ✅ se foi excluído
-
-  return ov || base.find((e) => String(e.id) === String(id)) || null;
+  return null;
 }
 
 const EditarEvento = () => {
@@ -66,8 +73,15 @@ const EditarEvento = () => {
     }
   }, []);
 
+  // 🔹 Busca evento final (base + overrides) pelo id
+  const getEventoAtual = () => {
+    const baseEventos = Array.isArray(dados.eventos) ? dados.eventos : [];
+    const todos = getEventos(baseEventos);
+    return todos.find((e) => String(e.id) === String(id)) || null;
+  };
+
   useEffect(() => {
-    const evento = getEventoById(id);
+    const evento = getEventoAtual();
 
     if (!evento) {
       Swal.fire({
@@ -109,45 +123,17 @@ const EditarEvento = () => {
     setTitulo(evento.titulo || "");
     setDescricao(evento.descricao || "");
 
-    // ✅ agora pode “desafixar” depois, mas inicializa ligado
     setNotificacoes({
-      calendario: true,
+      calendario: !!evento.calendario, // inicia com o que existe
       destaque: !!evento.destaque,
     });
 
-    function parseDataEvento(ev) {
-      if (!ev) return null;
-
-      const raw =
-        ev.dataEvento ??
-        ev.data ??
-        ev.dataInicio ??
-        ev.data_inicio ??
-        ev.inicio ??
-        ev.startDate ??
-        null;
-
-      if (!raw) return null;
-
-      const isoTry = new Date(raw);
-      if (!Number.isNaN(isoTry.getTime())) return isoTry;
-
-      if (typeof raw === "string" && raw.includes("/")) {
-        const [dd, mm, yyyy] = raw.split("/").map(Number);
-        if (dd && mm && yyyy) {
-          const dt = new Date(yyyy, mm - 1, dd);
-          return Number.isNaN(dt.getTime()) ? null : dt;
-        }
-      }
-
-      return null;
-    }
-
     setStartDate(parseDataEvento(evento));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id, navigate, usuarioLogado]);
 
   const handleSalvar = async () => {
-    if (!titulo) {
+    if (!titulo.trim()) {
       Swal.fire({
         title: "Campos obrigatórios",
         text: "Por favor, preencha o título do evento.",
@@ -169,7 +155,6 @@ const EditarEvento = () => {
       return;
     }
 
-    // ✅ data só obrigatória se calendário estiver marcado
     if (notificacoes.calendario && !startDate) {
       Swal.fire({
         title: "Campos obrigatórios",
@@ -188,25 +173,41 @@ const EditarEvento = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 1200));
+      // opcional: simular latência
+      await new Promise((resolve) => setTimeout(resolve, 600));
 
-      const original = getEventoById(id);
+      const original = getEventoAtual();
       if (!original) throw new Error("Evento não encontrado");
+
+      const agoraISO = new Date().toISOString();
+
+      const dataEventoISO =
+        notificacoes.calendario && startDate
+          ? new Date(
+              startDate.getFullYear(),
+              startDate.getMonth(),
+              startDate.getDate(),
+            ).toISOString()
+          : null;
 
       const atualizado = {
         ...original,
-        titulo,
-        descricao,
-        calendario: !!notificacoes.calendario, // ✅ agora grava o valor real
+        titulo: titulo.trim(),
+        descricao: descricao.trim(),
+        calendario: !!notificacoes.calendario,
         destaque: !!notificacoes.destaque,
-        dataEvento:
-          notificacoes.calendario && startDate ? startDate.toISOString() : null,
-        ultimaAtualizacao: new Date().toISOString(),
+        ...(dataEventoISO ? { dataEvento: dataEventoISO } : {}),
+        // Se desligou calendário, remova a dataEvento do objeto final
+        ...(dataEventoISO ? {} : { dataEvento: undefined }),
+        ultimaAtualizacao: agoraISO,
       };
 
-      const map = getOverrideMap();
-      map[String(id)] = atualizado;
-      setOverrideMap(map);
+      // remove campos undefined antes de salvar
+      Object.keys(atualizado).forEach((k) => {
+        if (atualizado[k] === undefined) delete atualizado[k];
+      });
+
+      upsertEvento(atualizado);
 
       Swal.fire({
         title: "Sucesso!",
@@ -242,7 +243,7 @@ const EditarEvento = () => {
     if (!confirm.isConfirmed) return;
 
     try {
-      const original = getEventoById(id);
+      const original = getEventoAtual();
       if (!original) {
         Swal.fire({
           title: "Evento não encontrado",
@@ -253,13 +254,7 @@ const EditarEvento = () => {
         return;
       }
 
-      const map = getOverrideMap();
-      map[String(id)] = {
-        __deleted: true,
-        id: String(id),
-        deletedAt: new Date().toISOString(),
-      };
-      setOverrideMap(map);
+      deleteEvento(original.id);
 
       Swal.fire({
         title: "Excluído",
@@ -365,16 +360,12 @@ const EditarEvento = () => {
               <label className="label-notificacao">Tipo de notificação</label>
 
               <div className="opcoes-bolinha">
-                {/* ✅ Agora é clicável */}
                 <div
                   className="item-bolinha"
                   onClick={() => {
                     setNotificacoes((prev) => {
                       const nextCalendario = !prev.calendario;
-
-                      // se DESLIGOU calendário, limpa data
                       if (!nextCalendario) setStartDate(null);
-
                       return { ...prev, calendario: nextCalendario };
                     });
                   }}
@@ -384,7 +375,6 @@ const EditarEvento = () => {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
                       e.preventDefault();
-
                       setNotificacoes((prev) => {
                         const nextCalendario = !prev.calendario;
                         if (!nextCalendario) setStartDate(null);
@@ -394,7 +384,9 @@ const EditarEvento = () => {
                   }}
                 >
                   <div
-                    className={`circular-check ${notificacoes.calendario ? "active" : ""}`}
+                    className={`circular-check ${
+                      notificacoes.calendario ? "active" : ""
+                    }`}
                   />
                   <span>Aviso no calendário</span>
                 </div>
@@ -421,7 +413,9 @@ const EditarEvento = () => {
                   }}
                 >
                   <div
-                    className={`circular-check ${notificacoes.destaque ? "active" : ""}`}
+                    className={`circular-check ${
+                      notificacoes.destaque ? "active" : ""
+                    }`}
                   />
                   <span>Aviso em destaque</span>
                 </div>
@@ -470,7 +464,9 @@ const EditarEvento = () => {
                         <div className="cal-header cal-header--figma">
                           <button
                             type="button"
-                            className={`cal-nav cal-nav--figma ${prevDisabled ? "is-disabled" : ""}`}
+                            className={`cal-nav cal-nav--figma ${
+                              prevDisabled ? "is-disabled" : ""
+                            }`}
                             onClick={() => {
                               if (!prevDisabled) decreaseMonth();
                             }}
@@ -510,7 +506,6 @@ const EditarEvento = () => {
                 Salvar alterações
               </button>
 
-              {/* ✅ Botão no canto inferior direito, como no print */}
               <button
                 type="button"
                 className="btn-excluir"

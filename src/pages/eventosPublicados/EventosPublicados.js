@@ -4,6 +4,8 @@ import { Pencil } from "lucide-react";
 import "./EventosPublicados.scss";
 import data from "../../data/dados.json";
 
+import { getEventos } from "../../services/eventosStore";
+
 function formatarDataPtBR(iso) {
   if (!iso) return "";
   const dt = new Date(iso);
@@ -30,20 +32,26 @@ export default function EventosPublicados() {
     getDisciplinaAtualId(),
   );
 
-  // escuta troca de disciplina feita no MenuLateral
+  // 🔹 força re-render quando criar/editar/excluir
+  const [refreshKey, setRefreshKey] = useState(0);
+
   useEffect(() => {
     const onDisciplinaChanged = () =>
       setDisciplinaAtualId(getDisciplinaAtualId());
 
-    // caso você altere usuário/disciplina em outra aba (não é obrigatório)
     const onStorage = (e) => {
       if (e.key === "usuario") setUsuarioLogado(getUsuarioLogado());
       if (e.key === "disciplinaAtualId")
         setDisciplinaAtualId(getDisciplinaAtualId());
+      // não confie em storage event para mesma aba
     };
+
+    // ✅ evento interno disparado pelo app quando eventos mudarem
+    const onEventosChanged = () => setRefreshKey((k) => k + 1);
 
     window.addEventListener("disciplinaAtual:changed", onDisciplinaChanged);
     window.addEventListener("storage", onStorage);
+    window.addEventListener("eventos:changed", onEventosChanged);
 
     return () => {
       window.removeEventListener(
@@ -51,6 +59,7 @@ export default function EventosPublicados() {
         onDisciplinaChanged,
       );
       window.removeEventListener("storage", onStorage);
+      window.removeEventListener("eventos:changed", onEventosChanged);
     };
   }, []);
 
@@ -72,10 +81,13 @@ export default function EventosPublicados() {
     const instId = user.faculdadeId;
     const discIdNum = disciplinaAtualId ? Number(disciplinaAtualId) : null;
 
-    const lista = (data.eventos || [])
+    // ✅ pega lista final (base + overrides do localStorage)
+    const baseEventos = Array.isArray(data.eventos) ? data.eventos : [];
+    const eventosFinal = getEventos(baseEventos);
+
+    const lista = eventosFinal
       .filter((ev) => ev.instituicaoId === instId)
       .filter((ev) => {
-        // se não tiver disciplina selecionada, mostra tudo da instituição
         if (!discIdNum) return true;
         return ev.disciplinaId === discIdNum;
       })
@@ -86,7 +98,7 @@ export default function EventosPublicados() {
       });
 
     return lista;
-  }, [user, disciplinaAtualId]);
+  }, [user, disciplinaAtualId, refreshKey]); // ✅ refreshKey garante atualização na mesma aba
 
   const handleEditar = (eventoId) => {
     navigate(`/eventos/${eventoId}/editar`);
@@ -127,7 +139,7 @@ export default function EventosPublicados() {
               ? formatarDataPtBR(ev.dataEvento)
               : "";
 
-            const podeEditar = !!ev.calendario; // REGRA: só calendário (inclui ambos)
+            const podeEditar = !!ev.calendario;
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
 
@@ -137,8 +149,6 @@ export default function EventosPublicados() {
                   <div className="evento-card-titleblock">
                     <div className="evento-card-title">{ev.titulo}</div>
 
-                    {/* ✅ Se tiver dataEvento, mostra "Data do evento" (igual figma).
-              ❌ Se não tiver, mantém "Última atualização" aqui (como está hoje). */}
                     {temDataEvento ? (
                       <div className="evento-card-eventdate">
                         Data do evento: {dataEventoFmt}
@@ -182,7 +192,6 @@ export default function EventosPublicados() {
                     Criado por: <strong>{criadoPor}</strong>
                   </span>
 
-                  {/* ✅ Quando tem dataEvento, joga a "Última atualização" pro rodapé (direita) */}
                   {temDataEvento && (
                     <span className="evento-card-footer-updated">
                       Última atualização: {dataAtual}
