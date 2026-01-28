@@ -236,3 +236,40 @@
   color: #98a2b3;
   white-space: nowrap;
 }
+
+/* FIX: chip não pode virar "barra" */
+.eventos-publicados-page .evento-card-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.eventos-publicados-page .evento-card-chips .chip {
+  /* impede ocupar a linha toda */
+  width: fit-content !important;
+  max-width: fit-content !important;
+  flex: 0 0 auto !important;
+  display: inline-flex !important;
+
+  /* remove qualquer min-width global */
+  min-width: unset !important;
+
+  /* estilo igual print */
+  height: 16px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1;
+
+  align-items: center;
+  justify-content: center;
+
+  border: 0;
+  color: #fff;
+  white-space: nowrap;
+}
+
+/* cores */
+.eventos-publicados-page .evento-card-chips .chip--calendario { background: #76A8D9 !important; }
+.eventos-publicados-page .evento-card-chips .chip--destaque   { background: #6EA8D9 !important; }

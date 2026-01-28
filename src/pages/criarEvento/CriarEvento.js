@@ -32,100 +32,107 @@ const CriarEvento = () => {
   const tituloCount = useMemo(() => titulo.length, [titulo]);
   const descricaoCount = useMemo(() => descricao.length, [descricao]);
 
-  const handleSalvar = async () => {
-    if (!titulo.trim()) {
-      Swal.fire({
-        title: "Campos obrigatórios",
-        text: "Por favor, preencha o título do evento.",
-        icon: "warning",
-        confirmButtonText: "Entendido",
-        confirmButtonColor: "#2E4A67",
-      });
-      return;
-    }
+ const handleSalvar = async () => {
+  if (!titulo.trim()) {
+    Swal.fire({
+      title: "Campos obrigatórios",
+      text: "Por favor, preencha o título do evento.",
+      icon: "warning",
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#2E4A67",
+    });
+    return;
+  }
 
-    if (!descricao.trim()) {
-      Swal.fire({
-        title: "Campos obrigatórios",
-        text: "Por favor, preencha a descrição do evento.",
-        icon: "warning",
-        confirmButtonText: "Entendido",
-        confirmButtonColor: "#2E4A67",
-      });
-      return;
-    }
+  if (!descricao.trim()) {
+    Swal.fire({
+      title: "Campos obrigatórios",
+      text: "Por favor, preencha a descrição do evento.",
+      icon: "warning",
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#2E4A67",
+    });
+    return;
+  }
 
-    if (notificacoes.calendario && !startDate) {
-      Swal.fire({
-        title: "Campos obrigatórios",
-        text: "Selecione a data do evento para aviso no calendário.",
-        icon: "warning",
-        confirmButtonText: "Entendido",
-        confirmButtonColor: "#2E4A67",
-      });
-      return;
-    }
+  if (notificacoes.calendario && !startDate) {
+    Swal.fire({
+      title: "Campos obrigatórios",
+      text: "Selecione a data do evento para aviso no calendário.",
+      icon: "warning",
+      confirmButtonText: "Entendido",
+      confirmButtonColor: "#2E4A67",
+    });
+    return;
+  }
 
-    try {
-      Swal.fire({
-        title: "Publicando evento...",
-        allowOutsideClick: false,
-        didOpen: () => Swal.showLoading(),
-      });
+  try {
+    Swal.fire({
+      title: "Publicando evento...",
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+      didOpen: () => Swal.showLoading(),
+    });
 
-      const id = nextEventoId(dados.eventos);
+    const id = nextEventoId(dados.eventos);
 
-      const dataEventoISO = notificacoes.calendario
-        ? new Date(
-            startDate.getFullYear(),
-            startDate.getMonth(),
-            startDate.getDate(),
-          ).toISOString()
-        : null;
+    const dataEventoISO = notificacoes.calendario
+      ? new Date(
+          startDate.getFullYear(),
+          startDate.getMonth(),
+          startDate.getDate(),
+        ).toISOString()
+      : null;
 
-      const agoraISO = new Date().toISOString();
+    const agoraISO = new Date().toISOString();
 
-      const criadoPorId = 201;
-      const instituicaoId = 1;
-      const disciplinaId = 1;
+    const criadoPorId = 201;
+    const instituicaoId = 1;
+    const disciplinaId = 1;
 
-      const novoEvento = {
-        id,
-        titulo: titulo.trim(),
-        descricao: descricao.trim(),
-        ultimaAtualizacao: agoraISO,
-        ...(dataEventoISO ? { dataEvento: dataEventoISO } : {}),
-        criadoPorId,
-        instituicaoId,
-        disciplinaId,
-        calendario: notificacoes.calendario,
-        destaque: notificacoes.destaque,
-      };
+    const novoEvento = {
+      id,
+      titulo: titulo.trim(),
+      descricao: descricao.trim(),
+      ultimaAtualizacao: agoraISO,
+      ...(dataEventoISO ? { dataEvento: dataEventoISO } : {}),
+      criadoPorId,
+      instituicaoId,
+      disciplinaId,
+      calendario: notificacoes.calendario,
+      destaque: notificacoes.destaque,
+    };
 
-      upsertEvento(novoEvento);
+    upsertEvento(novoEvento);
 
-      Swal.fire({
-        title: "Sucesso!",
-        text: "O evento foi publicado e já está disponível.",
-        icon: "success",
-        confirmButtonText: "Ótimo",
-        confirmButtonColor: "#2E4A67",
-      });
+    Swal.close();
 
-      setTitulo("");
-      setDescricao("");
-      setStartDate(null);
-      setNotificacoes({ calendario: false, destaque: false });
-    } catch (error) {
-      Swal.fire({
-        title: "Erro ao publicar",
-        text: "Não foi possível salvar o evento. Tente novamente em instantes.",
-        icon: "error",
-        confirmButtonText: "Fechar",
-        confirmButtonColor: "#d33",
-      });
-    }
-  };
+    await Swal.fire({
+      title: "Sucesso!",
+      text: "O evento foi publicado e já está disponível.",
+      icon: "success",
+      timer: 2000,
+      timerProgressBar: true,
+      showConfirmButton: false,
+    });
+
+    setTitulo("");
+    setDescricao("");
+    setStartDate(null);
+    setNotificacoes({ calendario: false, destaque: false });
+  } catch (error) {
+    Swal.close();
+
+    Swal.fire({
+      title: "Erro ao publicar",
+      text: "Não foi possível salvar o evento. Tente novamente em instantes.",
+      icon: "error",
+      confirmButtonText: "Fechar",
+      confirmButtonColor: "#d33",
+    });
+  }
+}; 
+
 
   const InputDataComIcone = forwardRef(
     ({ value, onClick, placeholder }, ref) => {

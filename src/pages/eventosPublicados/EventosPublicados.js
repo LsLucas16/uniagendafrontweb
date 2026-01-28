@@ -159,7 +159,13 @@ export default function EventosPublicados() {
                       </div>
                     )}
 
-                    <div className="evento-card-chips">
+                    <div
+                      className={`evento-card-chips ${
+                        temCalendario && temDestaque
+                          ? "evento-card-chips--duo"
+                          : ""
+                      }`}
+                    >
                       {temCalendario && (
                         <span className="chip chip--calendario">
                           Calendário
