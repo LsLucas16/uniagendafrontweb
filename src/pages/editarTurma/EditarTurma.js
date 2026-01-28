@@ -9,6 +9,12 @@ import "./EditarTurma.scss";
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_TURMA_ALUNOS = "turma_alunos_override"; // { [disciplinaId]: number[] alunoIds }
 
+const defaultPerms = {
+  eventos: true,
+  responsaveis: false,
+  alunos: true,
+};
+
 function safeJsonParse(v, fallback) {
   try {
     return JSON.parse(v) ?? fallback;
@@ -34,7 +40,6 @@ function setTurmaAlunosOverride(map) {
 }
 
 function splitNomeComplemento(disciplinaNome = "") {
-  // Ex.: "Cálculo I - Turma 8" => nome="Cálculo I", complemento="Turma 8"
   const parts = String(disciplinaNome).split(" - ");
   if (parts.length >= 2) {
     return { nome: parts[0], complemento: parts.slice(1).join(" - ") };
@@ -56,15 +61,25 @@ function getDisciplinaAtualId() {
 
 export default function EditarTurma() {
   const navigate = useNavigate();
+
+  // modal
   const [modalOpen, setModalOpen] = useState(false);
-  const [editIndex, setEditIndex] = useState(null);
+  const [modalMode, setModalMode] = useState("edit"); // "edit" | "add"
+  const [editIndex, setEditIndex] = useState(null); // number | null
 
   const openEditarResponsavel = (index) => {
+    setModalMode("edit");
     setEditIndex(index);
     setModalOpen(true);
   };
 
-  const closeEditarResponsavel = () => {
+  const openAdicionarResponsavel = () => {
+    setModalMode("add");
+    setEditIndex(null);
+    setModalOpen(true);
+  };
+
+  const closeModal = () => {
     setModalOpen(false);
     setEditIndex(null);
   };
@@ -74,7 +89,6 @@ export default function EditarTurma() {
     getDisciplinaAtualId(),
   );
 
-  // escuta troca de disciplina feita no MenuLateral
   useEffect(() => {
     const onDisciplinaChanged = () =>
       setDisciplinaAtualId(getDisciplinaAtualId());
@@ -89,10 +103,7 @@ export default function EditarTurma() {
     window.addEventListener("storage", onStorage);
 
     return () => {
-      window.removeEventListener(
-        "disciplinaAtual:changed",
-        onDisciplinaChanged,
-      );
+      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -102,9 +113,7 @@ export default function EditarTurma() {
     return Number.isNaN(n) ? 0 : n;
   }, [disciplinaAtualId]);
 
-  const baseDisciplinas = Array.isArray(data.disciplinas)
-    ? data.disciplinas
-    : [];
+  const baseDisciplinas = Array.isArray(data.disciplinas) ? data.disciplinas : [];
   const baseUsuarios = Array.isArray(data.usuarios) ? data.usuarios : [];
 
   const user = useMemo(() => {
@@ -115,26 +124,23 @@ export default function EditarTurma() {
 
   const disciplinaBase = useMemo(() => {
     if (!turmaId) return null;
-    return (
-      baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null
-    );
+    return baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null;
   }, [baseDisciplinas, turmaId]);
 
   const [loading, setLoading] = useState(true);
 
-  // Campos do topo
+  // topo
   const [nome, setNome] = useState("");
   const [complemento, setComplemento] = useState("");
 
-  // Responsáveis (chips + campos Cargo/Contato)
-  const [responsaveis, setResponsaveis] = useState([]); // [{ userId, nome, cargo, contato }]
+  // responsáveis: [{ userId, nome, cargo, contato, permissoes }]
+  const [responsaveis, setResponsaveis] = useState([]);
 
-  // Alunos
+  // alunos
   const [buscaAluno, setBuscaAluno] = useState("");
-  const [alunosIds, setAlunosIds] = useState([]); // ids adicionados (override + base)
+  const [alunosIds, setAlunosIds] = useState([]);
   const [alunoSelecionadoId, setAlunoSelecionadoId] = useState(null);
 
-  // Carrega base + override quando mudar a turma
   useEffect(() => {
     setLoading(true);
 
@@ -151,14 +157,11 @@ export default function EditarTurma() {
       ...(turmaOverride || {}),
     };
 
-    // Nome/Complemento (com fallback do split)
-    const { nome: n, complemento: c } = splitNomeComplemento(
-      disciplinaMerged.nome || "",
-    );
+    const { nome: n, complemento: c } = splitNomeComplemento(disciplinaMerged.nome || "");
     setNome(disciplinaMerged.nomeCustom ?? n);
     setComplemento(disciplinaMerged.complementoCustom ?? c);
 
-    // Responsáveis: professor + responsável (pais/responsável)
+    // responsaveis base (professor + responsavel)
     const professor = baseUsuarios.find(
       (u) => Number(u.id) === Number(disciplinaMerged.professorId),
     );
@@ -173,27 +176,41 @@ export default function EditarTurma() {
 
     const initialResponsaveis =
       respOverride ||
-      [professor, responsavel].filter(Boolean).map((u) => ({
-        userId: u.id,
-        nome: u.nome,
-        cargo:
-          u.tipo === "professor"
-            ? "Professor"
-            : u.tipo === "responsavel"
-              ? "Responsável"
-              : "Coordenador",
-        contato: u.contato || "",
-      }));
+      [professor, responsavel]
+        .filter(Boolean)
+        .map((u) => ({
+          userId: u.id,
+          nome: u.nome,
+          cargo:
+            u.tipo === "professor"
+              ? "Professor"
+              : u.tipo === "responsavel"
+                ? "Responsável"
+                : "Coordenador",
+          contato: u.contato || "",
+          permissoes: {
+            ...defaultPerms,
+            ...(u.permissoes || {}),
+          },
+        }));
 
-    setResponsaveis(initialResponsaveis);
+    // garante shape
+    const normalized = initialResponsaveis.map((r) => ({
+      userId: r.userId ?? "",
+      nome: r.nome ?? "",
+      cargo: r.cargo ?? "",
+      contato: r.contato ?? "",
+      permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+    }));
 
-    // Alunos base: usuários tipo aluno que tenham essa disciplina na lista
+    setResponsaveis(normalized);
+
+    // alunos base
     const alunosBase = baseUsuarios
       .filter((u) => u.tipo === "aluno" && Array.isArray(u.disciplinas))
       .filter((u) => u.disciplinas.map(Number).includes(turmaId))
       .map((u) => u.id);
 
-    // Override alunos: permite adicionar/remover sem mexer no json
     const alunosOverrideMap = getTurmaAlunosOverride();
     const overrideIds = Array.isArray(alunosOverrideMap[String(turmaId)])
       ? alunosOverrideMap[String(turmaId)].map(Number)
@@ -203,7 +220,6 @@ export default function EditarTurma() {
 
     setBuscaAluno("");
     setAlunoSelecionadoId(null);
-
     setLoading(false);
   }, [turmaId, disciplinaBase, baseUsuarios]);
 
@@ -273,53 +289,6 @@ export default function EditarTurma() {
     });
   };
 
-  const handleAdicionarResponsavel = () => {
-    const options = baseUsuarios
-      .filter(
-        (u) =>
-          u.tipo === "professor" ||
-          u.tipo === "responsavel" ||
-          u.tipo === "coordenador",
-      )
-      .reduce((acc, u) => {
-        acc[u.id] = `${u.nome} (${u.tipo})`;
-        return acc;
-      }, {});
-
-    Swal.fire({
-      title: "Adicionar responsável",
-      input: "select",
-      inputOptions: options,
-      inputPlaceholder: "Selecione um usuário",
-      showCancelButton: true,
-      confirmButtonText: "Adicionar",
-      cancelButtonText: "Cancelar",
-    }).then((res) => {
-      if (!res.isConfirmed) return;
-      const uid = Number(res.value);
-      const u = baseUsuarios.find((x) => Number(x.id) === uid);
-      if (!u) return;
-
-      const next = [
-        ...responsaveis,
-        {
-          userId: u.id,
-          nome: u.nome,
-          cargo:
-            u.tipo === "professor"
-              ? "Professor"
-              : u.tipo === "responsavel"
-                ? "Responsável"
-                : "Coordenador",
-          contato: u.contato || "",
-        },
-      ];
-
-      setResponsaveis(next);
-      persistTurma({ responsaveis: next });
-    });
-  };
-
   const handleAdicionarAluno = () => {
     if (!alunoSelecionadoId) {
       Swal.fire({
@@ -330,9 +299,7 @@ export default function EditarTurma() {
       return;
     }
 
-    const next = Array.from(
-      new Set([...alunosIds, Number(alunoSelecionadoId)]),
-    );
+    const next = Array.from(new Set([...alunosIds, Number(alunoSelecionadoId)]));
     setAlunosIds(next);
     persistAlunos(next);
 
@@ -346,6 +313,43 @@ export default function EditarTurma() {
     persistAlunos(next);
   };
 
+  // modal payload -> sempre salva no storage
+  const handleSaveResponsavelFromModal = (payload) => {
+    // payload esperado do modal:
+    // { userId, nome, cargo, contato, permissoes }
+    const normalized = {
+      userId: payload.userId ?? "",
+      nome: payload.nome ?? "",
+      cargo: payload.cargo ?? "",
+      contato: payload.contato ?? "",
+      permissoes: { ...defaultPerms, ...(payload.permissoes || {}) },
+    };
+
+    if (modalMode === "add") {
+      const next = [...responsaveis, normalized];
+      setResponsaveis(next);
+      persistTurma({ responsaveis: next });
+      closeModal();
+      return;
+    }
+
+    // edit
+    if (editIndex === null) return;
+    const next = [...responsaveis];
+    next[editIndex] = { ...next[editIndex], ...normalized };
+    setResponsaveis(next);
+    persistTurma({ responsaveis: next });
+    closeModal();
+  };
+
+  const handleRemoveResponsavelFromModal = () => {
+    if (editIndex === null) return;
+    const next = responsaveis.filter((_, i) => i !== editIndex);
+    setResponsaveis(next);
+    persistTurma({ responsaveis: next });
+    closeModal();
+  };
+
   if (!user) {
     return (
       <div className="editar-turma-page">
@@ -354,9 +358,7 @@ export default function EditarTurma() {
             <h1>Editar Turma</h1>
           </header>
 
-          <p className="empty-text">
-            Usuário não identificado. Faça login novamente.
-          </p>
+          <p className="empty-text">Usuário não identificado. Faça login novamente.</p>
           <button className="btn-secondary" onClick={() => navigate("/")}>
             Voltar
           </button>
@@ -373,9 +375,7 @@ export default function EditarTurma() {
             <h1>Editar Turma</h1>
           </header>
 
-          <p className="empty-text">
-            Nenhuma turma selecionada no menu lateral.
-          </p>
+          <p className="empty-text">Nenhuma turma selecionada no menu lateral.</p>
           <button className="btn-secondary" onClick={() => navigate(-1)}>
             Voltar
           </button>
@@ -456,9 +456,9 @@ export default function EditarTurma() {
                     className="btn-edit"
                     onClick={() => openEditarResponsavel(idx)}
                     aria-label="Editar responsável"
+                    title="Editar"
                   >
                     <Pencil size={14} />
-                    <span>Editar</span>
                   </button>
                 </div>
 
@@ -476,11 +476,7 @@ export default function EditarTurma() {
               </div>
             ))}
 
-            <button
-              type="button"
-              className="btn-primary wide"
-              onClick={handleAdicionarResponsavel}
-            >
+            <button type="button" className="btn-primary wide" onClick={openAdicionarResponsavel}>
               Adicionar Responsável
             </button>
           </div>
@@ -493,9 +489,7 @@ export default function EditarTurma() {
             <button
               type="button"
               className="btn-primary small"
-              onClick={() =>
-                Swal.fire("Info", "Função de importação (mock).", "info")
-              }
+              onClick={() => Swal.fire("Info", "Função de importação (mock).", "info")}
             >
               <Upload size={14} />
               <span>Importar lista</span>
@@ -523,9 +517,7 @@ export default function EditarTurma() {
                       key={c.id}
                       type="button"
                       className={`dropdown-item ${
-                        Number(alunoSelecionadoId) === Number(c.id)
-                          ? "active"
-                          : ""
+                        Number(alunoSelecionadoId) === Number(c.id) ? "active" : ""
                       }`}
                       onClick={() => setAlunoSelecionadoId(c.id)}
                     >
@@ -538,24 +530,14 @@ export default function EditarTurma() {
             </div>
 
             <div className="actions-row">
-              <button
-                type="button"
-                className="btn-primary wide muted"
-                onClick={handleAdicionarAluno}
-              >
+              <button type="button" className="btn-primary wide muted" onClick={handleAdicionarAluno}>
                 Adicionar aluno
               </button>
 
               <button
                 type="button"
                 className="link"
-                onClick={() =>
-                  Swal.fire(
-                    "Lista completa",
-                    "Tela de lista completa (mock).",
-                    "info",
-                  )
-                }
+                onClick={() => Swal.fire("Lista completa", "Tela de lista completa (mock).", "info")}
               >
                 Ver lista completa de alunos
               </button>
@@ -581,33 +563,21 @@ export default function EditarTurma() {
                 </div>
               ))}
 
-              {!alunosDetalhes.length && (
-                <div className="empty-small">Nenhum aluno adicionado.</div>
-              )}
+              {!alunosDetalhes.length && <div className="empty-small">Nenhum aluno adicionado.</div>}
             </div>
           </div>
         </div>
       </div>
+
       <EditarResponsavelModal
         open={modalOpen}
-        onClose={closeEditarResponsavel}
+        onClose={closeModal}
         usuarios={baseUsuarios}
-        initialValue={editIndex !== null ? responsaveis[editIndex] : null}
-        onSave={(payload) => {
-          if (editIndex === null) return;
-          const next = [...responsaveis];
-          next[editIndex] = { ...next[editIndex], ...payload };
-          setResponsaveis(next);
-          persistTurma({ responsaveis: next });
-          closeEditarResponsavel();
-        }}
-        onRemove={() => {
-          if (editIndex === null) return;
-          const next = responsaveis.filter((_, i) => i !== editIndex);
-          setResponsaveis(next);
-          persistTurma({ responsaveis: next });
-          closeEditarResponsavel();
-        }}
+        initialValue={
+          modalMode === "edit" && editIndex !== null ? responsaveis[editIndex] : null
+        }
+        onSave={handleSaveResponsavelFromModal}
+        onRemove={modalMode === "edit" ? handleRemoveResponsavelFromModal : null}
       />
     </div>
   );

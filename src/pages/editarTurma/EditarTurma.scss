@@ -1,13 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
-/* ===== tokens padrão (igual CriarEvento) ===== */
+/* tokens */
 $azul-primario: #334E68;
 $azul-claro: #7FB3D5;
 $cinza-borda: #E2E8F0;
 $fundo-page: #F4F4F4;
 $fundo-input: #F3F5F7;
 
-/* ===== page ===== */
+/* page */
 .editar-turma-page {
   background: $fundo-page;
   min-height: 100vh;
@@ -24,7 +24,7 @@ $fundo-input: #F3F5F7;
   margin: 0;
   background: #fff;
 
-  /* ✅ igual CriarEvento / Figma: esquerda arredondada, direita reta */
+  /* esquerda arredondada e direita reta */
   border-radius: 20px 0 0 20px;
 
   border: 1px solid #e9edf3;
@@ -33,8 +33,7 @@ $fundo-input: #F3F5F7;
   align-self: flex-start;
 }
 
-
-/* ===== header ===== */
+/* header */
 .page-header {
   margin-bottom: 24px;
 
@@ -54,12 +53,9 @@ $fundo-input: #F3F5F7;
   }
 }
 
-/* se ainda existir em algum JSX, não deixa aparecer */
-.page-title {
-  display: none;
-}
+.page-title { display: none; }
 
-/* ===== grids / sections ===== */
+/* layout */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -70,9 +66,7 @@ $fundo-input: #F3F5F7;
   }
 }
 
-.section {
-  margin-top: 18px;
-}
+.section { margin-top: 18px; }
 
 .section-head {
   display: flex;
@@ -87,19 +81,22 @@ $fundo-input: #F3F5F7;
   }
 }
 
-.section-title,
+/* Títulos */
+.section-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $azul-primario;
+  margin: 6px 0 18px;
+}
+
 .sub-title {
   font-size: 15px;
   font-weight: 600;
   color: $azul-primario;
-  margin: 0 0 10px;
-}
-
-.sub-title {
   margin: 6px 0 10px;
 }
 
-/* ===== fields ===== */
+/* fields padrão */
 .field {
   display: flex;
   flex-direction: column;
@@ -117,15 +114,13 @@ $fundo-input: #F3F5F7;
     height: 44px;
     border-radius: 6px;
     border: 1px solid $cinza-borda;
-    background: $fundo-input; /* ✅ cinza dentro */
+    background: $fundo-input;
     padding: 0 14px;
     font-size: 14px;
     color: $azul-primario;
     outline: none;
 
-    &::placeholder {
-      color: #CBD5E0;
-    }
+    &::placeholder { color: #CBD5E0; }
 
     &:focus {
       border-color: rgba(127, 179, 213, 0.9);
@@ -134,47 +129,71 @@ $fundo-input: #F3F5F7;
   }
 }
 
-/* ===== responsáveis ===== */
+/* ===== RESPONSÁVEIS (igual Figma) ===== */
 .responsaveis {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 18px;
 }
 
+/* sem “card” visível */
 .responsavel-card {
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
-  padding: 14px;
-  background: #fff;
+  border: 0;
+  padding: 0;
+  background: transparent;
 }
 
+/* topo: chip + botão editar à direita */
 .responsavel-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 12px;
 }
 
+/* chip do nome: INÍCIO RETO, FINAL BOLEADO */
 .chip {
   display: inline-flex;
   align-items: center;
-  height: 26px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: #f3f5f7;
-  color: #2f6fb6;
-  font-size: 12px;
-  font-weight: 700;
-  border: 1px solid #e9edf3;
+
+  height: 44px;
+  min-width: 220px;
+  padding: 0 22px;
+
+  background: #DDE3EA;
+  color: $azul-primario;
+  font-size: 18px;
+  font-weight: 600;
+
+  /* ✅ esquerda reta, direita arredondada */
+  border-radius: 0 999px 999px 0;
 }
 
-.inner {
-  gap: 14px;
+/* botão editar pequeno (igual sensação do figma) */
+.btn-edit {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid $cinza-borda;
+  background: #fff;
+  cursor: pointer;
 
-  .field input {
-    background: $fundo-input; /* ✅ garante cinza dentro também */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #607089;
+
+  &:hover {
+    background: #f7f9fc;
+    border-color: #dbe3ee;
   }
+}
+
+/* inputs do responsável no figma são brancos */
+.inner .field input {
+  background: #fff;
 }
 
 /* ===== botões ===== */
@@ -192,6 +211,7 @@ $fundo-input: #F3F5F7;
   justify-content: center;
   gap: 8px;
   padding: 0 14px;
+
   transition: filter 0.15s ease, transform 0.02s ease, box-shadow 0.15s ease;
 
   &:hover {
@@ -199,13 +219,9 @@ $fundo-input: #F3F5F7;
     box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
   }
 
-  &:active {
-    transform: translateY(1px);
-  }
+  &:active { transform: translateY(1px); }
 
-  &.wide {
-    width: 100%;
-  }
+  &.wide { width: 100%; }
 
   &.small {
     height: 36px;
@@ -218,10 +234,7 @@ $fundo-input: #F3F5F7;
     background: #c8d6e7;
     color: #2b3b4f;
 
-    &:hover {
-      filter: brightness(0.99);
-      box-shadow: none;
-    }
+    &:hover { filter: brightness(0.99); box-shadow: none; }
   }
 }
 
@@ -235,29 +248,7 @@ $fundo-input: #F3F5F7;
   color: $azul-primario;
   cursor: pointer;
 
-  &:hover {
-    background: #f7f9fc;
-  }
-}
-
-.btn-edit {
-  height: 36px;
-  border-radius: 8px;
-  border: 1px solid $cinza-borda;
-  background: #fff;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  color: #607089;
-  font-size: 13px;
-  font-weight: 600;
-
-  &:hover {
-    background: #f7f9fc;
-    border-color: #dbe3ee;
-  }
+  &:hover { background: #f7f9fc; }
 }
 
 /* ===== busca alunos ===== */
@@ -278,15 +269,13 @@ $fundo-input: #F3F5F7;
     height: 44px;
     border-radius: 6px;
     border: 1px solid $cinza-borda;
-    background: $fundo-input; /* ✅ cinza dentro */
+    background: $fundo-input;
     padding: 0 14px 0 42px;
     font-size: 14px;
     color: $azul-primario;
     outline: none;
 
-    &::placeholder {
-      color: #CBD5E0;
-    }
+    &::placeholder { color: #CBD5E0; }
 
     &:focus {
       border-color: rgba(127, 179, 213, 0.9);
@@ -329,13 +318,8 @@ $fundo-input: #F3F5F7;
       color: #8a96a8;
     }
 
-    &:hover {
-      background: #f7f9fc;
-    }
-
-    &.active {
-      background: rgba(127, 179, 213, 0.14);
-    }
+    &:hover { background: #f7f9fc; }
+    &.active { background: rgba(127, 179, 213, 0.14); }
   }
 }
 
@@ -362,13 +346,9 @@ $fundo-input: #F3F5F7;
   padding: 0;
   white-space: nowrap;
 
-  &:hover {
-    text-decoration: underline;
-  }
+  &:hover { text-decoration: underline; }
 
-  @media (max-width: 720px) {
-    text-align: right;
-  }
+  @media (max-width: 720px) { text-align: right; }
 }
 
 /* ===== lista alunos ===== */
@@ -386,9 +366,7 @@ $fundo-input: #F3F5F7;
   padding: 12px 14px;
   border-bottom: 1px solid #eef2f7;
 
-  &:last-child {
-    border-bottom: 0;
-  }
+  &:last-child { border-bottom: 0; }
 }
 
 .aluno-info {
@@ -427,7 +405,7 @@ $fundo-input: #F3F5F7;
   }
 }
 
-/* ===== estados vazios / skeleton ===== */
+/* states */
 .empty-text {
   font-size: 14px;
   color: #6b7280;
@@ -454,101 +432,4 @@ $fundo-input: #F3F5F7;
   border-radius: 10px;
   background: #eef2f7;
   margin-bottom: 12px;
-}
-
-
-/* ===== RESPONSÁVEIS (igual Figma) ===== */
-
-.section-title {
-  font-size: 22px;        /* no Figma está maior nessa seção */
-  font-weight: 700;
-  color: $azul-primario;
-  margin: 6px 0 18px;
-}
-
-.responsaveis {
-  display: flex;
-  flex-direction: column;
-  gap: 18px; /* espaço entre responsáveis */
-}
-
-/* tira “card” visual */
-.responsavel-card {
-  border: 0;
-  border-radius: 0;
-  padding: 0;
-  background: transparent;
-}
-
-/* no Figma não aparece o botão editar nesse trecho */
-.responsavel-top {
-  display: block;
-  margin: 0 0 12px;
-}
-
-.responsavel-top .btn-edit {
-  display: none;
-}
-
-/* chip do nome (pílula grande cinza) */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  height: 44px;
-  min-width: 220px;       /* tamanho parecido com o print */
-  padding: 0 22px;
-
-  border-radius: 6px 14px 14px 6px;
-  background: #DDE3EA;    /* cinza do chip */
-  border: 0;
-
-  color: $azul-primario;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-/* fields dentro do responsável viram 1 coluna */
-.responsavel-card .inner {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 10px;
-}
-
-/* label “Cargo” mais forte e maior */
-.responsavel-card .field {
-  gap: 10px;
-}
-
-.responsavel-card .field label {
-  font-size: 18px;
-  font-weight: 700;
-  color: $azul-primario;
-}
-
-/* input branco com borda leve (igual print do Figma) */
-.responsavel-card .field input {
-  height: 56px;
-  border-radius: 8px;
-  border: 1px solid #E3EAF2;
-  background: #FFFFFF;      /* ✅ branco (não cinza) */
-  padding: 0 16px;
-
-  font-size: 18px;
-  font-weight: 500;
-  color: $azul-primario;
-
-  box-shadow: none;
-
-  &:focus {
-    border-color: rgba(127, 179, 213, 0.9);
-    box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
-  }
-}
-
-/* no print só aparece “Cargo”.
-   Se você quiser ficar IDENTICO, esconda o 2º campo (Contato) */
-.responsavel-card .inner .field:nth-child(2) {
-  display: none;
 }
