@@ -1,28 +1,65 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+/* ===== tokens padrão (igual CriarEvento) ===== */
+$azul-primario: #334E68;
+$azul-claro: #7FB3D5;
+$cinza-borda: #E2E8F0;
+$fundo-page: #F4F4F4;
+$fundo-input: #F3F5F7;
+
+/* ===== page ===== */
 .editar-turma-page {
+  background: $fundo-page;
   min-height: 100vh;
-  background: #f4f4f4;
-  padding: 0px;
+  padding: 0;
   display: flex;
+  align-items: flex-start;
   justify-content: center;
+  overflow-x: hidden;
+  font-family: "Inter", sans-serif;
 }
 
 .editar-turma-card {
-  width: 100%;
-  max-width: 1300px;
-  background: #ffffff;
+  width: min(1128px, calc(100% - 10px));
+  margin: 0;
+  background: #fff;
+
+  /* ✅ igual CriarEvento / Figma: esquerda arredondada, direita reta */
+  border-radius: 20px 0 0 20px;
+
   border: 1px solid #e9edf3;
-  border-radius: 8px;
-  padding: 18px 18px 20px;
-  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.04);
+  padding: 34px 42px;
+  align-self: flex-start;
 }
 
+
+/* ===== header ===== */
+.page-header {
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: $azul-primario;
+    letter-spacing: -0.2px;
+  }
+
+  p {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #6f7d8c;
+  }
+}
+
+/* se ainda existir em algum JSX, não deixa aparecer */
 .page-title {
-  margin: 2px 0 14px;
-  font-size: 14px;
-  font-weight: 700;
-  color: #1f2937;
+  display: none;
 }
 
+/* ===== grids / sections ===== */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -33,47 +70,8 @@
   }
 }
 
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  label {
-    font-size: 11px;
-    font-weight: 700;
-    color: #364152;
-  }
-
-  input {
-    height: 28px;
-    border-radius: 3px;
-    border: 1px solid #e9edf3;
-    background: #ffffff;
-    padding: 0 10px;
-    font-size: 11px;
-    color: #111827;
-    outline: none;
-
-    &::placeholder {
-      color: #9aa4b2;
-    }
-
-    &:focus {
-      border-color: rgba(115, 165, 215, 0.9);
-      box-shadow: 0 0 0 2px rgba(115, 165, 215, 0.15);
-    }
-  }
-}
-
 .section {
-  margin-top: 14px;
-}
-
-.section-title {
-  font-size: 11px;
-  font-weight: 700;
-  color: #364152;
-  margin: 0 0 10px;
+  margin-top: 18px;
 }
 
 .section-head {
@@ -81,20 +79,73 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 6px;
+  margin-bottom: 10px;
+
+  @media (max-width: 720px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
-.responsaveis {
+.section-title,
+.sub-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: $azul-primario;
+  margin: 0 0 10px;
+}
+
+.sub-title {
+  margin: 6px 0 10px;
+}
+
+/* ===== fields ===== */
+.field {
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  label {
+    display: block;
+    color: $azul-primario;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  input {
+    width: 100%;
+    height: 44px;
+    border-radius: 6px;
+    border: 1px solid $cinza-borda;
+    background: $fundo-input; /* ✅ cinza dentro */
+    padding: 0 14px;
+    font-size: 14px;
+    color: $azul-primario;
+    outline: none;
+
+    &::placeholder {
+      color: #CBD5E0;
+    }
+
+    &:focus {
+      border-color: rgba(127, 179, 213, 0.9);
+      box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
+    }
+  }
+}
+
+/* ===== responsáveis ===== */
+.responsaveis {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .responsavel-card {
   border: 1px solid #eef2f7;
-  border-radius: 6px;
-  padding: 10px;
-  background: #ffffff;
+  border-radius: 10px;
+  padding: 14px;
+  background: #fff;
 }
 
 .responsavel-top {
@@ -102,48 +153,50 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
-  height: 18px;
-  padding: 0 10px;
+  height: 26px;
+  padding: 0 12px;
   border-radius: 999px;
   background: #f3f5f7;
   color: #2f6fb6;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 700;
   border: 1px solid #e9edf3;
 }
 
 .inner {
-  gap: 10px;
+  gap: 14px;
 
   .field input {
-    background: #ffffff;
+    background: $fundo-input; /* ✅ garante cinza dentro também */
   }
 }
 
+/* ===== botões ===== */
 .btn-primary {
-  height: 30px;
+  height: 44px;
   border: 0;
-  border-radius: 3px;
-  background: #73a5d7; // cor do botão no print
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 700;
+  border-radius: 6px;
+  background: $azul-claro;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 0 12px;
-  transition: filter 0.15s ease, transform 0.02s ease;
+  padding: 0 14px;
+  transition: filter 0.15s ease, transform 0.02s ease, box-shadow 0.15s ease;
 
   &:hover {
     filter: brightness(0.97);
+    box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
   }
 
   &:active {
@@ -155,10 +208,10 @@
   }
 
   &.small {
-    height: 26px;
-    padding: 0 10px;
+    height: 36px;
     border-radius: 999px;
-    font-size: 10px;
+    font-size: 13px;
+    padding: 0 14px;
   }
 
   &.muted {
@@ -167,18 +220,19 @@
 
     &:hover {
       filter: brightness(0.99);
+      box-shadow: none;
     }
   }
 }
 
 .btn-secondary {
-  height: 30px;
-  border-radius: 3px;
-  border: 1px solid #e9edf3;
-  background: #ffffff;
-  font-size: 11px;
-  font-weight: 700;
-  color: #334155;
+  height: 44px;
+  border-radius: 6px;
+  border: 1px solid $cinza-borda;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  color: $azul-primario;
   cursor: pointer;
 
   &:hover {
@@ -187,22 +241,18 @@
 }
 
 .btn-edit {
-  height: 20px;
-  border-radius: 4px;
-  border: 1px solid #e9edf3;
-  background: #ffffff;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid $cinza-borda;
+  background: #fff;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 0 8px;
+  gap: 8px;
+  padding: 0 12px;
   color: #607089;
-  font-size: 10px;
-  font-weight: 700;
-
-  svg {
-    color: #607089;
-  }
+  font-size: 13px;
+  font-weight: 600;
 
   &:hover {
     background: #f7f9fc;
@@ -210,23 +260,13 @@
   }
 }
 
-.subsection {
-  margin-top: 6px;
-}
-
-.sub-title {
-  font-size: 10px;
-  font-weight: 700;
-  color: #364152;
-  margin: 6px 0 6px;
-}
-
+/* ===== busca alunos ===== */
 .search-wrap {
   position: relative;
 
   .search-ico {
     position: absolute;
-    left: 10px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
     color: #93a0b2;
@@ -235,16 +275,22 @@
 
   input {
     width: 100%;
-    height: 28px;
-    border-radius: 3px;
-    border: 1px solid #e9edf3;
-    padding: 0 10px 0 30px;
-    font-size: 11px;
+    height: 44px;
+    border-radius: 6px;
+    border: 1px solid $cinza-borda;
+    background: $fundo-input; /* ✅ cinza dentro */
+    padding: 0 14px 0 42px;
+    font-size: 14px;
+    color: $azul-primario;
     outline: none;
 
+    &::placeholder {
+      color: #CBD5E0;
+    }
+
     &:focus {
-      border-color: rgba(115, 165, 215, 0.9);
-      box-shadow: 0 0 0 2px rgba(115, 165, 215, 0.15);
+      border-color: rgba(127, 179, 213, 0.9);
+      box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
     }
   }
 }
@@ -253,11 +299,11 @@
   position: absolute;
   left: 0;
   right: 0;
-  top: calc(100% + 6px);
+  top: calc(100% + 8px);
   background: #ffffff;
   border: 1px solid #e9edf3;
-  border-radius: 6px;
-  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.12);
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.14);
   overflow: hidden;
   z-index: 30;
 
@@ -266,19 +312,20 @@
     text-align: left;
     border: 0;
     background: #ffffff;
-    padding: 10px 10px;
+    padding: 12px 14px;
     cursor: pointer;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 4px;
 
     .d-name {
-      font-size: 11px;
+      font-size: 14px;
       font-weight: 700;
       color: #1f2937;
     }
+
     .d-sub {
-      font-size: 10px;
+      font-size: 12px;
       color: #8a96a8;
     }
 
@@ -287,7 +334,7 @@
     }
 
     &.active {
-      background: rgba(115, 165, 215, 0.12);
+      background: rgba(127, 179, 213, 0.14);
     }
   }
 }
@@ -296,8 +343,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin: 10px 0 10px;
+  gap: 12px;
+  margin: 14px 0;
 
   @media (max-width: 720px) {
     flex-direction: column;
@@ -309,9 +356,9 @@
   border: 0;
   background: transparent;
   cursor: pointer;
-  font-size: 10px;
+  font-size: 13px;
   color: #607089;
-  font-weight: 700;
+  font-weight: 600;
   padding: 0;
   white-space: nowrap;
 
@@ -324,9 +371,10 @@
   }
 }
 
+/* ===== lista alunos ===== */
 .alunos-list {
   border: 1px solid #eef2f7;
-  border-radius: 6px;
+  border-radius: 10px;
   background: #ffffff;
   overflow: hidden;
 }
@@ -335,7 +383,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 10px;
+  padding: 12px 14px;
   border-bottom: 1px solid #eef2f7;
 
   &:last-child {
@@ -346,24 +394,24 @@
 .aluno-info {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
 }
 
 .aluno-nome {
-  font-size: 11px;
+  font-size: 14px;
   font-weight: 700;
   color: #1f2937;
 }
 
 .aluno-matricula {
-  font-size: 10px;
+  font-size: 12px;
   color: #9aa4b2;
 }
 
 .btn-x {
-  width: 24px;
-  height: 24px;
-  border-radius: 6px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
   cursor: pointer;
@@ -379,31 +427,128 @@
   }
 }
 
+/* ===== estados vazios / skeleton ===== */
 .empty-text {
-  font-size: 12px;
+  font-size: 14px;
   color: #6b7280;
   margin: 10px 0 14px;
 }
 
 .empty-small {
-  padding: 10px;
-  font-size: 11px;
+  padding: 12px 14px;
+  font-size: 14px;
   color: #6b7280;
 }
 
-/* Skeleton simples */
 .skeleton-title {
-  height: 14px;
-  width: 120px;
-  border-radius: 6px;
+  height: 18px;
+  width: 180px;
+  border-radius: 10px;
+  background: #eef2f7;
+  margin-bottom: 14px;
+}
+
+.skeleton-line {
+  height: 44px;
+  width: 100%;
+  border-radius: 10px;
   background: #eef2f7;
   margin-bottom: 12px;
 }
 
-.skeleton-line {
-  height: 28px;
-  width: 100%;
-  border-radius: 6px;
-  background: #eef2f7;
-  margin-bottom: 10px;
+
+/* ===== RESPONSÁVEIS (igual Figma) ===== */
+
+.section-title {
+  font-size: 22px;        /* no Figma está maior nessa seção */
+  font-weight: 700;
+  color: $azul-primario;
+  margin: 6px 0 18px;
+}
+
+.responsaveis {
+  display: flex;
+  flex-direction: column;
+  gap: 18px; /* espaço entre responsáveis */
+}
+
+/* tira “card” visual */
+.responsavel-card {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+/* no Figma não aparece o botão editar nesse trecho */
+.responsavel-top {
+  display: block;
+  margin: 0 0 12px;
+}
+
+.responsavel-top .btn-edit {
+  display: none;
+}
+
+/* chip do nome (pílula grande cinza) */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 44px;
+  min-width: 220px;       /* tamanho parecido com o print */
+  padding: 0 22px;
+
+  border-radius: 6px 14px 14px 6px;
+  background: #DDE3EA;    /* cinza do chip */
+  border: 0;
+
+  color: $azul-primario;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* fields dentro do responsável viram 1 coluna */
+.responsavel-card .inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+/* label “Cargo” mais forte e maior */
+.responsavel-card .field {
+  gap: 10px;
+}
+
+.responsavel-card .field label {
+  font-size: 18px;
+  font-weight: 700;
+  color: $azul-primario;
+}
+
+/* input branco com borda leve (igual print do Figma) */
+.responsavel-card .field input {
+  height: 56px;
+  border-radius: 8px;
+  border: 1px solid #E3EAF2;
+  background: #FFFFFF;      /* ✅ branco (não cinza) */
+  padding: 0 16px;
+
+  font-size: 18px;
+  font-weight: 500;
+  color: $azul-primario;
+
+  box-shadow: none;
+
+  &:focus {
+    border-color: rgba(127, 179, 213, 0.9);
+    box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
+  }
+}
+
+/* no print só aparece “Cargo”.
+   Se você quiser ficar IDENTICO, esconda o 2º campo (Contato) */
+.responsavel-card .inner .field:nth-child(2) {
+  display: none;
 }

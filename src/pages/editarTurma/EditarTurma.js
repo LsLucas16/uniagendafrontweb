@@ -6,11 +6,6 @@ import Swal from "sweetalert2";
 import data from "../../data/dados.json";
 import "./EditarTurma.scss";
 
-/**
- * Sem backend:
- * - dados.json é read-only em runtime
- * - salvamos alterações em localStorage (override)
- */
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_TURMA_ALUNOS = "turma_alunos_override"; // { [disciplinaId]: number[] alunoIds }
 
@@ -61,18 +56,18 @@ function getDisciplinaAtualId() {
 
 export default function EditarTurma() {
   const navigate = useNavigate();
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editIndex, setEditIndex] = useState(null);
-  
-    const openEditarResponsavel = (index) => {
-      setEditIndex(index);
-      setModalOpen(true);
-    };
-  
-    const closeEditarResponsavel = () => {
-      setModalOpen(false);
-      setEditIndex(null);
-    };
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+
+  const openEditarResponsavel = (index) => {
+    setEditIndex(index);
+    setModalOpen(true);
+  };
+
+  const closeEditarResponsavel = () => {
+    setModalOpen(false);
+    setEditIndex(null);
+  };
 
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
@@ -355,7 +350,10 @@ export default function EditarTurma() {
     return (
       <div className="editar-turma-page">
         <div className="editar-turma-card">
-          <h2 className="page-title">Editar Turma</h2>
+          <header className="page-header">
+            <h1>Editar Turma</h1>
+          </header>
+
           <p className="empty-text">
             Usuário não identificado. Faça login novamente.
           </p>
@@ -371,7 +369,10 @@ export default function EditarTurma() {
     return (
       <div className="editar-turma-page">
         <div className="editar-turma-card">
-          <h2 className="page-title">Editar Turma</h2>
+          <header className="page-header">
+            <h1>Editar Turma</h1>
+          </header>
+
           <p className="empty-text">
             Nenhuma turma selecionada no menu lateral.
           </p>
@@ -399,7 +400,10 @@ export default function EditarTurma() {
     return (
       <div className="editar-turma-page">
         <div className="editar-turma-card">
-          <h2 className="page-title">Editar Turma</h2>
+          <header className="page-header">
+            <h1>Editar Turma</h1>
+          </header>
+
           <p className="empty-text">Turma não encontrada.</p>
           <button className="btn-secondary" onClick={() => navigate(-1)}>
             Voltar
@@ -412,7 +416,9 @@ export default function EditarTurma() {
   return (
     <div className="editar-turma-page">
       <div className="editar-turma-card">
-        <h2 className="page-title">Editar Turma</h2>
+        <header className="page-header">
+          <h1>Editar Turma</h1>
+        </header>
 
         <div className="grid-2">
           <div className="field">
