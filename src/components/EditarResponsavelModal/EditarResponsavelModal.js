@@ -1,12 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./EditarResponsavelModal.scss";
-import { X } from "lucide-react";
+import { X, Search } from "lucide-react";
 
 const defaultPerms = {
-  eventos: true, // Pode criar e editar eventos
-  responsaveis: false, // Pode gerenciar responsáveis
-  alunos: true, // Pode editar lista de alunos
+  eventos: true,
+  responsaveis: false,
+  alunos: true,
 };
+
+const CARGOS = ["Professor", "Responsável", "Coordenador"];
 
 export default function EditarResponsavelModal({
   open,
@@ -18,11 +20,16 @@ export default function EditarResponsavelModal({
 }) {
   const [draft, setDraft] = useState(null);
 
+  // busca responsável
+  const [queryUser, setQueryUser] = useState("");
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const searchRef = useRef(null);
+
   useEffect(() => {
     if (!open) return;
 
     const iv = initialValue || {};
-    setDraft({
+    const next = {
       userId: iv.userId ?? "",
       nome: iv.nome ?? "",
       cargo: iv.cargo ?? "",
@@ -31,14 +38,45 @@ export default function EditarResponsavelModal({
         ...defaultPerms,
         ...(iv.permissoes || {}),
       },
-    });
+    };
+
+    setDraft(next);
+    setQueryUser(next.nome || "");
+    setDropdownOpen(false);
   }, [open, initialValue]);
 
   const opcoes = useMemo(() => {
     return (usuarios || [])
       .filter((u) => ["professor", "responsavel", "coordenador"].includes(u.tipo))
-      .map((u) => ({ id: u.id, nome: u.nome, tipo: u.tipo, contato: u.contato || "" }));
+      .map((u) => ({
+        id: u.id,
+        nome: u.nome,
+        tipo: u.tipo,
+        contato: u.contato || "",
+      }));
   }, [usuarios]);
+
+  const candidatos = useMemo(() => {
+    const q = queryUser.trim().toLowerCase();
+    if (!q) return [];
+
+    return opcoes
+      .filter((o) => o.nome?.toLowerCase().includes(q) || String(o.id).includes(q))
+      .slice(0, 8);
+  }, [queryUser, opcoes]);
+
+  // fechar dropdown ao clicar fora
+  useEffect(() => {
+    if (!open) return;
+
+    const onDocMouseDown = (e) => {
+      if (!searchRef.current) return;
+      if (!searchRef.current.contains(e.target)) setDropdownOpen(false);
+    };
+
+    document.addEventListener("mousedown", onDocMouseDown);
+    return () => document.removeEventListener("mousedown", onDocMouseDown);
+  }, [open]);
 
   if (!open) return null;
   if (!draft) return null;
@@ -47,25 +85,29 @@ export default function EditarResponsavelModal({
     if (e.target?.classList?.contains("erm__overlay")) onClose?.();
   };
 
-  const handleChangeUser = (e) => {
-    const nextId = e.target.value;
-    const selected = opcoes.find((o) => String(o.id) === String(nextId));
-
+  const pickUser = (o) => {
     setDraft((prev) => ({
       ...prev,
-      userId: nextId,
-      nome: selected?.nome || "",
-      contato: selected?.contato || prev.contato,
+      userId: o.id,
+      nome: o.nome,
+
+      // se ainda não escolheu cargo, sugere automaticamente pelo tipo
       cargo:
         prev.cargo ||
-        (selected?.tipo === "professor"
+        (o.tipo === "professor"
           ? "Professor"
-          : selected?.tipo === "responsavel"
+          : o.tipo === "responsavel"
             ? "Responsável"
-            : selected?.tipo === "coordenador"
+            : o.tipo === "coordenador"
               ? "Coordenador"
               : ""),
+
+      // só coloca contato se o cargo estiver selecionado (senão, guarda o que já tinha)
+      contato: prev.cargo ? (o.contato || prev.contato) : prev.contato,
     }));
+
+    setQueryUser(o.nome);
+    setDropdownOpen(false);
   };
 
   const clearUser = () => {
@@ -74,6 +116,8 @@ export default function EditarResponsavelModal({
       userId: "",
       nome: "",
     }));
+    setQueryUser("");
+    setDropdownOpen(false);
   };
 
   const togglePerm = (key) => {
@@ -83,8 +127,17 @@ export default function EditarResponsavelModal({
     }));
   };
 
+  const handleChangeCargo = (e) => {
+    const value = e.target.value;
+
+    setDraft((prev) => ({
+      ...prev,
+      cargo: value,
+      contato: value ? prev.contato : "", // se desmarcar cargo, limpa contato
+    }));
+  };
+
   const save = () => {
-    // validações simples
     if (!draft.userId) return;
 
     onSave?.({
@@ -97,7 +150,12 @@ export default function EditarResponsavelModal({
   };
 
   return (
-    <div className="erm__overlay" onMouseDown={handleOverlayClick} role="dialog" aria-modal="true">
+    <div
+      className="erm__overlay"
+      onMouseDown={handleOverlayClick}
+      role="dialog"
+      aria-modal="true"
+    >
       <div className="erm__modal" onMouseDown={(e) => e.stopPropagation()}>
         <button className="erm__close" type="button" onClick={onClose} aria-label="Fechar">
           <X size={16} />
@@ -109,18 +167,26 @@ export default function EditarResponsavelModal({
         </div>
 
         <div className="erm__body">
-          <div className="erm__field">
+          {/* RESPONSÁVEL (PESQUISA) */}
+          <div className="erm__field" ref={searchRef}>
             <label>Responsável</label>
 
-            <div className="erm__inputWrap">
-              <select value={draft.userId} onChange={handleChangeUser}>
-                <option value="">Selecione...</option>
-                {opcoes.map((o) => (
-                  <option key={o.id} value={String(o.id)}>
-                    {o.nome}
-                  </option>
-                ))}
-              </select>
+            <div className="erm__searchWrap">
+              <Search size={14} className="erm__searchIco" />
+
+              <input
+                value={queryUser}
+                onChange={(e) => {
+                  setQueryUser(e.target.value);
+                  setDropdownOpen(true);
+
+                  // se digitar manualmente, "desseleciona" até escolher do dropdown
+                  setDraft((prev) => ({ ...prev, userId: "", nome: e.target.value }));
+                }}
+                onFocus={() => setDropdownOpen(true)}
+                placeholder="Digite para buscar..."
+                autoComplete="off"
+              />
 
               <button
                 type="button"
@@ -131,26 +197,51 @@ export default function EditarResponsavelModal({
               >
                 <X size={14} />
               </button>
+
+              {dropdownOpen && candidatos.length > 0 && (
+                <div className="erm__dropdown">
+                  {candidatos.map((o) => (
+                    <button
+                      key={o.id}
+                      type="button"
+                      className={`erm__item ${String(draft.userId) === String(o.id) ? "is-active" : ""}`}
+                      onClick={() => pickUser(o)}
+                    >
+                      <div className="erm__itemName">{o.nome}</div>
+                      <div className="erm__itemSub">ID {String(o.id).padStart(3, "0")}</div>
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
+          {/* CARGO (SELECT) */}
           <div className="erm__field">
             <label>Cargo</label>
-            <input
-              value={draft.cargo}
-              onChange={(e) => setDraft((p) => ({ ...p, cargo: e.target.value }))}
-              placeholder="Ex.: Professor"
-            />
+            <div className="erm__inputWrap">
+              <select value={draft.cargo} onChange={handleChangeCargo}>
+                <option value="">Selecione...</option>
+                {CARGOS.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="erm__field">
-            <label>Contato</label>
-            <input
-              value={draft.contato}
-              onChange={(e) => setDraft((p) => ({ ...p, contato: e.target.value }))}
-              placeholder="Ex.: (61) 99999-9999"
-            />
-          </div>
+          {/* CONTATO (SÓ SE CARGO SELECIONADO) */}
+          {draft.cargo ? (
+            <div className="erm__field">
+              <label>Contato</label>
+              <input
+                value={draft.contato}
+                onChange={(e) => setDraft((p) => ({ ...p, contato: e.target.value }))}
+                placeholder="Ex.: (61) 99999-9999"
+              />
+            </div>
+          ) : null}
 
           <div className="erm__divider" />
 
@@ -193,7 +284,6 @@ export default function EditarResponsavelModal({
         </div>
 
         <div className="erm__footer">
-
           <button
             type="button"
             className={`erm__btn erm__btn--primary ${!draft.userId ? "is-disabled" : ""}`}

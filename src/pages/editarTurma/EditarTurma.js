@@ -1,10 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Upload, Search, X } from "lucide-react";
 import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
 import Swal from "sweetalert2";
 import data from "../../data/dados.json";
 import "./EditarTurma.scss";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_TURMA_ALUNOS = "turma_alunos_override"; // { [disciplinaId]: number[] alunoIds }
@@ -14,6 +14,8 @@ const defaultPerms = {
   responsaveis: false,
   alunos: true,
 };
+
+const CARGOS = ["Professor", "Responsável", "Coordenador"];
 
 function safeJsonParse(v, fallback) {
   try {
