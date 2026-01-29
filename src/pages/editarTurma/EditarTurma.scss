@@ -433,3 +433,62 @@ $fundo-input: #F3F5F7;
   background: #eef2f7;
   margin-bottom: 12px;
 }
+
+
+/* Título "Responsáveis da turma" menor */
+.section-title {
+  font-size: 18px;
+  margin: 6px 0 12px;
+}
+
+/* Chip do nome menor + não estourar */
+.chip {
+  height: 36px;
+  min-width: 0;          /* tira a largura mínima */
+  max-width: 100%;       /* limita no container */
+  padding: 0 14px;
+  font-size: 14px;
+  font-weight: 600;
+
+  white-space: nowrap;   /* não quebrar linha */
+  overflow: hidden;      /* corta se passar */
+  text-overflow: ellipsis; /* coloca "..." */
+}
+
+
+.btn-edit {
+  height: 34px;
+  width: auto;                /* <<< deixa crescer */
+  padding: 0 12px;            /* <<< espaço pro texto */
+  border-radius: 10px;
+  border: 1px solid $cinza-borda;
+  background: #fff;
+  cursor: pointer;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;                   /* <<< espaço entre ícone e texto */
+
+  color: #607089;
+
+  &:hover {
+    background: #f7f9fc;
+    border-color: #dbe3ee;
+  }
+
+  .btn-edit__text {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    color: inherit;
+    white-space: nowrap;
+  }
+}
+
+
+.divider {
+  height: 1px;
+  background: #e9edf3;
+  margin: 18px 0;
+}

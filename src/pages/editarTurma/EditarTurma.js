@@ -103,7 +103,10 @@ export default function EditarTurma() {
     window.addEventListener("storage", onStorage);
 
     return () => {
-      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
+      window.removeEventListener(
+        "disciplinaAtual:changed",
+        onDisciplinaChanged,
+      );
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -113,7 +116,9 @@ export default function EditarTurma() {
     return Number.isNaN(n) ? 0 : n;
   }, [disciplinaAtualId]);
 
-  const baseDisciplinas = Array.isArray(data.disciplinas) ? data.disciplinas : [];
+  const baseDisciplinas = Array.isArray(data.disciplinas)
+    ? data.disciplinas
+    : [];
   const baseUsuarios = Array.isArray(data.usuarios) ? data.usuarios : [];
 
   const user = useMemo(() => {
@@ -124,7 +129,9 @@ export default function EditarTurma() {
 
   const disciplinaBase = useMemo(() => {
     if (!turmaId) return null;
-    return baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null;
+    return (
+      baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null
+    );
   }, [baseDisciplinas, turmaId]);
 
   const [loading, setLoading] = useState(true);
@@ -157,7 +164,9 @@ export default function EditarTurma() {
       ...(turmaOverride || {}),
     };
 
-    const { nome: n, complemento: c } = splitNomeComplemento(disciplinaMerged.nome || "");
+    const { nome: n, complemento: c } = splitNomeComplemento(
+      disciplinaMerged.nome || "",
+    );
     setNome(disciplinaMerged.nomeCustom ?? n);
     setComplemento(disciplinaMerged.complementoCustom ?? c);
 
@@ -176,23 +185,21 @@ export default function EditarTurma() {
 
     const initialResponsaveis =
       respOverride ||
-      [professor, responsavel]
-        .filter(Boolean)
-        .map((u) => ({
-          userId: u.id,
-          nome: u.nome,
-          cargo:
-            u.tipo === "professor"
-              ? "Professor"
-              : u.tipo === "responsavel"
-                ? "Responsável"
-                : "Coordenador",
-          contato: u.contato || "",
-          permissoes: {
-            ...defaultPerms,
-            ...(u.permissoes || {}),
-          },
-        }));
+      [professor, responsavel].filter(Boolean).map((u) => ({
+        userId: u.id,
+        nome: u.nome,
+        cargo:
+          u.tipo === "professor"
+            ? "Professor"
+            : u.tipo === "responsavel"
+              ? "Responsável"
+              : "Coordenador",
+        contato: u.contato || "",
+        permissoes: {
+          ...defaultPerms,
+          ...(u.permissoes || {}),
+        },
+      }));
 
     // garante shape
     const normalized = initialResponsaveis.map((r) => ({
@@ -299,7 +306,9 @@ export default function EditarTurma() {
       return;
     }
 
-    const next = Array.from(new Set([...alunosIds, Number(alunoSelecionadoId)]));
+    const next = Array.from(
+      new Set([...alunosIds, Number(alunoSelecionadoId)]),
+    );
     setAlunosIds(next);
     persistAlunos(next);
 
@@ -358,7 +367,9 @@ export default function EditarTurma() {
             <h1>Editar Turma</h1>
           </header>
 
-          <p className="empty-text">Usuário não identificado. Faça login novamente.</p>
+          <p className="empty-text">
+            Usuário não identificado. Faça login novamente.
+          </p>
           <button className="btn-secondary" onClick={() => navigate("/")}>
             Voltar
           </button>
@@ -375,7 +386,9 @@ export default function EditarTurma() {
             <h1>Editar Turma</h1>
           </header>
 
-          <p className="empty-text">Nenhuma turma selecionada no menu lateral.</p>
+          <p className="empty-text">
+            Nenhuma turma selecionada no menu lateral.
+          </p>
           <button className="btn-secondary" onClick={() => navigate(-1)}>
             Voltar
           </button>
@@ -441,6 +454,7 @@ export default function EditarTurma() {
             />
           </div>
         </div>
+        <div className="divider" />
 
         <div className="section">
           <h3 className="section-title">Responsáveis da turma</h3>
@@ -459,6 +473,7 @@ export default function EditarTurma() {
                     title="Editar"
                   >
                     <Pencil size={14} />
+                    <span className="btn-edit__text">Editar</span>
                   </button>
                 </div>
 
@@ -476,7 +491,11 @@ export default function EditarTurma() {
               </div>
             ))}
 
-            <button type="button" className="btn-primary wide" onClick={openAdicionarResponsavel}>
+            <button
+              type="button"
+              className="btn-primary wide"
+              onClick={openAdicionarResponsavel}
+            >
               Adicionar Responsável
             </button>
           </div>
@@ -489,7 +508,9 @@ export default function EditarTurma() {
             <button
               type="button"
               className="btn-primary small"
-              onClick={() => Swal.fire("Info", "Função de importação (mock).", "info")}
+              onClick={() =>
+                Swal.fire("Info", "Função de importação (mock).", "info")
+              }
             >
               <Upload size={14} />
               <span>Importar lista</span>
@@ -517,7 +538,9 @@ export default function EditarTurma() {
                       key={c.id}
                       type="button"
                       className={`dropdown-item ${
-                        Number(alunoSelecionadoId) === Number(c.id) ? "active" : ""
+                        Number(alunoSelecionadoId) === Number(c.id)
+                          ? "active"
+                          : ""
                       }`}
                       onClick={() => setAlunoSelecionadoId(c.id)}
                     >
@@ -530,14 +553,24 @@ export default function EditarTurma() {
             </div>
 
             <div className="actions-row">
-              <button type="button" className="btn-primary wide muted" onClick={handleAdicionarAluno}>
+              <button
+                type="button"
+                className="btn-primary wide muted"
+                onClick={handleAdicionarAluno}
+              >
                 Adicionar aluno
               </button>
 
               <button
                 type="button"
                 className="link"
-                onClick={() => Swal.fire("Lista completa", "Tela de lista completa (mock).", "info")}
+                onClick={() =>
+                  Swal.fire(
+                    "Lista completa",
+                    "Tela de lista completa (mock).",
+                    "info",
+                  )
+                }
               >
                 Ver lista completa de alunos
               </button>
@@ -563,7 +596,9 @@ export default function EditarTurma() {
                 </div>
               ))}
 
-              {!alunosDetalhes.length && <div className="empty-small">Nenhum aluno adicionado.</div>}
+              {!alunosDetalhes.length && (
+                <div className="empty-small">Nenhum aluno adicionado.</div>
+              )}
             </div>
           </div>
         </div>
@@ -574,10 +609,14 @@ export default function EditarTurma() {
         onClose={closeModal}
         usuarios={baseUsuarios}
         initialValue={
-          modalMode === "edit" && editIndex !== null ? responsaveis[editIndex] : null
+          modalMode === "edit" && editIndex !== null
+            ? responsaveis[editIndex]
+            : null
         }
         onSave={handleSaveResponsavelFromModal}
-        onRemove={modalMode === "edit" ? handleRemoveResponsavelFromModal : null}
+        onRemove={
+          modalMode === "edit" ? handleRemoveResponsavelFromModal : null
+        }
       />
     </div>
   );
