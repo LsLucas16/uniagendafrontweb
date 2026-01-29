@@ -498,6 +498,7 @@ export default function EditarTurma() {
             >
               Adicionar Responsável
             </button>
+        <div className="divider" />
           </div>
         </div>
 
