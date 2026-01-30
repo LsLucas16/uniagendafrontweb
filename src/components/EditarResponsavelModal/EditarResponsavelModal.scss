@@ -1,3 +1,34 @@
+/* ============ Tokens (pra não repetir) ============ */
+$border: #e9edf3;
+$bg: #ffffff;
+$muted: #8a96a8;
+$text: #111827;
+$title: #1f2937;
+$label: #2b3b4f;
+$soft: #f8fafc;     // ✅ cinza “dentro” (inputs e botão remover)
+$softHover: #f3f5f7;
+
+$primary: #73a5d7;
+$focusRing: rgba(115, 165, 215, 0.18);
+$focusBorder: rgba(115, 165, 215, 0.95);
+
+/* ============ Mixins ============ */
+@mixin controlBase($h: 34px) {
+  height: $h;
+  border-radius: 4px;
+  border: 1px solid $border;
+  background: $bg;
+  font-size: 12px;
+  color: $text;
+  outline: none;
+
+  &:focus {
+    border-color: $focusBorder;
+    box-shadow: 0 0 0 3px $focusRing;
+  }
+}
+
+/* ============ Layout ============ */
 .erm__overlay {
   position: fixed;
   inset: 0;
@@ -12,9 +43,9 @@
 .erm__modal {
   width: 100%;
   max-width: 560px;
-  background: #ffffff;
+  background: $bg;
   border-radius: 10px;
-  border: 1px solid #e9edf3;
+  border: 1px solid $border;
   box-shadow: 0 22px 60px rgba(2, 6, 23, 0.18);
   position: relative;
   padding: 22px 22px 18px;
@@ -37,7 +68,7 @@
   justify-content: center;
 
   &:hover {
-    background: #f3f5f7;
+    background: $softHover;
   }
 }
 
@@ -47,22 +78,23 @@
 
 .erm__title {
   font-size: 18px;
-  font-weight: 800;
-  color: #1f2937;
+  font-weight: 700; // ✅ menos negrito
+  color: $title;
   line-height: 1.15;
 }
 
 .erm__subtitle {
   margin-top: 4px;
   font-size: 12px;
-  color: #8a96a8;
-  font-weight: 600;
+  color: $muted;
+  font-weight: 500;
 }
 
 .erm__body {
   margin-top: 18px;
 }
 
+/* ============ Fields ============ */
 .erm__field {
   display: flex;
   flex-direction: column;
@@ -71,24 +103,14 @@
 
   label {
     font-size: 11px;
-    font-weight: 800;
-    color: #2b3b4f;
+    font-weight: 600;
+    color: $label;
   }
 
   input {
-    height: 34px;
-    border-radius: 4px;
-    border: 1px solid #e9edf3;
-    background: #ffffff;
+    @include controlBase(34px);
     padding: 0 12px;
-    font-size: 12px;
-    color: #111827;
-    outline: none;
-
-    &:focus {
-      border-color: rgba(115, 165, 215, 0.95);
-      box-shadow: 0 0 0 3px rgba(115, 165, 215, 0.18);
-    }
+    font-weight: 500;
   }
 }
 
@@ -97,20 +119,31 @@
 
   select {
     width: 100%;
-    height: 34px;
-    border-radius: 4px;
-    border: 1px solid #e9edf3;
-    background: #ffffff;
+    @include controlBase(34px);
     padding: 0 38px 0 12px;
-    font-size: 12px;
-    color: #111827;
-    outline: none;
-
-    &:focus {
-      border-color: rgba(115, 165, 215, 0.95);
-      box-shadow: 0 0 0 3px rgba(115, 165, 215, 0.18);
-    }
+    font-weight: 500;
   }
+}
+
+/* ============ Busca responsável ============ */
+.erm__searchWrap {
+  position: relative;
+
+  input {
+    width: 100%;
+    @include controlBase(34px);
+    padding: 0 38px 0 34px; // ícone + X
+    font-weight: 500;
+  }
+}
+
+.erm__searchIco {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  pointer-events: none;
 }
 
 .erm__clear {
@@ -131,28 +164,76 @@
   justify-content: center;
 
   &:hover {
-    background: #f3f5f7;
+    background: $softHover;
     color: #64748b;
   }
 }
 
+/* dropdown */
+.erm__dropdown {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 8px);
+  background: $bg;
+  border: 1px solid $border;
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.14);
+  overflow: hidden;
+  z-index: 50;
+}
+
+.erm__item {
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: $bg;
+  padding: 10px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  &:hover {
+    background: #f7f9fc;
+  }
+
+  &.is-active {
+    background: rgba(115, 165, 215, 0.14);
+  }
+}
+
+.erm__itemName {
+  font-size: 12px;
+  font-weight: 700;
+  color: $title;
+}
+
+.erm__itemSub {
+  font-size: 11px;
+  font-weight: 500;
+  color: $muted;
+}
+
+/* ============ Divider ============ */
 .erm__divider {
   height: 1px;
   background: #eef2f7;
   margin: 10px 0 14px;
 }
 
+/* ============ Permissões ============ */
 .erm__permsTitle {
   font-size: 12px;
-  font-weight: 900;
-  color: #2b3b4f;
+  font-weight: 700;
+  color: $label;
 }
 
 .erm__permsSubtitle {
   margin-top: 3px;
   font-size: 11px;
-  font-weight: 600;
-  color: #8a96a8;
+  font-weight: 500;
+  color: $muted;
 }
 
 .erm__checks {
@@ -182,7 +263,7 @@
   span {
     font-size: 12px;
     color: #334155;
-    font-weight: 700;
+    font-weight: 600;
   }
 }
 
@@ -191,14 +272,14 @@
   height: 16px;
   border-radius: 4px;
   border: 1px solid #cbd5e1;
-  background: #ffffff;
+  background: $bg;
   display: inline-block;
   position: relative;
 }
 
 .erm__check input:checked + .erm__checkBox {
-  border-color: #73a5d7;
-  background: #73a5d7;
+  border-color: $primary;
+  background: $primary;
 }
 
 .erm__check input:checked + .erm__checkBox::after {
@@ -208,133 +289,66 @@
   top: 2px;
   width: 5px;
   height: 9px;
-  border: solid #ffffff;
+  border: solid $bg;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
 }
 
+/* ============ Footer / Buttons ============ */
 .erm__footer {
   margin-top: 16px;
   display: flex;
-  justify-content: center; 
+  justify-content: flex-end;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
-
 .erm__btn {
-    height: 32px;
-    padding: 0 14px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 800;
-    cursor: pointer;
-    border: 1px solid transparent;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600; // ✅ menos negrito
+  cursor: pointer;
+  border: 1px solid transparent;
 
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  line-height: 1;
 
-  &--ghost {
-    background: #f8fafc;
-    border-color: #e9edf3;
-    color: #334155;
-
-    &:hover {
-      background: #f3f5f7;
-    }
+  &.is-disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
   }
 
   &--primary {
-    background: #73a5d7;
-    border-color: #73a5d7;
-    color: #ffffff;
+    min-width: 170px;
+    background: $primary;
+    border-color: $primary;
+    color: $bg;
 
     &:hover {
       filter: brightness(0.97);
     }
   }
 
-  &.is-disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
+  /* ✅ Remover com “cinza por dentro” igual inputs */
+  &--dangerGhost {
+    background: $soft;       // ✅ era branco, agora cinza
+    border-color: $border;
+    color: #334155;
+
+    &:hover {
+      background: $softHover; // mantém comportamento “ghost”
+    }
+
+    &:active {
+      transform: translateY(0.5px);
+    }
   }
 }
 
-/* ===== Busca do responsável ===== */
-.erm__searchWrap {
-  position: relative;
-}
 
-.erm__searchIco {
-  position: absolute;
-  left: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #94a3b8;
-  pointer-events: none;
-}
-
-.erm__searchWrap input {
-  width: 100%;
-  height: 34px;
-  border-radius: 4px;
-  border: 1px solid #e9edf3;
-  background: #ffffff;
-  padding: 0 38px 0 34px; /* espaço pro ícone e pro X */
-  font-size: 12px;
-  color: #111827;
-  outline: none;
-
-  &:focus {
-    border-color: rgba(115, 165, 215, 0.95);
-    box-shadow: 0 0 0 3px rgba(115, 165, 215, 0.18);
-  }
-}
-
-/* dropdown */
-.erm__dropdown {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 8px);
-  background: #ffffff;
-  border: 1px solid #e9edf3;
-  border-radius: 10px;
-  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.14);
-  overflow: hidden;
-  z-index: 50;
-}
-
-.erm__item {
-  width: 100%;
-  text-align: left;
-  border: 0;
-  background: #ffffff;
-  padding: 10px 12px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-
-  &:hover {
-    background: #f7f9fc;
-  }
-
-  &.is-active {
-    background: rgba(115, 165, 215, 0.14);
-  }
-}
-
-.erm__itemName {
-  font-size: 12px;
-  font-weight: 900;
-  color: #1f2937;
-}
-
-.erm__itemSub {
-  font-size: 11px;
-  font-weight: 700;
-  color: #8a96a8;
-}

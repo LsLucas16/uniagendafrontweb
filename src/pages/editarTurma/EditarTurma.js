@@ -123,6 +123,14 @@ export default function EditarTurma() {
     : [];
   const baseUsuarios = Array.isArray(data.usuarios) ? data.usuarios : [];
 
+  // ✅ user = matrícula (string 9 dígitos)
+  const usuariosComUser = useMemo(() => {
+    return baseUsuarios.map((u) => ({
+      ...u,
+      user: u.user ?? String(u.id).padStart(9, "0"),
+    }));
+  }, [baseUsuarios]);
+
   const user = useMemo(() => {
     const id = usuarioLogado?.id;
     if (!id) return null;
@@ -188,7 +196,7 @@ export default function EditarTurma() {
     const initialResponsaveis =
       respOverride ||
       [professor, responsavel].filter(Boolean).map((u) => ({
-        userId: u.id,
+        userId: u.user,
         nome: u.nome,
         cargo:
           u.tipo === "professor"
@@ -240,7 +248,7 @@ export default function EditarTurma() {
       .map((u) => ({
         id: u.id,
         nome: u.nome,
-        matricula: String(u.id).padStart(9, "0"),
+        matricula: u.user,
       }))
       .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
   }, [alunosIds, baseUsuarios]);
@@ -257,14 +265,16 @@ export default function EditarTurma() {
         instituicaoId ? Number(u.faculdadeId) === Number(instituicaoId) : true,
       )
       .filter(
-        (u) => u.nome?.toLowerCase().includes(q) || String(u.id).includes(q),
+        (u) => u.nome?.toLowerCase().includes(q) || String(u.id).includes(q) ||
+         String(u.user).toLowerCase().includes(q) || 
+        String(u.id).includes(q),
       )
       .slice(0, 8);
 
     return filtrados.map((u) => ({
-      id: u.id,
+      id: u.user,
       nome: u.nome,
-      matricula: String(u.id).padStart(9, "0"),
+      matricula: u.user,
     }));
   }, [buscaAluno, baseUsuarios, disciplinaBase]);
 
@@ -500,7 +510,7 @@ export default function EditarTurma() {
             >
               Adicionar Responsável
             </button>
-        <div className="divider" />
+            <div className="divider" />
           </div>
         </div>
 
@@ -567,13 +577,7 @@ export default function EditarTurma() {
               <button
                 type="button"
                 className="link"
-                onClick={() =>
-                  Swal.fire(
-                    "Lista completa",
-                    "Tela de lista completa (mock).",
-                    "info",
-                  )
-                }
+                onClick={() => navigate(`/turma/${turmaId}/alunos`)}
               >
                 Ver lista completa de alunos
               </button>
@@ -610,7 +614,7 @@ export default function EditarTurma() {
       <EditarResponsavelModal
         open={modalOpen}
         onClose={closeModal}
-        usuarios={baseUsuarios}
+        usuarios={usuariosComUser}
         initialValue={
           modalMode === "edit" && editIndex !== null
             ? responsaveis[editIndex]

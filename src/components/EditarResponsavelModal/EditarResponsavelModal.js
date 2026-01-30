@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./EditarResponsavelModal.scss";
-import { X, Search } from "lucide-react";
+import { X, Search, Trash2 } from "lucide-react";
 
 const defaultPerms = {
   eventos: true,
@@ -10,17 +10,19 @@ const defaultPerms = {
 
 const CARGOS = ["Professor", "Responsável", "Coordenador"];
 
+// ✅ ajuste para a SUA chave real no localStorage
+const RESPONSAVEIS_STORAGE_KEY = "responsaveis_v1";
+
 export default function EditarResponsavelModal({
   open,
   onClose,
   usuarios = [],
-  initialValue = null, // { userId, nome, cargo, contato, permissoes }
+  initialValue = null,
   onSave,
   onRemove,
 }) {
   const [draft, setDraft] = useState(null);
 
-  // busca responsável
   const [queryUser, setQueryUser] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const searchRef = useRef(null);
@@ -30,7 +32,7 @@ export default function EditarResponsavelModal({
 
     const iv = initialValue || {};
     const next = {
-      userId: iv.userId ?? "",
+      userId: iv.userId ?? "", // login (string)
       nome: iv.nome ?? "",
       cargo: iv.cargo ?? "",
       contato: iv.contato ?? "",
@@ -47,13 +49,16 @@ export default function EditarResponsavelModal({
 
   const opcoes = useMemo(() => {
     return (usuarios || [])
-      .filter((u) => ["professor", "responsavel", "coordenador"].includes(u.tipo))
+      .filter((u) =>
+        ["professor", "responsavel", "coordenador"].includes(u.tipo),
+      )
       .map((u) => ({
-        id: u.id,
+        user: u.user ?? u.login ?? u.username ?? "",
         nome: u.nome,
         tipo: u.tipo,
         contato: u.contato || "",
-      }));
+      }))
+      .filter((o) => !!o.user);
   }, [usuarios]);
 
   const candidatos = useMemo(() => {
@@ -61,11 +66,14 @@ export default function EditarResponsavelModal({
     if (!q) return [];
 
     return opcoes
-      .filter((o) => o.nome?.toLowerCase().includes(q) || String(o.id).includes(q))
+      .filter(
+        (o) =>
+          o.nome?.toLowerCase().includes(q) ||
+          o.user?.toLowerCase().includes(q),
+      )
       .slice(0, 8);
   }, [queryUser, opcoes]);
 
-  // fechar dropdown ao clicar fora
   useEffect(() => {
     if (!open) return;
 
@@ -88,10 +96,8 @@ export default function EditarResponsavelModal({
   const pickUser = (o) => {
     setDraft((prev) => ({
       ...prev,
-      userId: o.id,
+      userId: o.user,
       nome: o.nome,
-
-      // se ainda não escolheu cargo, sugere automaticamente pelo tipo
       cargo:
         prev.cargo ||
         (o.tipo === "professor"
@@ -101,9 +107,7 @@ export default function EditarResponsavelModal({
             : o.tipo === "coordenador"
               ? "Coordenador"
               : ""),
-
-      // só coloca contato se o cargo estiver selecionado (senão, guarda o que já tinha)
-      contato: prev.cargo ? (o.contato || prev.contato) : prev.contato,
+      contato: prev.cargo ? o.contato || prev.contato : prev.contato,
     }));
 
     setQueryUser(o.nome);
@@ -111,11 +115,7 @@ export default function EditarResponsavelModal({
   };
 
   const clearUser = () => {
-    setDraft((prev) => ({
-      ...prev,
-      userId: "",
-      nome: "",
-    }));
+    setDraft((prev) => ({ ...prev, userId: "", nome: "" }));
     setQueryUser("");
     setDropdownOpen(false);
   };
@@ -129,11 +129,10 @@ export default function EditarResponsavelModal({
 
   const handleChangeCargo = (e) => {
     const value = e.target.value;
-
     setDraft((prev) => ({
       ...prev,
       cargo: value,
-      contato: value ? prev.contato : "", // se desmarcar cargo, limpa contato
+      contato: value ? prev.contato : "",
     }));
   };
 
@@ -141,12 +140,37 @@ export default function EditarResponsavelModal({
     if (!draft.userId) return;
 
     onSave?.({
-      userId: Number(draft.userId),
+      userId: String(draft.userId),
       nome: draft.nome,
       cargo: draft.cargo,
       contato: draft.contato,
       permissoes: { ...draft.permissoes },
     });
+  };
+
+  // ✅ remove + persiste no localStorage
+  const remove = () => {
+    if (!draft.userId) return;
+
+    // 1) callback pra você atualizar estado/UI no pai
+    onRemove?.(String(draft.userId));
+
+    // 2) persistência no storage (ajuste a estrutura conforme seu projeto)
+    try {
+      const raw = localStorage.getItem(RESPONSAVEIS_STORAGE_KEY);
+      const arr = raw ? JSON.parse(raw) : [];
+
+      const nextArr = Array.isArray(arr)
+        ? arr.filter((r) => String(r.userId) !== String(draft.userId))
+        : [];
+
+      localStorage.setItem(RESPONSAVEIS_STORAGE_KEY, JSON.stringify(nextArr));
+    } catch (e) {
+      // se der erro, pelo menos remove no estado do pai via onRemove
+      console.error("Erro ao remover responsável do storage:", e);
+    }
+
+    onClose?.();
   };
 
   return (
@@ -157,7 +181,12 @@ export default function EditarResponsavelModal({
       aria-modal="true"
     >
       <div className="erm__modal" onMouseDown={(e) => e.stopPropagation()}>
-        <button className="erm__close" type="button" onClick={onClose} aria-label="Fechar">
+        <button
+          className="erm__close"
+          type="button"
+          onClick={onClose}
+          aria-label="Fechar"
+        >
           <X size={16} />
         </button>
 
@@ -167,7 +196,7 @@ export default function EditarResponsavelModal({
         </div>
 
         <div className="erm__body">
-          {/* RESPONSÁVEL (PESQUISA) */}
+          {/* RESPONSÁVEL */}
           <div className="erm__field" ref={searchRef}>
             <label>Responsável</label>
 
@@ -179,9 +208,11 @@ export default function EditarResponsavelModal({
                 onChange={(e) => {
                   setQueryUser(e.target.value);
                   setDropdownOpen(true);
-
-                  // se digitar manualmente, "desseleciona" até escolher do dropdown
-                  setDraft((prev) => ({ ...prev, userId: "", nome: e.target.value }));
+                  setDraft((prev) => ({
+                    ...prev,
+                    userId: "",
+                    nome: e.target.value,
+                  }));
                 }}
                 onFocus={() => setDropdownOpen(true)}
                 placeholder="Digite para buscar..."
@@ -192,7 +223,7 @@ export default function EditarResponsavelModal({
                 type="button"
                 className="erm__clear"
                 onClick={clearUser}
-                aria-label="Limpar responsável"
+                aria-label="Limpar"
                 title="Limpar"
               >
                 <X size={14} />
@@ -202,13 +233,13 @@ export default function EditarResponsavelModal({
                 <div className="erm__dropdown">
                   {candidatos.map((o) => (
                     <button
-                      key={o.id}
+                      key={o.user}
                       type="button"
-                      className={`erm__item ${String(draft.userId) === String(o.id) ? "is-active" : ""}`}
+                      className={`erm__item ${String(draft.userId) === String(o.user) ? "is-active" : ""}`}
                       onClick={() => pickUser(o)}
                     >
                       <div className="erm__itemName">{o.nome}</div>
-                      <div className="erm__itemSub">ID {String(o.id).padStart(3, "0")}</div>
+                      <div className="erm__itemSub">{o.user}</div>
                     </button>
                   ))}
                 </div>
@@ -216,28 +247,26 @@ export default function EditarResponsavelModal({
             </div>
           </div>
 
-          {/* CARGO (SELECT) */}
+          {/* CARGO */}
           <div className="erm__field">
             <label>Cargo</label>
-            <div className="erm__inputWrap">
-              <select value={draft.cargo} onChange={handleChangeCargo}>
-                <option value="">Selecione...</option>
-                {CARGOS.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <input
+              type="text"
+              value={draft.cargo}
+              onChange={handleChangeCargo}
+              placeholder="Ex.: Professor, Coordenador, Responsável..."
+            />
           </div>
 
-          {/* CONTATO (SÓ SE CARGO SELECIONADO) */}
+          {/* CONTATO */}
           {draft.cargo ? (
             <div className="erm__field">
               <label>Contato</label>
               <input
                 value={draft.contato}
-                onChange={(e) => setDraft((p) => ({ ...p, contato: e.target.value }))}
+                onChange={(e) =>
+                  setDraft((p) => ({ ...p, contato: e.target.value }))
+                }
                 placeholder="Ex.: (61) 99999-9999"
               />
             </div>
@@ -245,9 +274,12 @@ export default function EditarResponsavelModal({
 
           <div className="erm__divider" />
 
+          {/* PERMS */}
           <div className="erm__perms">
             <div className="erm__permsTitle">Permissões</div>
-            <div className="erm__permsSubtitle">Selecione as permissões desse responsável</div>
+            <div className="erm__permsSubtitle">
+              Selecione as permissões desse responsável
+            </div>
 
             <div className="erm__checks">
               <label className="erm__check">
@@ -283,7 +315,18 @@ export default function EditarResponsavelModal({
           </div>
         </div>
 
+        {/* ✅ FOOTER IGUAL FIGMA: remover (ghost/danger) + salvar (primary) alinhado à direita */}
         <div className="erm__footer">
+          {!!draft.userId && !!onRemove && (
+            <button
+              type="button"
+              className="erm__btn erm__btn--dangerGhost"
+              onClick={remove}
+            >
+              Remover responsável
+            </button>
+          )}
+
           <button
             type="button"
             className={`erm__btn erm__btn--primary ${!draft.userId ? "is-disabled" : ""}`}

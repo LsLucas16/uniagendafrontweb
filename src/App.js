@@ -14,9 +14,9 @@ import PaginaTemporaria from "./pages/temp/PaginaTemporaria";
 import EventosPublicados from "./pages/eventosPublicados/EventosPublicados";
 import EditarEvento from "./pages/editarEvento/EditarEvento";
 import EditarTurma from "./pages/editarTurma/EditarTurma";
+import ListaAlunos from "./pages/listaAlunos/ListaAlunos";
 
 function App() {
-
   return (
     <Router>
       <Routes>
@@ -38,7 +38,9 @@ function App() {
           {/* professor, coordenador, responsável */}
           <Route
             element={
-              <RoleRoute allowed={["professor", "coordenador", "responsavel"]} />
+              <RoleRoute
+                allowed={["professor", "coordenador", "responsavel"]}
+              />
             }
           >
             <Route
@@ -46,6 +48,15 @@ function App() {
               element={
                 <Layout>
                   <CriarEvento />
+                </Layout>
+              }
+            />
+
+            <Route
+              path="/turma/:turmaId/alunos"
+              element={
+                <Layout>
+                  <ListaAlunos />
                 </Layout>
               }
             />
@@ -95,9 +106,7 @@ function App() {
               path="/editar-turma-dev"
               element={
                 <Layout>
-                  <PaginaTemporaria
-                    titulo="Editar Turma (Em desenvolvimento)"
-                  />
+                  <PaginaTemporaria titulo="Editar Turma (Em desenvolvimento)" />
                 </Layout>
               }
             />
