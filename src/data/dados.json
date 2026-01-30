@@ -100,8 +100,207 @@
       "faculdadeId": 3,
       "disciplinas":  [1, 2, 3, 8, 9, 10, 11, 4]
       
-     } 
-   ],
+     },
+  {
+    "id": 501,
+    "user": "202650001",
+    "senha": "123",
+    "nome": "Julia Maria Neto",
+    "tipo": "responsavel",
+    "faculdadeId": 1,
+    "disciplinas": [1, 2, 3, 4]
+  },
+  {
+    "id": 101,
+    "user": "202610101",
+    "senha": "123",
+    "nome": "Carlos Augusto de Silva Pinho",
+    "contato": "(99)99999-9999",
+    "tipo": "aluno",
+    "faculdadeId": 2,
+    "disciplinas": [1, 6, 3, 4]
+  },
+  {
+    "id": 201,
+    "user": "202620201",
+    "senha": "123",
+    "nome": "Roberto Almeida Costa Junior",
+    "contato": "professor@faculdade.br",
+    "tipo": "professor",
+    "faculdadeId": 1,
+    "disciplinas": [1, 6, 3, 4]
+  },
+  {
+    "id": 301,
+    "user": "202630301",
+    "senha": "123",
+    "nome": "Ana Claudia Oliveira",
+    "contato": "coordenador@faculdade.br",
+    "tipo": "coordenador",
+    "faculdadeId": 1,
+    "disciplinas": [1, 6, 3, 4]
+  },
+  {
+    "id": 401,
+    "user": "202640401",
+    "senha": "123",
+    "nome": "Junior Carlos Costa de Matos",
+    "contato": "(99)99999-9999",
+    "tipo": "responsavel",
+    "faculdadeId": 1,
+    "disciplinas": [1, 6, 3, 4]
+  },
+  {
+    "id": 102,
+    "user": "202610102",
+    "senha": "123",
+    "nome": "Lucas Ribeiro Silva",
+    "contato": "(99)99999-9999",
+    "tipo": "aluno",
+    "faculdadeId": 3,
+    "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
+  },
+  {
+    "id": 202,
+    "user": "202630202",
+    "senha": "123",
+    "nome": "Marcos Antônio Ferreira",
+    "contato": "coordenador@faculdade.br",
+    "tipo": "coordenador",
+    "faculdadeId": 3,
+    "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
+  },
+  {
+    "id": 302,
+    "user": "202620302",
+    "senha": "123",
+    "nome": "Renata Oliveira Costa",
+    "contato": "professor@faculdade.br",
+    "tipo": "professor",
+    "faculdadeId": 3,
+    "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
+  },
+  {
+    "id": 402,
+    "user": "202640402",
+    "senha": "123",
+    "nome": "Fernanda Ribeiro Silva",
+    "contato": "(99)99999-9999",
+    "tipo": "responsavel",
+    "faculdadeId": 3,
+    "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
+  },
+  {
+    "id": 103,
+    "user": "202610103",
+    "senha": "123",
+    "nome": "Beatriz Fernandes Lima",
+    "contato": "(61) 98888-0103",
+    "tipo": "aluno",
+    "faculdadeId": 1,
+    "disciplinas": [1, 2, 3, 4]
+  },
+  {
+    "id": 104,
+    "user": "202610104",
+    "senha": "123",
+    "nome": "Pedro Henrique Souza",
+    "contato": "(61) 98888-0104",
+    "tipo": "aluno",
+    "faculdadeId": 1,
+    "disciplinas": [2, 3, 4]
+  },
+  {
+    "id": 105,
+    "user": "202610105",
+    "senha": "123",
+    "nome": "Mariana Costa Ribeiro",
+    "contato": "(61) 98888-0105",
+    "tipo": "aluno",
+    "faculdadeId": 1,
+    "disciplinas": [1, 4]
+  },
+  {
+    "id": 106,
+    "user": "202610106",
+    "senha": "123",
+    "nome": "Gustavo Almeida Santos",
+    "contato": "(61) 98888-0106",
+    "tipo": "aluno",
+    "faculdadeId": 1,
+    "disciplinas": [1, 3]
+  },
+  {
+    "id": 107,
+    "user": "202610107",
+    "senha": "123",
+    "nome": "Larissa Martins Pereira",
+    "contato": "(62) 97777-0107",
+    "tipo": "aluno",
+    "faculdadeId": 2,
+    "disciplinas": [6, 1, 3]
+  },
+  {
+    "id": 108,
+    "user": "202610108",
+    "senha": "123",
+    "nome": "João Vitor Nascimento",
+    "contato": "(62) 97777-0108",
+    "tipo": "aluno",
+    "faculdadeId": 2,
+    "disciplinas": [6, 3, 4]
+  },
+  {
+    "id": 109,
+    "user": "202610109",
+    "senha": "123",
+    "nome": "Camila Rocha Freitas",
+    "contato": "(62) 97777-0109",
+    "tipo": "aluno",
+    "faculdadeId": 2,
+    "disciplinas": [1, 4]
+  },
+  {
+    "id": 110,
+    "user": "202610110",
+    "senha": "123",
+    "nome": "Rafael Teixeira Cardoso",
+    "contato": "(63) 96666-0110",
+    "tipo": "aluno",
+    "faculdadeId": 3,
+    "disciplinas": [8, 9, 10]
+  },
+  {
+    "id": 111,
+    "user": "202610111",
+    "senha": "123",
+    "nome": "Isabela Mendes Araujo",
+    "contato": "(63) 96666-0111",
+    "tipo": "aluno",
+    "faculdadeId": 3,
+    "disciplinas": [8, 11, 12]
+  },
+  {
+    "id": 112,
+    "user": "202610112",
+    "senha": "123",
+    "nome": "Bruno Vieira Monteiro",
+    "contato": "(63) 96666-0112",
+    "tipo": "aluno",
+    "faculdadeId": 3,
+    "disciplinas": [7, 9, 11]
+  },
+  {
+    "id": 113,
+    "user": "202610113",
+    "senha": "123",
+    "nome": "Sofia Carvalho Batista",
+    "contato": "(63) 96666-0113",
+    "tipo": "aluno",
+    "faculdadeId": 3,
+    "disciplinas": [10, 11]
+  }
+],
    "disciplinas": [
   {
     "id": 1,
