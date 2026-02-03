@@ -2,7 +2,7 @@ import React, { useState, forwardRef, useMemo } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ptBR from "date-fns/locale/pt-BR";
 import Swal from "sweetalert2";
-import { Calendar } from "lucide-react";
+import { Calendar, X } from "lucide-react";
 import "react-datepicker/dist/react-datepicker.css";
 import "./CriarEvento.scss";
 
@@ -31,6 +31,25 @@ function getDisciplinaAtualId() {
   return localStorage.getItem("disciplinaAtualId") || "";
 }
 
+/**
+ * TURMAS = disciplinas da instituição do usuário logado
+ * (No seu JSON não existe "turmas", então usamos dados.disciplinas)
+ */
+function getTurmasDisponiveis({ instituicaoId }) {
+  const disciplinas = Array.isArray(dados?.disciplinas) ? dados.disciplinas : [];
+
+  return disciplinas
+    .filter((d) => Number(d?.instituicaoId) === Number(instituicaoId))
+    .map((d) => ({
+      id: Number(d.id),
+      nome:
+        typeof d?.nome === "string" && d.nome.trim()
+          ? d.nome
+          : `Turma ${d?.id ?? ""}`.trim(),
+    }))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}
+
 const CriarEvento = () => {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -41,8 +60,58 @@ const CriarEvento = () => {
     destaque: false,
   });
 
+  // ✅ Turmas (coordenador)
+  const [modoTurmas, setModoTurmas] = useState("all"); // "all" | "some"
+  const [turmaSelecionadaId, setTurmaSelecionadaId] = useState("");
+  const [turmaIds, setTurmaIds] = useState([]);
+
   const tituloCount = useMemo(() => titulo.length, [titulo]);
   const descricaoCount = useMemo(() => descricao.length, [descricao]);
+
+  const usuario = useMemo(() => getUsuarioLogado(), []);
+  const isCoordenador = (usuario?.tipo || "").toLowerCase() === "coordenador";
+
+  const instituicaoId = useMemo(
+    () => Number(usuario?.faculdadeId) || null,
+    [usuario],
+  );
+
+  const turmasDisponiveis = useMemo(() => {
+    if (!isCoordenador) return [];
+    if (!instituicaoId) return [];
+    return getTurmasDisponiveis({ instituicaoId });
+  }, [isCoordenador, instituicaoId]);
+
+  const turmaIdToNome = useMemo(() => {
+    const m = new Map();
+    turmasDisponiveis.forEach((t) => m.set(Number(t.id), t.nome));
+    return m;
+  }, [turmasDisponiveis]);
+
+  // ✅ Toggle
+  const setAllTurmas = () => {
+    setModoTurmas("all");
+    setTurmaSelecionadaId("");
+    setTurmaIds([]);
+  };
+
+  const setSomeTurmas = () => {
+    setModoTurmas("some");
+  };
+
+  const addTurma = () => {
+    if (modoTurmas !== "some") return;
+
+    const idNum = Number(turmaSelecionadaId);
+    if (!idNum || Number.isNaN(idNum)) return;
+
+    setTurmaIds((prev) => (prev.includes(idNum) ? prev : [...prev, idNum]));
+    setTurmaSelecionadaId("");
+  };
+
+  const removeTurma = (id) => {
+    setTurmaIds((prev) => prev.filter((x) => x !== id));
+  };
 
   const handleSalvar = async () => {
     if (!titulo.trim()) {
@@ -78,6 +147,18 @@ const CriarEvento = () => {
       return;
     }
 
+    // ✅ Se estiver em "Selecionar", obriga escolher ao menos 1 turma
+    if (isCoordenador && modoTurmas === "some" && turmaIds.length === 0) {
+      Swal.fire({
+        title: "Selecione ao menos uma turma",
+        text: "Você está em 'Selecionar'. Adicione pelo menos uma turma ou troque para 'Todas'.",
+        icon: "warning",
+        confirmButtonText: "Ok",
+        confirmButtonColor: "#2E4A67",
+      });
+      return;
+    }
+
     try {
       Swal.fire({
         title: "Publicando evento...",
@@ -98,8 +179,9 @@ const CriarEvento = () => {
 
       const agoraISO = new Date().toISOString();
 
-      const usuario = getUsuarioLogado();
-      const criadoPorId = usuario?.id; // ou usuario?.userId (depende do seu objeto)
+      const usuarioNow = getUsuarioLogado();
+      const criadoPorId = usuarioNow?.id;
+
       if (!criadoPorId) {
         Swal.close();
         await Swal.fire({
@@ -112,8 +194,8 @@ const CriarEvento = () => {
         return;
       }
 
-      const disciplinaId = Number(getDisciplinaAtualId()) || null;
-      if (!disciplinaId) {
+      const disciplinaAtual = Number(getDisciplinaAtualId()) || null;
+      if (!disciplinaAtual) {
         Swal.close();
         await Swal.fire({
           title: "Selecione uma disciplina",
@@ -125,8 +207,8 @@ const CriarEvento = () => {
         return;
       }
 
-      const instituicaoId = Number(usuario?.faculdadeId) || null;
-      if (!instituicaoId) {
+      const instId = Number(usuarioNow?.faculdadeId) || null;
+      if (!instId) {
         Swal.close();
         await Swal.fire({
           title: "Usuário sem instituição",
@@ -145,10 +227,17 @@ const CriarEvento = () => {
         ultimaAtualizacao: agoraISO,
         ...(dataEventoISO ? { dataEvento: dataEventoISO } : {}),
         criadoPorId,
-        instituicaoId,
-        disciplinaId,
+        instituicaoId: instId,
+        disciplinaId: disciplinaAtual,
         calendario: notificacoes.calendario,
         destaque: notificacoes.destaque,
+
+        // ✅ turmas só para coordenador (all ou some)
+        ...(isCoordenador
+          ? modoTurmas === "all"
+            ? { turmaScope: "all" }
+            : { turmaScope: "some", turmaIds }
+          : {}),
       };
 
       upsertEvento(novoEvento);
@@ -168,9 +257,11 @@ const CriarEvento = () => {
       setDescricao("");
       setStartDate(null);
       setNotificacoes({ calendario: false, destaque: false });
+
+      // reset turmas
+      setAllTurmas();
     } catch (error) {
       Swal.close();
-
       Swal.fire({
         title: "Erro ao publicar",
         text: "Não foi possível salvar o evento. Tente novamente em instantes.",
@@ -181,74 +272,160 @@ const CriarEvento = () => {
     }
   };
 
-  const InputDataComIcone = forwardRef(
-    ({ value, onClick, placeholder }, ref) => {
-      return (
-        <button
-          type="button"
-          className="date-input"
-          onClick={onClick}
-          ref={ref}
-        >
-          <span className="date-input__icon" aria-hidden="true">
-            <Calendar size={16} />
-          </span>
+  const InputDataComIcone = forwardRef(({ value, onClick, placeholder }, ref) => {
+    return (
+      <button type="button" className="date-input" onClick={onClick} ref={ref}>
+        <span className="date-input__icon" aria-hidden="true">
+          <Calendar size={16} />
+        </span>
 
-          <span
-            className={value ? "date-input__value" : "date-input__placeholder"}
-          >
-            {value || placeholder}
-          </span>
-        </button>
-      );
-    },
-  );
+        <span className={value ? "date-input__value" : "date-input__placeholder"}>
+          {value || placeholder}
+        </span>
+      </button>
+    );
+  });
 
   return (
     <div className="painel-evento">
-      <div className="card-form">
-        <h1 className="titulo-sessao">Criar novo evento</h1>
+      <div className="eventos-wrap">
+        {/* CARD 1 */}
+        <section className="card-bloco">
+          <h1 className="titulo-sessao">Criar novo evento</h1>
 
-        <div className="formulario">
-          <div className="campo">
-            <label className="titulo-evento">Título</label>
-            <input
-              type="text"
-              placeholder="Digite o título do evento"
-              className="input-estilizado"
-              value={titulo}
-              maxLength={TITULO_MAX}
-              onChange={(e) => {
-                const raw = e.target.value || "";
-                const limited = raw.slice(0, TITULO_MAX);
-                setTitulo(capitalizeFirst(limited));
-              }}
-              required
-            />
-            <div className="contador-campo">
-              {tituloCount}/{TITULO_MAX}
+          <div className="formulario">
+            <div className="campo">
+              <label className="titulo-evento">Título</label>
+              <input
+                type="text"
+                placeholder="Digite o título do evento"
+                className="input-estilizado"
+                value={titulo}
+                maxLength={TITULO_MAX}
+                onChange={(e) => {
+                  const raw = e.target.value || "";
+                  const limited = raw.slice(0, TITULO_MAX);
+                  setTitulo(capitalizeFirst(limited));
+                }}
+                required
+              />
+              <div className="contador-campo">
+                {tituloCount}/{TITULO_MAX}
+              </div>
+            </div>
+
+            <div className="campo">
+              <label>Descrição</label>
+              <textarea
+                rows="10"
+                placeholder="Descreva os detalhes do evento"
+                className="input-estilizado"
+                value={descricao}
+                maxLength={DESCRICAO_MAX}
+                onChange={(e) => {
+                  const raw = e.target.value || "";
+                  setDescricao(raw.slice(0, DESCRICAO_MAX));
+                }}
+                required
+              />
+              <div className="contador-campo">
+                {descricaoCount}/{DESCRICAO_MAX}
+              </div>
             </div>
           </div>
+        </section>
 
-          <div className="campo">
-            <label>Descrição</label>
-            <textarea
-              rows="10"
-              placeholder="Descreva os detalhes do evento"
-              className="input-estilizado"
-              value={descricao}
-              maxLength={DESCRICAO_MAX}
-              onChange={(e) => {
-                const raw = e.target.value || "";
-                setDescricao(raw.slice(0, DESCRICAO_MAX));
-              }}
-              required
-            />
-            <div className="contador-campo">
-              {descricaoCount}/{DESCRICAO_MAX}
+        {/* CARD 2: Turmas */}
+        {isCoordenador && (
+          <section className="card-bloco">
+            <h2 className="titulo-bloco">Turmas</h2>
+
+            <div className="turmas-toggle">
+              <button
+                type="button"
+                className={`turmas-toggle__btn ${modoTurmas === "all" ? "is-active" : ""}`}
+                onClick={setAllTurmas}
+              >
+                Todas
+              </button>
+
+              <button
+                type="button"
+                className={`turmas-toggle__btn ${modoTurmas === "some" ? "is-active" : ""}`}
+                onClick={setSomeTurmas}
+              >
+                Selecionar
+              </button>
             </div>
-          </div>
 
+            <div className="campo" style={{ marginBottom: 0 }}>
+              <div className="turmas-select-row">
+                <div className="select-wrap">
+                  <select
+                    className="select-estilizado"
+                    value={turmaSelecionadaId}
+                    onChange={(e) => setTurmaSelecionadaId(e.target.value)}
+                    disabled={modoTurmas === "all"}
+                  >
+                    <option value="" disabled>
+                      Selecionar turma
+                    </option>
+
+                    {turmasDisponiveis
+                      .filter((t) => !turmaIds.includes(Number(t.id)))
+                      .map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.nome}
+                        </option>
+                      ))}
+                  </select>
+
+                  <span className="select-arrow" aria-hidden="true">
+                    ▾
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn-add-turma"
+                  onClick={addTurma}
+                  disabled={modoTurmas === "all" || !turmaSelecionadaId}
+                >
+                  Adicionar
+                </button>
+              </div>
+
+              {modoTurmas === "some" && turmaIds.length > 0 && (
+                <div className="turmas-chips">
+                  {turmaIds.map((id) => (
+                    <div className="chip-turma" key={id}>
+                      <span className="chip-text">
+                        {turmaIdToNome.get(id) || `Turma ${id}`}
+                      </span>
+                      <button
+                        type="button"
+                        className="chip-remove"
+                        onClick={() => removeTurma(id)}
+                        aria-label="Remover turma"
+                      >
+                        <X size={14} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {modoTurmas === "all" && (
+                <div className="turmas-info">
+                  Todas as turmas desta instituição serão notificadas.
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* CARD 3 */}
+        <section className="card-bloco">
           <div className="campo">
             <label className="label-notificacao">Tipo de notificação</label>
 
@@ -265,22 +442,8 @@ const CriarEvento = () => {
                 role="checkbox"
                 aria-checked={notificacoes.calendario}
                 tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setNotificacoes((prev) => {
-                      const next = { ...prev, calendario: !prev.calendario };
-                      if (!next.calendario) setStartDate(null);
-                      return next;
-                    });
-                  }
-                }}
               >
-                <div
-                  className={`circular-check ${
-                    notificacoes.calendario ? "active" : ""
-                  }`}
-                />
+                <div className={`circular-check ${notificacoes.calendario ? "active" : ""}`} />
                 <span>Aviso no calendário</span>
               </div>
 
@@ -295,21 +458,8 @@ const CriarEvento = () => {
                 role="checkbox"
                 aria-checked={notificacoes.destaque}
                 tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    setNotificacoes((prev) => ({
-                      ...prev,
-                      destaque: !prev.destaque,
-                    }));
-                  }
-                }}
               >
-                <div
-                  className={`circular-check ${
-                    notificacoes.destaque ? "active" : ""
-                  }`}
-                />
+                <div className={`circular-check ${notificacoes.destaque ? "active" : ""}`} />
                 <span>Aviso em destaque</span>
               </div>
             </div>
@@ -327,41 +477,24 @@ const CriarEvento = () => {
                   dateFormat="dd/MM/yyyy"
                   minDate={new Date()}
                   placeholderText="Escolha uma data"
-                  customInput={
-                    <InputDataComIcone placeholder="Escolha uma data" />
-                  }
+                  customInput={<InputDataComIcone placeholder="Escolha uma data" />}
                   calendarClassName="calendario-customizado"
                   popperClassName="popper-calendario"
                   showPopperArrow={false}
                   fixedHeight
                   disabledKeyboardNavigation
                   openToDate={startDate ?? new Date()}
-                  renderCustomHeader={({
-                    date,
-                    decreaseMonth,
-                    increaseMonth,
-                  }) => {
+                  renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => {
                     const hoje = new Date();
-                    const firstOfCurrentMonth = new Date(
-                      hoje.getFullYear(),
-                      hoje.getMonth(),
-                      1,
-                    );
-                    const firstOfShownMonth = new Date(
-                      date.getFullYear(),
-                      date.getMonth(),
-                      1,
-                    );
-                    const prevDisabled =
-                      firstOfShownMonth <= firstOfCurrentMonth;
+                    const firstOfCurrentMonth = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+                    const firstOfShownMonth = new Date(date.getFullYear(), date.getMonth(), 1);
+                    const prevDisabled = firstOfShownMonth <= firstOfCurrentMonth;
 
                     return (
                       <div className="cal-header cal-header--figma">
                         <button
                           type="button"
-                          className={`cal-nav cal-nav--figma ${
-                            prevDisabled ? "is-disabled" : ""
-                          }`}
+                          className={`cal-nav cal-nav--figma ${prevDisabled ? "is-disabled" : ""}`}
                           onClick={() => {
                             if (!prevDisabled) decreaseMonth();
                           }}
@@ -373,10 +506,7 @@ const CriarEvento = () => {
 
                         <div className="cal-title cal-title--figma">
                           {date
-                            .toLocaleDateString("pt-BR", {
-                              month: "long",
-                              year: "numeric",
-                            })
+                            .toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
                             .replace(/^./, (c) => c.toUpperCase())}
                         </div>
 
@@ -401,7 +531,7 @@ const CriarEvento = () => {
               Publicar
             </button>
           </div>
-        </div>
+        </section>
       </div>
     </div>
   );
