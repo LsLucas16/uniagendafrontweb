@@ -73,7 +73,7 @@ const CriarEvento = () => {
 
   const instituicaoId = useMemo(
     () => Number(usuario?.faculdadeId) || null,
-    [usuario],
+    [usuario]
   );
 
   const turmasDisponiveis = useMemo(() => {
@@ -97,6 +97,8 @@ const CriarEvento = () => {
 
   const setSomeTurmas = () => {
     setModoTurmas("some");
+    setTurmaSelecionadaId("");
+    // não limpa turmaIds aqui pra não perder seleção sem querer
   };
 
   const addTurma = () => {
@@ -167,13 +169,14 @@ const CriarEvento = () => {
         didOpen: () => Swal.showLoading(),
       });
 
+      // ✅ id novo (mantém seu padrão atual)
       const id = nextEventoId(dados.eventos);
 
       const dataEventoISO = notificacoes.calendario
         ? new Date(
             startDate.getFullYear(),
             startDate.getMonth(),
-            startDate.getDate(),
+            startDate.getDate()
           ).toISOString()
         : null;
 
@@ -220,24 +223,32 @@ const CriarEvento = () => {
         return;
       }
 
+      // ✅ regra final: sempre salvar turmasIds pro coordenador
+      const turmasIdsFinal = isCoordenador
+        ? Array.from(
+            new Set(
+              (modoTurmas === "all"
+                ? turmasDisponiveis.map((t) => Number(t.id))
+                : turmaIds
+              ).filter((x) => Number.isFinite(x) && x > 0)
+            )
+          )
+        : undefined;
+
       const novoEvento = {
         id,
         titulo: titulo.trim(),
         descricao: descricao.trim(),
         ultimaAtualizacao: agoraISO,
-        ...(dataEventoISO ? { dataEvento: dataEventoISO } : {}),
+        dataEvento: dataEventoISO ?? null, // ✅ padroniza sempre
         criadoPorId,
         instituicaoId: instId,
         disciplinaId: disciplinaAtual,
         calendario: notificacoes.calendario,
         destaque: notificacoes.destaque,
 
-        // ✅ turmas só para coordenador (all ou some)
-        ...(isCoordenador
-          ? modoTurmas === "all"
-            ? { turmaScope: "all" }
-            : { turmaScope: "some", turmaIds }
-          : {}),
+        // ✅ NOVO: turmasIds (disciplinas = turmas)
+        ...(isCoordenador ? { turmasIds: turmasIdsFinal } : {}),
       };
 
       upsertEvento(novoEvento);
@@ -272,19 +283,30 @@ const CriarEvento = () => {
     }
   };
 
-  const InputDataComIcone = forwardRef(({ value, onClick, placeholder }, ref) => {
-    return (
-      <button type="button" className="date-input" onClick={onClick} ref={ref}>
-        <span className="date-input__icon" aria-hidden="true">
-          <Calendar size={16} />
-        </span>
+  const InputDataComIcone = forwardRef(
+    ({ value, onClick, placeholder }, ref) => {
+      return (
+        <button
+          type="button"
+          className="date-input"
+          onClick={onClick}
+          ref={ref}
+        >
+          <span className="date-input__icon" aria-hidden="true">
+            <Calendar size={16} />
+          </span>
 
-        <span className={value ? "date-input__value" : "date-input__placeholder"}>
-          {value || placeholder}
-        </span>
-      </button>
-    );
-  });
+          <span
+            className={
+              value ? "date-input__value" : "date-input__placeholder"
+            }
+          >
+            {value || placeholder}
+          </span>
+        </button>
+      );
+    }
+  );
 
   return (
     <div className="painel-evento">
@@ -343,7 +365,9 @@ const CriarEvento = () => {
             <div className="turmas-toggle">
               <button
                 type="button"
-                className={`turmas-toggle__btn ${modoTurmas === "all" ? "is-active" : ""}`}
+                className={`turmas-toggle__btn ${
+                  modoTurmas === "all" ? "is-active" : ""
+                }`}
                 onClick={setAllTurmas}
               >
                 Todas
@@ -351,7 +375,9 @@ const CriarEvento = () => {
 
               <button
                 type="button"
-                className={`turmas-toggle__btn ${modoTurmas === "some" ? "is-active" : ""}`}
+                className={`turmas-toggle__btn ${
+                  modoTurmas === "some" ? "is-active" : ""
+                }`}
                 onClick={setSomeTurmas}
               >
                 Selecionar
@@ -417,7 +443,8 @@ const CriarEvento = () => {
 
               {modoTurmas === "all" && (
                 <div className="turmas-info">
-                  Todas as turmas desta instituição serão notificadas.
+                  Todas as turmas aos cuidados desse coordenador serão
+                  notificadas.
                 </div>
               )}
             </div>
@@ -443,7 +470,11 @@ const CriarEvento = () => {
                 aria-checked={notificacoes.calendario}
                 tabIndex={0}
               >
-                <div className={`circular-check ${notificacoes.calendario ? "active" : ""}`} />
+                <div
+                  className={`circular-check ${
+                    notificacoes.calendario ? "active" : ""
+                  }`}
+                />
                 <span>Aviso no calendário</span>
               </div>
 
@@ -459,7 +490,11 @@ const CriarEvento = () => {
                 aria-checked={notificacoes.destaque}
                 tabIndex={0}
               >
-                <div className={`circular-check ${notificacoes.destaque ? "active" : ""}`} />
+                <div
+                  className={`circular-check ${
+                    notificacoes.destaque ? "active" : ""
+                  }`}
+                />
                 <span>Aviso em destaque</span>
               </div>
             </div>
@@ -477,24 +512,41 @@ const CriarEvento = () => {
                   dateFormat="dd/MM/yyyy"
                   minDate={new Date()}
                   placeholderText="Escolha uma data"
-                  customInput={<InputDataComIcone placeholder="Escolha uma data" />}
+                  customInput={
+                    <InputDataComIcone placeholder="Escolha uma data" />
+                  }
                   calendarClassName="calendario-customizado"
                   popperClassName="popper-calendario"
                   showPopperArrow={false}
                   fixedHeight
                   disabledKeyboardNavigation
                   openToDate={startDate ?? new Date()}
-                  renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => {
+                  renderCustomHeader={({
+                    date,
+                    decreaseMonth,
+                    increaseMonth,
+                  }) => {
                     const hoje = new Date();
-                    const firstOfCurrentMonth = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-                    const firstOfShownMonth = new Date(date.getFullYear(), date.getMonth(), 1);
-                    const prevDisabled = firstOfShownMonth <= firstOfCurrentMonth;
+                    const firstOfCurrentMonth = new Date(
+                      hoje.getFullYear(),
+                      hoje.getMonth(),
+                      1
+                    );
+                    const firstOfShownMonth = new Date(
+                      date.getFullYear(),
+                      date.getMonth(),
+                      1
+                    );
+                    const prevDisabled =
+                      firstOfShownMonth <= firstOfCurrentMonth;
 
                     return (
                       <div className="cal-header cal-header--figma">
                         <button
                           type="button"
-                          className={`cal-nav cal-nav--figma ${prevDisabled ? "is-disabled" : ""}`}
+                          className={`cal-nav cal-nav--figma ${
+                            prevDisabled ? "is-disabled" : ""
+                          }`}
                           onClick={() => {
                             if (!prevDisabled) decreaseMonth();
                           }}
@@ -506,7 +558,10 @@ const CriarEvento = () => {
 
                         <div className="cal-title cal-title--figma">
                           {date
-                            .toLocaleDateString("pt-BR", { month: "long", year: "numeric" })
+                            .toLocaleDateString("pt-BR", {
+                              month: "long",
+                              year: "numeric",
+                            })
                             .replace(/^./, (c) => c.toUpperCase())}
                         </div>
 

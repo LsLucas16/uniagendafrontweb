@@ -4,106 +4,10 @@
     { "id": 2, "nome": "Universidade de Brasilia","sigla":"UNB", "logo":"http://cen.unb.br/wp-content/uploads/2025/02/logo_unb_oficial_2025.png" },
     { "id": 3, "nome": "Centro Universitario de Brasilia","sigla":"CEUB", "logo":"https://institucional.uniceub.br/hubfs/BrandCenter/img/logo-ceub-uso-incorreto-aplicar-efeitos.png" }
   ],
-  "usuarios": [
-    {
-      "id": 501,
-      "user": "teste.responsavel",
-      "senha": "123",
-      "nome": "Julia Maria Neto",
-      "tipo": "responsavel",
-      "faculdadeId": 1,
-      "disciplinas": [1, 2, 3 , 4]
-    },
-    {
-      "id": 101,
-      "user": "aluno",
-      "senha": "123",
-      "nome": "Carlos Augusto de Silva Pinho",
-      "contato": "(99)99999-9999",
-      "tipo": "aluno",
-      "faculdadeId": 2,
-      "disciplinas": [1, 6, 3 , 4]
-      
-    },
-    {
-      "id": 201,
-      "user": "professor",
-      "senha": "123",
-      "nome": "Roberto Almeida Costa Junior",
-      "contato": "professor@faculdade.br",
-      "tipo": "professor",
-      "faculdadeId": 1,
-      "disciplinas": [1, 6, 3 , 4] 
-        
-    },
-    {
-      "id": 301,
-      "user": "coordenador",
-      "senha": "123",
-      "nome": "Ana Claudia Oliveira",
-      "contato": "coordenador@faculdade.br",
-      "tipo": "coordenador",
-      "faculdadeId": 1,
-      "disciplinas": [1, 6, 3 , 4] 
-      
-    },
-    {
-      "id": 401,
-      "user": "aluno.responsavel",
-      "senha": "123",
-      "nome": "Junior Carlos Costa de Matos",
-      "contato": "(99)99999-9999",
-      "tipo": "responsavel",
-      "faculdadeId": 1,
-      "disciplinas": [1, 6, 3 , 4]
-      
-    },
-    {
-      "id": 102,
-      "user": "aluno",
-      "senha": "123",
-      "nome": "Lucas Ribeiro Silva",
-      "contato": "(99)99999-9999",
-      "tipo": "aluno",
-      "faculdadeId": 3,
-      "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
-      
-  },
-  {
-      "id": 202,
-      "user": "coordenador",
-      "senha": "123",
-      "nome": "Marcos Antônio Ferreira",
-      "contato": "coordenador@faculdade.br",
-      "tipo": "coordenador",
-      "faculdadeId": 3,
-      "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
-  },
-  {
-      "id": 302,
-      "user": "professor",
-      "senha": "123",
-      "nome": "Renata Oliveira Costa",
-      "contato": "professor@faculdade.br",
-      "tipo": "professor",
-      "faculdadeId": 3,
-      "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
-
-  },
-  {
-      "id": 402,
-      "user": "aluno.responsavel",
-      "senha": "123",
-      "nome": "Fernanda Ribeiro Silva",
-      "contato": "(99)99999-9999",
-      "tipo": "responsavel",
-      "faculdadeId": 3,
-      "disciplinas":  [1, 2, 3, 8, 9, 10, 11, 4]
-      
-     },
+ "usuarios": [
   {
     "id": 501,
-    "user": "202650001",
+    "user": "responsavel",
     "senha": "123",
     "nome": "Julia Maria Neto",
     "tipo": "responsavel",
@@ -112,7 +16,7 @@
   },
   {
     "id": 101,
-    "user": "202610101",
+    "user": "aluno",
     "senha": "123",
     "nome": "Carlos Augusto de Silva Pinho",
     "contato": "(99)99999-9999",
@@ -122,7 +26,7 @@
   },
   {
     "id": 201,
-    "user": "202620201",
+    "user": "aluno",
     "senha": "123",
     "nome": "Roberto Almeida Costa Junior",
     "contato": "professor@faculdade.br",
@@ -132,7 +36,7 @@
   },
   {
     "id": 301,
-    "user": "202630301",
+    "user": "coordenador",
     "senha": "123",
     "nome": "Ana Claudia Oliveira",
     "contato": "coordenador@faculdade.br",
@@ -410,6 +314,7 @@
     "criadoPorId": 201,
     "instituicaoId": 1,
     "disciplinaId": 1,
+    "turmasIds": [],
     "calendario": true,
     "destaque": true
   },
@@ -421,6 +326,7 @@
     "criadoPorId": 201,
     "instituicaoId": 1,
     "disciplinaId": 3,
+    "turmasIds": [],
     "calendario": false,
     "destaque": true
   },
@@ -433,6 +339,7 @@
     "criadoPorId": 301,
     "instituicaoId": 1,
     "disciplinaId": 2,
+    "turmasIds": [],
     "calendario": true,
     "destaque": false
   },
@@ -445,6 +352,7 @@
     "criadoPorId": 302,
     "instituicaoId": 3,
     "disciplinaId": 10,
+    "turmasIds": [],
     "calendario": true,
     "destaque": true
   },
@@ -456,6 +364,7 @@
     "criadoPorId": 202,
     "instituicaoId": 3,
     "disciplinaId": 11,
+    "turmasIds": [],
     "calendario": false,
     "destaque": false
   },
@@ -468,6 +377,7 @@
     "criadoPorId": 201,
     "instituicaoId": 1,
     "disciplinaId": 4,
+    "turmasIds": [],
     "calendario": true,
     "destaque": false
   },
@@ -479,6 +389,7 @@
     "criadoPorId": 201,
     "instituicaoId": 1,
     "disciplinaId": 1,
+    "turmasIds": [],
     "calendario": false,
     "destaque": true
   },
@@ -491,6 +402,7 @@
     "criadoPorId": 301,
     "instituicaoId": 1,
     "disciplinaId": 3,
+    "turmasIds": [],
     "calendario": true,
     "destaque": false
   },
@@ -503,6 +415,7 @@
     "criadoPorId": 201,
     "instituicaoId": 1,
     "disciplinaId": 2,
+    "turmasIds": [],
     "calendario": true,
     "destaque": true
   },
@@ -514,6 +427,7 @@
     "criadoPorId": 201,
     "instituicaoId": 1,
     "disciplinaId": 4,
+    "turmasIds": [],
     "calendario": false,
     "destaque": false
   },
@@ -526,6 +440,7 @@
     "criadoPorId": 302,
     "instituicaoId": 3,
     "disciplinaId": 8,
+    "turmasIds": [],
     "calendario": true,
     "destaque": true
   },
@@ -538,6 +453,7 @@
     "criadoPorId": 302,
     "instituicaoId": 3,
     "disciplinaId": 8,
+    "turmasIds": [],
     "calendario": true,
     "destaque": false
   },
@@ -549,6 +465,7 @@
     "criadoPorId": 202,
     "instituicaoId": 3,
     "disciplinaId": 10,
+    "turmasIds": [],
     "calendario": false,
     "destaque": true
   },
@@ -561,6 +478,7 @@
     "criadoPorId": 302,
     "instituicaoId": 3,
     "disciplinaId": 12,
+    "turmasIds": [],
     "calendario": true,
     "destaque": false
   },
@@ -572,6 +490,7 @@
     "criadoPorId": 202,
     "instituicaoId": 3,
     "disciplinaId": 11,
+    "turmasIds": [],
     "calendario": false,
     "destaque": false
   },
@@ -584,6 +503,7 @@
     "criadoPorId": 201,
     "instituicaoId": 1,
     "disciplinaId": 2,
+    "turmasIds": [],
     "calendario": true,
     "destaque": false
   },
@@ -595,6 +515,7 @@
     "criadoPorId": 301,
     "instituicaoId": 1,
     "disciplinaId": 3,
+    "turmasIds": [],
     "calendario": false,
     "destaque": true
   },
@@ -606,6 +527,7 @@
     "criadoPorId": 302,
     "instituicaoId": 3,
     "disciplinaId": 9,
+    "turmasIds": [],
     "calendario": false,
     "destaque": false
   },
@@ -618,6 +540,7 @@
     "criadoPorId": 202,
     "instituicaoId": 3,
     "disciplinaId": 7,
+    "turmasIds": [],
     "calendario": true,
     "destaque": true
   },
@@ -630,9 +553,63 @@
     "criadoPorId": 301,
     "instituicaoId": 1,
     "disciplinaId": 1,
+    "turmasIds": [],
     "calendario": true,
     "destaque": true
-  }
+  },
+  {
+  "id": 21,
+  "titulo": "Semana de Provas",
+  "descricao": "Semana oficial de provas do semestre. Verifiquem os horários específicos de cada disciplina e cheguem com antecedência.",
+  "ultimaAtualizacao": "2026-02-04T12:10:00.000Z",
+  "dataEvento": "2026-02-10T00:00:00.000Z",
+  "criadoPorId": 201,
+  "instituicaoId": 1,
+  "disciplinaId": 1,
+  "turmasIds": [11, 12, 13],
+  "calendario": true,
+  "destaque": true
+},
+{
+  "id": 22,
+  "titulo": "Campanha do Agasalho",
+  "descricao": "Estamos arrecadando agasalhos e cobertores. Os pontos de coleta estarão disponíveis até o final do mês.",
+  "ultimaAtualizacao": "2026-02-04T12:15:00.000Z",
+  "dataEvento": "2026-02-05T00:00:00.000Z",
+  "criadoPorId": 301,
+  "instituicaoId": 1,
+  "disciplinaId": null,
+  "turmasIds": [11, 12, 13, 14, 15],
+  "calendario": true,
+  "destaque": false
+},
+{
+  "id": 23,
+  "titulo": "Reposição de Aula",
+  "descricao": "Reposição referente à aula cancelada da semana passada. Conteúdo completo será revisado.",
+  "ultimaAtualizacao": "2026-02-04T12:20:00.000Z",
+  "dataEvento": "2026-02-12T00:00:00.000Z",
+  "criadoPorId": 201,
+  "instituicaoId": 1,
+  "disciplinaId": 2,
+  "turmasIds": [12, 14],
+  "calendario": true,
+  "destaque": false
+},
+{
+  "id": 24,
+  "titulo": "Simulado Geral",
+  "descricao": "Simulado preparatório com duração de 40 minutos. Resultado não valerá nota, apenas diagnóstico.",
+  "ultimaAtualizacao": "2026-02-04T12:25:00.000Z",
+  "dataEvento": "2026-02-15T00:00:00.000Z",
+  "criadoPorId": 202,
+  "instituicaoId": 1,
+  "disciplinaId": 3,
+  "turmasIds": [11, 13, 15],
+  "calendario": true,
+  "destaque": true
+}
+
 ]
 
 

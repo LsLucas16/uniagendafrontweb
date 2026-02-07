@@ -1,7 +1,7 @@
 .eventos-publicados-page {
-  background: #F4F4F4;     /* igual ao CriarEvento */
-  min-height: 100vh;       /* remove o “estica” */
-  padding: 0;              /* igual ao CriarEvento */
+  background: #f4f4f4;
+  min-height: 100vh;
+  padding: 0;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -9,21 +9,18 @@
 }
 
 .eventos-publicados-container {
-  width: min(1128px, calc(100% - 10px)); /* igual ao card-form */
-  min-height: 658px;                      /* igual ao card-form (opcional) */
+  width: min(1128px, calc(100% - 10px));
   margin: 0;
   background: #fff;
-  border-radius: 20px;                    /* alinhar com CriarEvento */
-  box-shadow: 0 4px 4px rgba(0,0,0,0.04); /* aproximar do CriarEvento */
-  padding: 34px 42px;                     /* igual ao card-form */
+  border-radius: 20px;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.04);
+  padding: 34px 42px;
   align-self: flex-start;
 }
 
-
-
 /* Cabeçalho */
 .eventos-publicados-header {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 
   h1 {
     margin: 0;
@@ -41,19 +38,159 @@
   }
 }
 
-/* Lista de cards */
+/* =========================
+   FILTROS (topo como figma)
+========================= */
+.filtros-card {
+  border: 1px solid #eef2f6;
+  border-radius: 14px;
+  padding: 12px 14px;
+  background: #fff;
+  margin-bottom: 16px;
+}
+
+.filtros-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.filtros-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #344054;
+}
+
+/* Toggle pill */
+.switch-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  user-select: none;
+
+  input {
+    display: none;
+  }
+}
+
+.switch-pill__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #667085;
+  white-space: nowrap;
+}
+
+.switch-pill__track {
+  width: 40px;
+  height: 22px;
+  border-radius: 999px;
+  background: #e6edf5;
+  position: relative;
+  transition: background 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+}
+
+.switch-pill__dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.12);
+  transform: translateX(0);
+  transition: transform 0.2s ease;
+}
+
+.switch-pill input:checked + .switch-pill__track {
+  background: #76a8d9;
+}
+
+.switch-pill input:checked + .switch-pill__track .switch-pill__dot {
+  transform: translateX(18px);
+}
+
+.filtros-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.filtro-search {
+  flex: 1;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid #eef2f6;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  background: #fff;
+
+  input {
+    border: 0;
+    outline: none;
+    width: 100%;
+    font-size: 12px;
+    color: #344054;
+
+    &::placeholder {
+      color: #98a2b3;
+    }
+  }
+}
+
+.filtro-search__icon {
+  color: #98a2b3;
+  font-size: 14px;
+  line-height: 0;
+}
+
+.filtro-select {
+  position: relative;
+  min-width: 260px;
+
+  select {
+    width: 100%;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid #eef2f6;
+    background: #fff;
+    padding: 0 36px 0 12px;
+    font-size: 12px;
+    color: #344054;
+    outline: none;
+    appearance: none;
+  }
+}
+
+.filtro-select__arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #98a2b3;
+  pointer-events: none;
+}
+
+/* =========================
+   LISTA / CARD
+========================= */
 .eventos-publicados-list {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* no figma parece um pouco menor */
+  gap: 16px;
+  width: 100%;
 }
 
 /* Card */
 .evento-card {
   background: #ffffff;
-  border: 1px solid #e6edf5; /* mais neutro (menos azul) */
-  border-radius: 14px;       /* um pouco menor que 16 */
-  box-shadow: 0 6px 14px rgba(16, 24, 40, 0.08); /* sombra mais suave */
+  border: 1px solid #e6edf5;
+  border-radius: 14px;
+  box-shadow: 0 6px 14px rgba(16, 24, 40, 0.08);
   padding: 14px 16px 12px;
 }
 
@@ -67,59 +204,106 @@
 
 .evento-card-titleblock {
   min-width: 0;
+  width: 100%;
 }
 
-/* Título do evento */
-.evento-card-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #344054; /* mais escuro, parecido com o figma */
-  margin: 0 0 2px 0;
-}
-
-/* Última atualização */
-.evento-card-updated {
+.evento-card-createdbyline {
   font-size: 11px;
   color: #98a2b3;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+
+  strong {
+    color: #667085;
+    font-weight: 700;
+  }
 }
 
-/* Chips */
+/* Título */
+.evento-card-title {
+  font-size: 15px;
+  font-weight: 800;
+  color: #344054;
+  margin: 0 0 6px 0;
+}
+
+/* Descrição */
+.evento-card-desc {
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+  color: #667085;
+  margin-top: 0;
+  max-width: 880px;
+}
+
+/* chips turmas */
+.evento-card-turmaschips {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Meta row */
+.evento-card-meta {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: #98a2b3;
+}
+
 .evento-card-chips {
   display: flex;
-  gap: 8px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  gap: 6px;
 }
 
+/* Chips base */
 .chip {
   display: inline-flex;
   align-items: center;
-  height: 18px;      /* menor */
-  padding: 0 10px;   /* menor */
+  height: 16px;
+  padding: 0 8px;
   border-radius: 999px;
-  font-size: 10px;   /* menor */
-  font-weight: 700;
-  background: #6ea8d9;
-  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
   line-height: 1;
+  white-space: nowrap;
+  border: 0;
+  color: #fff;
 }
 
-.chip--calendario,
+/* Cores */
+.chip--calendario {
+  background: #76a8d9;
+}
 .chip--destaque {
   background: #6ea8d9;
+}
+.chip--turma {
+  background: rgba(118, 168, 217, 0.18);
+  color: #2e4a67;
+  border: 1px solid rgba(46, 74, 103, 0.15);
+}
+.chip--more {
+  background: rgba(46, 74, 103, 0.12);
+  color: #2e4a67;
+  border: 1px solid rgba(46, 74, 103, 0.15);
 }
 
 /* Botão Editar */
 .btn-editar {
-  height: 28px;         /* menor */
-  padding: 0 14px;      /* menor */
+  height: 28px;
+  padding: 0 14px;
   border-radius: 8px;
   border: 1px solid #e6edf5;
   background: #ffffff;
   color: #667085;
   font-size: 12px;
-  font-weight: 600;     /* menos pesado */
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -144,91 +328,11 @@
   line-height: 0;
 }
 
-/* Descrição */
-.evento-card-desc {
-  font-size: 15px;     /* um pouco menor */
-  line-height: 1.45;
-  font-weight: 700;    /* reduz peso (no figma não parece 800) */
-  color: #667085;
-  margin-top: 2px;
-  max-width: 880px;
-}
-
-/* Rodapé */
+/* Rodapé (quando tem dataEvento) */
 .evento-card-footer {
   margin-top: 10px;
-}
-
-.evento-card-createdby {
-  font-size: 11px;
-  color: #98a2b3;
-
-  strong {
-    font-weight: 700;
-    color: #667085;
-  }
-}
-
-.eventos-publicados-empty {
-  padding: 10px 4px;
-  font-size: 14px;
-  color: #9aa6b2;
-}
-
-
-.eventos-publicados-list {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
-  width: 100%;          /* garante base */
-}
-
-/* força o card a não ocupar tudo */
-.eventos-publicados-list .evento-card {
-  width: min(980px, 100%);
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.eventos-publicados-list {
-  width: 100%;
-}
-
-.eventos-publicados-list .evento-card {
-  width: min(800px, 100%);
-  margin-left: 0px;
-  margin-right: auto;
-}
-
-.evento-card-chips .chip {
-  background: #76A8D9 !important;
-  color: #ffffff !important;
-  border: 0 !important;
-}
-
-.evento-card-chips .chip--calendario {
-  background: #76A8D9 !important;
-}
-
-.evento-card-chips .chip--destaque {
-  background: #6EA8D9 !important;
-}
-
-
-/* Linha "Data do evento" (quando existir dataEvento) */
-.evento-card-eventdate {
-  font-size: 11px;
-  color: #98a2b3;
-  margin-bottom: 6px;
-}
-
-/* Rodapé vira 2 colunas (esq: criado por / dir: ultima atualização) */
-.evento-card-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 10px;
+  justify-content: flex-end;
 }
 
 .evento-card-footer-updated {
@@ -237,39 +341,8 @@
   white-space: nowrap;
 }
 
-/* FIX: chip não pode virar "barra" */
-.eventos-publicados-page .evento-card-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+.eventos-publicados-empty {
+  padding: 10px 4px;
+  font-size: 14px;
+  color: #9aa6b2;
 }
-
-.eventos-publicados-page .evento-card-chips .chip {
-  /* impede ocupar a linha toda */
-  width: fit-content !important;
-  max-width: fit-content !important;
-  flex: 0 0 auto !important;
-  display: inline-flex !important;
-
-  /* remove qualquer min-width global */
-  min-width: unset !important;
-
-  /* estilo igual print */
-  height: 16px;
-  padding: 0 8px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1;
-
-  align-items: center;
-  justify-content: center;
-
-  border: 0;
-  color: #fff;
-  white-space: nowrap;
-}
-
-/* cores */
-.eventos-publicados-page .evento-card-chips .chip--calendario { background: #76A8D9 !important; }
-.eventos-publicados-page .evento-card-chips .chip--destaque   { background: #6EA8D9 !important; }
