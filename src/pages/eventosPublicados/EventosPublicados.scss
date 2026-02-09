@@ -1,7 +1,8 @@
 /* EventosPublicados.scss */
 
+/* Fundo geral (Figma parece um cinza MUITO leve) */
 .eventos-publicados-page {
-  background: #f3f4f6; /* cinza do fundo */
+  background: #f4f6f9;
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -9,11 +10,13 @@
   padding: 18px 12px;
 }
 
+/* Container principal branco com sombra leve */
 .eventos-publicados-container {
   width: min(1128px, 100%);
   background: #ffffff;
   border-radius: 18px;
-  box-shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
+  border: 1px solid #e9eef6;
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.05);
   padding: 26px 26px 22px;
 }
 
@@ -26,7 +29,7 @@
     font-size: 28px;
     line-height: 1.15;
     font-weight: 800;
-    color: #2e4a67; /* azul escuro do título */
+    color: #2e4a67;
     letter-spacing: -0.2px;
   }
 
@@ -38,14 +41,15 @@
 }
 
 /* =========================
-   FILTROS (IGUAL PRINT)
+   FILTROS (IGUAL FIGMA)
 ========================= */
 .filtros-card {
   background: #ffffff;
-  border: 1px solid #e7eef6;
-  border-radius: 14px;
-  padding: 14px 14px 12px;
+  border: 1px solid #e9eef6;
+  border-radius: 16px;
+  padding: 16px;
   margin-bottom: 16px;
+  box-shadow: 0 10px 16px rgba(16, 24, 40, 0.05);
 }
 
 .filtros-top {
@@ -53,29 +57,24 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 }
 
 .filtros-title {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 10px;
+  font-size: 16px;
   font-weight: 700;
-  color: #344054;
+  color: #2e4a67;
 }
 
 .filtros-icon {
-  width: 18px;
-  height: 18px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #667085;
-  opacity: 0.9;
+  color: #2e4a67;
+  opacity: 0.85;
 }
 
-/* Botão pill azul (Selecionar apenas meus eventos) */
+/* Botão pill */
 .filtros-pill {
   height: 34px;
   padding: 0 12px 0 14px;
@@ -107,10 +106,8 @@
   height: 8px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 2px 6px rgba(16, 24, 40, 0.18);
 }
 
-/* estado "on" (um pouco mais forte) */
 .filtros-pill.is-on {
   background: #5f9ed5;
   border-color: #bcd7f3;
@@ -122,67 +119,45 @@
   align-items: center;
 }
 
-/* Busca */
+/* ✅ Campo de busca no Figma NÃO é branco puro */
 .filtro-search {
   flex: 1;
-  height: 38px;
+  height: 44px;
   border-radius: 10px;
-  border: 1px solid #e7eef6;
-  background: #ffffff;
+  border: 1px solid #e5edf7;
+  background: #f2f5fa;
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: 10px;
+  padding: 0 14px;
+  box-shadow: inset 0 1px 0 rgba(16, 24, 40, 0.03);
 
   input {
     border: 0;
     outline: none;
     width: 100%;
-    font-size: 13px;
+    background: transparent;
+    font-size: 14px;
     color: #344054;
 
     &::placeholder {
       color: #98a2b3;
     }
   }
+
+  &:focus-within {
+    border-color: #bcd7f3;
+    background: #eef3fb;
+    box-shadow: 0 0 0 4px rgba(110, 168, 217, 0.18);
+  }
 }
 
 .filtro-search__icon {
   color: #98a2b3;
-  font-size: 16px;
-  line-height: 0;
-}
-
-/* Select de turmas (coordenador) */
-.filtro-select {
-  position: relative;
-  min-width: 260px;
-
-  select {
-    width: 100%;
-    height: 38px;
-    border-radius: 10px;
-    border: 1px solid #e7eef6;
-    background: #ffffff;
-    padding: 0 38px 0 12px;
-    font-size: 13px;
-    color: #344054;
-    outline: none;
-    appearance: none;
-  }
-}
-
-.filtro-select__arrow {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #98a2b3;
-  pointer-events: none;
 }
 
 /* =========================
-   LISTA / CARD
+   LISTA / CARD (igual Figma)
 ========================= */
 .eventos-publicados-list {
   display: flex;
@@ -191,13 +166,13 @@
   width: 100%;
 }
 
-/* Card */
+/* Card com sombra mais suave (no seu estava forte) */
 .evento-card {
   background: #ffffff;
-  border: 1px solid #dde7f2;
-  border-radius: 14px;
-  padding: 14px 16px 12px;
-  box-shadow: 0 10px 18px rgba(16, 24, 40, 0.06);
+  border: 1px solid #e6edf7;
+  border-radius: 12px;
+  padding: 18px 18px 14px;
+  box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
 }
 
 .evento-card-top {
@@ -224,7 +199,7 @@
 }
 
 .evento-card-title {
-  font-size: 24px; /* no print o título é grande */
+  font-size: 26px;
   line-height: 1.12;
   font-weight: 800;
   color: #2e4a67;
@@ -233,7 +208,7 @@
 }
 
 .evento-card-desc {
-  font-size: 18px; /* texto grande igual ao print */
+  font-size: 20px;
   line-height: 1.25;
   font-weight: 600;
   color: #98a2b3;
@@ -249,21 +224,9 @@
   gap: 8px;
 }
 
-/* Aviso multi-turma */
-.evento-card-warning {
-  margin-top: 8px;
-  font-size: 12px;
-  color: #667085;
-
-  strong {
-    color: #344054;
-    font-weight: 800;
-  }
-}
-
 /* Meta (datas à esquerda, chips à direita) */
 .evento-card-meta {
-  margin-top: 12px;
+  margin-top: 14px;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -289,7 +252,7 @@
 .chip {
   display: inline-flex;
   align-items: center;
-  height: 22px; /* no print são mais “gordinhos” */
+  height: 24px;
   padding: 0 12px;
   border-radius: 999px;
   font-size: 12px;
@@ -300,11 +263,7 @@
 }
 
 /* Chips específicos */
-.chip--calendario {
-  background: #6ea8d9;
-  color: #ffffff;
-}
-
+.chip--calendario,
 .chip--destaque {
   background: #6ea8d9;
   color: #ffffff;
@@ -316,12 +275,12 @@
   border: 1px solid rgba(46, 74, 103, 0.14);
 }
 
-/* Botão editar (ícone no canto direito) */
+/* Botão editar */
 .btn-editar-icononly {
   width: 34px;
   height: 34px;
   border-radius: 10px;
-  border: 1px solid #dde7f2;
+  border: 1px solid #e6edf7;
   background: #ffffff;
   color: #98a2b3;
   display: inline-flex;
@@ -348,7 +307,7 @@
 }
 
 /* =========================
-   RESPONSIVO (mobile)
+   RESPONSIVO
 ========================= */
 @media (max-width: 900px) {
   .eventos-publicados-container {
@@ -356,11 +315,11 @@
   }
 
   .evento-card-title {
-    font-size: 20px;
+    font-size: 22px;
   }
 
   .evento-card-desc {
-    font-size: 15px;
+    font-size: 16px;
   }
 }
 
@@ -379,57 +338,9 @@
     align-items: stretch;
   }
 
-  .filtro-select {
-    min-width: 100%;
-  }
-
-  .evento-card-top {
-    gap: 10px;
-  }
-
-  .btn-editar-icononly {
-    width: 36px;
-    height: 36px;
-  }
-
   .evento-card-meta {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-}
-
-.evento-card-turmaschips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.chip--calendario {
-  background: #6ea8d9;
-  color: #ffffff;
-}
-
-.chip--destaque {
-  background: #6ea8d9;
-  color: #ffffff;
-}
-
-.chip--turma {
-  background: rgba(110, 168, 217, 0.22);
-  color: #2e4a67;
-  border: 1px solid rgba(46, 74, 103, 0.14);
-}
-
-/* ✅ "+N" igual figma */
-.chip--more {
-  height: auto;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  border: 0;
-  color: #2e4a67;
-  font-size: 12px;
-  font-weight: 800;
-  align-self: center;
 }
