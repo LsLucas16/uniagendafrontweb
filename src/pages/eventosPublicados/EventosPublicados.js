@@ -1,3 +1,4 @@
+// EventosPublicados.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil } from "lucide-react";
@@ -32,29 +33,43 @@ function normStr(s) {
     .trim();
 }
 
+function getTurmasDoEvento(ev) {
+  const fromTurmasIds =
+    Array.isArray(ev?.turmasIds) && ev.turmasIds.length > 0
+      ? ev.turmasIds
+      : null;
+
+  if (fromTurmasIds) {
+    return fromTurmasIds.map(Number).filter((x) => Number.isFinite(x));
+  }
+
+  if (Array.isArray(ev?.disciplinaId)) {
+    return ev.disciplinaId.map(Number).filter((x) => Number.isFinite(x));
+  }
+
+  const single = Number(ev?.disciplinaId);
+  return Number.isFinite(single) ? [single] : [];
+}
+
 export default function EventosPublicados() {
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const navigate = useNavigate();
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
-    getDisciplinaAtualId()
+    getDisciplinaAtualId(),
   );
 
-  // 🔹 força re-render quando criar/editar/excluir
   const [refreshKey, setRefreshKey] = useState(0);
-
-  // ✅ filtros UI
   const [apenasMeus, setApenasMeus] = useState(false);
   const [busca, setBusca] = useState("");
 
-  // ✅ filtro de turmas (somente coordenador)
-  const [turmaFiltroId, setTurmaFiltroId] = useState("all"); // "all" | "<id>"
-
   useEffect(() => {
-    const onDisciplinaChanged = () => setDisciplinaAtualId(getDisciplinaAtualId());
+    const onDisciplinaChanged = () =>
+      setDisciplinaAtualId(getDisciplinaAtualId());
 
     const onStorage = (e) => {
       if (e.key === "usuario") setUsuarioLogado(getUsuarioLogado());
-      if (e.key === "disciplinaAtualId") setDisciplinaAtualId(getDisciplinaAtualId());
+      if (e.key === "disciplinaAtualId")
+        setDisciplinaAtualId(getDisciplinaAtualId());
     };
 
     const onEventosChanged = () => setRefreshKey((k) => k + 1);
@@ -64,7 +79,10 @@ export default function EventosPublicados() {
     window.addEventListener("eventos:changed", onEventosChanged);
 
     return () => {
-      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
+      window.removeEventListener(
+        "disciplinaAtual:changed",
+        onDisciplinaChanged,
+      );
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("eventos:changed", onEventosChanged);
     };
@@ -82,46 +100,42 @@ export default function EventosPublicados() {
     return map;
   }, []);
 
+  // user “do JSON”
   const user = useMemo(() => {
     const id = usuarioLogado?.id;
     if (!id) return null;
     return (data.usuarios || []).find((u) => u.id === id) || null;
   }, [usuarioLogado]);
 
-  const isCoordenador = useMemo(() => {
-    return (user?.tipo || "").toLowerCase() === "coordenador";
-  }, [user]);
+  // ✅ TIPO ROBUSTO (não depende só do JSON)
+  const tipo = useMemo(() => {
+    const raw =
+      user?.tipo ??
+      usuarioLogado?.tipo ??
+      usuarioLogado?.cargo ??
+      usuarioLogado?.perfil ??
+      "";
+    return String(raw).toLowerCase().trim();
+  }, [user, usuarioLogado]);
 
-  const turmasDisponiveis = useMemo(() => {
-    if (!user) return [];
-    if (!isCoordenador) return [];
+  const isCoordenador = tipo === "coordenador";
+  const isProfessor = tipo === "professor";
+  const isResponsavel = tipo === "responsavel";
 
-    const instId = Number(user.faculdadeId);
-    return (data.disciplinas || [])
-      .filter((d) => Number(d?.instituicaoId) === instId)
-      .map((d) => ({
-        id: Number(d.id),
-        nome:
-          typeof d?.nome === "string" && d.nome.trim()
-            ? d.nome
-            : `Turma ${d?.id ?? ""}`,
-      }))
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [user, isCoordenador]);
-
-  // ✅ garante que se mudar de usuário/instituição, filtro de turma não fique inválido
-  useEffect(() => {
-    if (!isCoordenador) return;
-    if (turmaFiltroId === "all") return;
-    const idNum = Number(turmaFiltroId);
-    const ok = turmasDisponiveis.some((t) => Number(t.id) === idNum);
-    if (!ok) setTurmaFiltroId("all");
-  }, [isCoordenador, turmaFiltroId, turmasDisponiveis]);
+  // ✅ turmas do usuário (pra coordenador enxergar o que ele coordena)
+  const userTurmasSet = useMemo(() => {
+    const ids =
+      (Array.isArray(user?.disciplinas) && user.disciplinas) ||
+      (Array.isArray(usuarioLogado?.disciplinas) && usuarioLogado.disciplinas) ||
+      [];
+    return new Set(ids.map(Number).filter((x) => Number.isFinite(x)));
+  }, [user, usuarioLogado]);
 
   const eventosFiltrados = useMemo(() => {
-    if (!user) return [];
+    if (!user && !usuarioLogado) return [];
 
-    const instId = Number(user.faculdadeId);
+    // inst vem do JSON, mas se não achar, tenta do storage
+    const instId = Number(user?.faculdadeId ?? usuarioLogado?.faculdadeId);
     const discAtualNum = disciplinaAtualId ? Number(disciplinaAtualId) : null;
 
     const baseEventos = Array.isArray(data.eventos) ? data.eventos : [];
@@ -132,47 +146,47 @@ export default function EventosPublicados() {
     const lista = eventosFinal
       .filter((ev) => Number(ev.instituicaoId) === instId)
       .filter((ev) => {
-        // ✅ toggle "apenas meus"
-        if (apenasMeus) return Number(ev.criadoPorId) === Number(user.id);
+        if (apenasMeus)
+          return Number(ev.criadoPorId) === Number(user?.id ?? usuarioLogado?.id);
         return true;
       })
       .filter((ev) => {
-        // ✅ regra de visibilidade por turma:
-        // - novo formato: ev.turmasIds (array)
-        // - legado: usa ev.disciplinaId como "turma"
-        const turmasEv = Array.isArray(ev.turmasIds) && ev.turmasIds.length > 0
-          ? ev.turmasIds.map(Number).filter((x) => Number.isFinite(x))
-          : [Number(ev.disciplinaId)].filter((x) => Number.isFinite(x));
+        const turmasEv = getTurmasDoEvento(ev);
 
+        // ✅ COORDENADOR: vê se criou OU se bate com QUALQUER turma dele
         if (isCoordenador) {
-          // coordenador: pode ver "Todas" ou filtrar por uma turma específica
-          if (turmaFiltroId === "all") return true;
-          const filtroNum = Number(turmaFiltroId);
-          if (!filtroNum) return true;
-          return turmasEv.includes(filtroNum);
+          const meuId = Number(user?.id ?? usuarioLogado?.id);
+          const criou = Number(ev.criadoPorId) === meuId;
+          if (criou) return true;
+
+          // se não tiver turmas no perfil, não bloqueia
+          if (!userTurmasSet || userTurmasSet.size === 0) return true;
+
+          return turmasEv.some((id) => userTurmasSet.has(Number(id)));
         }
 
-        // não coordenador: mantém o filtro de disciplina atual (turma atual)
+        // ✅ professor/responsável: só enxerga turma atual
+        if (isProfessor || isResponsavel) {
+          if (!discAtualNum) return true;
+          return turmasEv.includes(discAtualNum);
+        }
+
         if (!discAtualNum) return true;
         return turmasEv.includes(discAtualNum);
       })
       .filter((ev) => {
-        // ✅ busca (título, descrição, criador, turmas)
         if (!q) return true;
 
         const criadoPor = usuariosById.get(ev.criadoPorId)?.nome || "";
-        const turmasEv = Array.isArray(ev.turmasIds) && ev.turmasIds.length > 0
-          ? ev.turmasIds
-          : [ev.disciplinaId];
+        const turmasEv = getTurmasDoEvento(ev);
 
         const nomesTurmas = (turmasEv || [])
-          .map((id) => disciplinasById.get(Number(id))?.nome || "")
+          .map((id) => disciplinasById.get(Number(id))?.nome || `Turma ${id}`)
           .join(" ");
 
         const hay = normStr(
-          `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`
+          `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`,
         );
-
         return hay.includes(q);
       })
       .sort((a, b) => {
@@ -184,21 +198,24 @@ export default function EventosPublicados() {
     return lista;
   }, [
     user,
+    usuarioLogado,
     disciplinaAtualId,
     refreshKey,
     apenasMeus,
     busca,
     isCoordenador,
-    turmaFiltroId,
+    isProfessor,
+    isResponsavel,
     usuariosById,
     disciplinasById,
+    userTurmasSet,
   ]);
 
   const handleEditar = (eventoId) => {
     navigate(`/eventos/${eventoId}/editar`);
   };
 
-  if (!user) {
+  if (!user && !usuarioLogado) {
     return (
       <div className="eventos-publicados-page">
         <div className="eventos-publicados-container">
@@ -223,81 +240,70 @@ export default function EventosPublicados() {
           <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
         </header>
 
-        {/* ✅ Filtros (igual sensação do print/figma) */}
         <section className="filtros-card">
           <div className="filtros-top">
-            <div className="filtros-title">Filtros</div>
-
-            <label className="switch-pill">
-              <span className="switch-pill__label">Selecionar apenas meus eventos</span>
-              <input
-                type="checkbox"
-                checked={apenasMeus}
-                onChange={(e) => setApenasMeus(e.target.checked)}
-              />
-              <span className="switch-pill__track" aria-hidden="true">
-                <span className="switch-pill__dot" />
+            <div className="filtros-title">
+              <span className="filtros-icon" aria-hidden="true">
+                ⏷
               </span>
-            </label>
+              Filtros
+            </div>
+
+            <button
+              type="button"
+              className={`filtros-pill ${apenasMeus ? "is-on" : ""}`}
+              onClick={() => setApenasMeus((v) => !v)}
+              aria-pressed={apenasMeus}
+              title="Selecionar apenas meus eventos"
+            >
+              Selecionar apenas meus eventos
+              <span className="filtros-pill-dot" aria-hidden="true" />
+            </button>
           </div>
 
           <div className="filtros-row">
             <div className="filtro-search">
-              <span className="filtro-search__icon" aria-hidden="true">⌕</span>
+              <span className="filtro-search__icon" aria-hidden="true">
+                ⌕
+              </span>
               <input
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
                 placeholder="Buscar por nome, disciplina ou professor..."
               />
             </div>
-
-            {isCoordenador && (
-              <div className="filtro-select">
-                <select
-                  value={turmaFiltroId}
-                  onChange={(e) => setTurmaFiltroId(e.target.value)}
-                >
-                  <option value="all">Todas as turmas</option>
-                  {turmasDisponiveis.map((t) => (
-                    <option key={t.id} value={String(t.id)}>
-                      {t.nome}
-                    </option>
-                  ))}
-                </select>
-                <span className="filtro-select__arrow" aria-hidden="true">▾</span>
-              </div>
-            )}
           </div>
         </section>
 
-        {/* ✅ Lista */}
         <div className="eventos-publicados-list">
           {eventosFiltrados.map((ev) => {
             const criadoPor = usuariosById.get(ev.criadoPorId)?.nome || "—";
             const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
             const temDataEvento = !!ev.dataEvento;
-            const dataEventoFmt = temDataEvento ? formatarDataPtBR(ev.dataEvento) : "";
+            const dataEventoFmt = temDataEvento
+              ? formatarDataPtBR(ev.dataEvento)
+              : "";
 
             const podeEditar = !!ev.calendario;
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
 
-            // ✅ chips de turmas (coordenador enxerga multi-turma)
-            const turmasEv = Array.isArray(ev.turmasIds) && ev.turmasIds.length > 0
-              ? ev.turmasIds
-              : [ev.disciplinaId];
+            const turmasEv = getTurmasDoEvento(ev);
 
-            const turmasNomes = turmasEv
-              .map((id) => ({
-                id: Number(id),
-                nome: disciplinasById.get(Number(id))?.nome || `Turma ${id}`,
-              }))
-              .filter((x) => x.nome);
+            const turmasNomes = (turmasEv || []).map((id) => ({
+              id: Number(id),
+              nome: disciplinasById.get(Number(id))?.nome || `Turma ${id}`,
+            }));
 
-            const MAX_CHIPS = 8;
-            const chipsVisiveis = turmasNomes.slice(0, MAX_CHIPS);
-            const chipsRestantes = turmasNomes.length - chipsVisiveis.length;
+            // ✅ figma: aqui você pode controlar +N (coloque 9999 pra mostrar tudo)
+            const MAX_TURMAS_CHIPS = 9999;
+            const turmasOrdenadas = [...turmasNomes].sort((a, b) => a.id - b.id);
+            const chipsVisiveis = turmasOrdenadas.slice(0, MAX_TURMAS_CHIPS);
+            const restantes = turmasOrdenadas.length - chipsVisiveis.length;
+
+            // ✅ agora depende de um tipo “robusto”
+            const mostrarTodasTurmas = isCoordenador;
 
             return (
               <article key={ev.id} className="evento-card">
@@ -311,30 +317,36 @@ export default function EventosPublicados() {
 
                     <div className="evento-card-desc">{ev.descricao}</div>
 
-                    {/* chips de turmas */}
-                    {isCoordenador && turmasNomes.length > 0 && (
+                    {turmasOrdenadas.length > 0 && (
                       <div className="evento-card-turmaschips">
-                        {chipsVisiveis.map((t) => (
+                        {(mostrarTodasTurmas
+                          ? chipsVisiveis
+                          : chipsVisiveis.slice(0, 1)
+                        ).map((t) => (
                           <span key={t.id} className="chip chip--turma">
                             {t.nome}
                           </span>
                         ))}
-                        {chipsRestantes > 0 && (
-                          <span className="chip chip--more">+ {chipsRestantes}</span>
+
+                        {mostrarTodasTurmas && restantes > 0 && (
+                          <span className="chip chip--more">+{restantes}</span>
                         )}
                       </div>
                     )}
 
                     <div className="evento-card-meta">
-                      {temDataEvento ? (
-                        <span>Data do evento: {dataEventoFmt}</span>
-                      ) : (
+                      <div className="evento-card-dates">
+                        {temDataEvento && (
+                          <span>Data do evento: {dataEventoFmt}</span>
+                        )}
                         <span>Última atualização: {dataAtual}</span>
-                      )}
+                      </div>
 
                       <div className="evento-card-chips">
                         {temCalendario && (
-                          <span className="chip chip--calendario">Calendário</span>
+                          <span className="chip chip--calendario">
+                            Calendário
+                          </span>
                         )}
                         {temDestaque && (
                           <span className="chip chip--destaque">Destaque</span>
@@ -346,24 +358,15 @@ export default function EventosPublicados() {
                   {podeEditar && (
                     <button
                       type="button"
-                      className="btn-editar"
+                      className="btn-editar-icononly"
                       onClick={() => handleEditar(ev.id)}
+                      aria-label="Editar evento"
+                      title="Editar"
                     >
-                      <span className="btn-editar-icon" aria-hidden="true">
-                        <Pencil size={14} />
-                      </span>
-                      Editar
+                      <Pencil size={16} />
                     </button>
                   )}
                 </div>
-
-                {temDataEvento && (
-                  <div className="evento-card-footer">
-                    <span className="evento-card-footer-updated">
-                      Última atualização: {dataAtual}
-                    </span>
-                  </div>
-                )}
               </article>
             );
           })}

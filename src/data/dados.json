@@ -313,8 +313,7 @@
     "dataEvento": "2025-11-15T00:00:00.000Z",
     "criadoPorId": 201,
     "instituicaoId": 1,
-    "disciplinaId": 1,
-    "turmasIds": [],
+    "disciplinaId": [1],
     "calendario": true,
     "destaque": true
   },
@@ -325,8 +324,7 @@
     "ultimaAtualizacao": "2025-11-15T09:10:00.000Z",
     "criadoPorId": 201,
     "instituicaoId": 1,
-    "disciplinaId": 3,
-    "turmasIds": [],
+    "disciplinaId": [3],
     "calendario": false,
     "destaque": true
   },
@@ -338,8 +336,7 @@
     "dataEvento": "2025-11-10T00:00:00.000Z",
     "criadoPorId": 301,
     "instituicaoId": 1,
-    "disciplinaId": 2,
-    "turmasIds": [],
+    "disciplinaId": [2],
     "calendario": true,
     "destaque": false
   },
@@ -351,8 +348,7 @@
     "dataEvento": "2025-11-12T00:00:00.000Z",
     "criadoPorId": 302,
     "instituicaoId": 3,
-    "disciplinaId": 10,
-    "turmasIds": [],
+    "disciplinaId": [10],
     "calendario": true,
     "destaque": true
   },
@@ -363,8 +359,7 @@
     "ultimaAtualizacao": "2025-11-09T08:20:00.000Z",
     "criadoPorId": 202,
     "instituicaoId": 3,
-    "disciplinaId": 11,
-    "turmasIds": [],
+    "disciplinaId": [11],
     "calendario": false,
     "destaque": false
   },
@@ -376,8 +371,7 @@
     "dataEvento": "2025-11-15T00:00:00.000Z",
     "criadoPorId": 201,
     "instituicaoId": 1,
-    "disciplinaId": 4,
-    "turmasIds": [],
+    "disciplinaId": [4],
     "calendario": true,
     "destaque": false
   },
@@ -388,8 +382,7 @@
     "ultimaAtualizacao": "2025-11-13T11:20:00.000Z",
     "criadoPorId": 201,
     "instituicaoId": 1,
-    "disciplinaId": 1,
-    "turmasIds": [],
+    "disciplinaId": [1],
     "calendario": false,
     "destaque": true
   },
@@ -401,8 +394,7 @@
     "dataEvento": "2025-11-14T00:00:00.000Z",
     "criadoPorId": 301,
     "instituicaoId": 1,
-    "disciplinaId": 3,
-    "turmasIds": [],
+    "disciplinaId": [3],
     "calendario": true,
     "destaque": false
   },
@@ -414,8 +406,7 @@
     "dataEvento": "2025-11-14T00:00:00.000Z",
     "criadoPorId": 201,
     "instituicaoId": 1,
-    "disciplinaId": 2,
-    "turmasIds": [],
+    "disciplinaId": [2],
     "calendario": true,
     "destaque": true
   },
@@ -426,8 +417,7 @@
     "ultimaAtualizacao": "2025-11-11T19:12:00.000Z",
     "criadoPorId": 201,
     "instituicaoId": 1,
-    "disciplinaId": 4,
-    "turmasIds": [],
+    "disciplinaId": [4],
     "calendario": false,
     "destaque": false
   },
@@ -439,8 +429,7 @@
     "dataEvento": "2025-11-13T00:00:00.000Z",
     "criadoPorId": 302,
     "instituicaoId": 3,
-    "disciplinaId": 8,
-    "turmasIds": [],
+    "disciplinaId": [8],
     "calendario": true,
     "destaque": true
   },
@@ -452,8 +441,7 @@
     "dataEvento": "2025-11-15T00:00:00.000Z",
     "criadoPorId": 302,
     "instituicaoId": 3,
-    "disciplinaId": 8,
-    "turmasIds": [],
+    "disciplinaId": [8],
     "calendario": true,
     "destaque": false
   },
@@ -464,8 +452,7 @@
     "ultimaAtualizacao": "2025-11-12T10:00:00.000Z",
     "criadoPorId": 202,
     "instituicaoId": 3,
-    "disciplinaId": 10,
-    "turmasIds": [],
+    "disciplinaId": [10],
     "calendario": false,
     "destaque": true
   },
@@ -477,8 +464,7 @@
     "dataEvento": "2025-11-14T00:00:00.000Z",
     "criadoPorId": 302,
     "instituicaoId": 3,
-    "disciplinaId": 12,
-    "turmasIds": [],
+    "disciplinaId": [12],
     "calendario": true,
     "destaque": false
   },
@@ -489,8 +475,7 @@
     "ultimaAtualizacao": "2025-11-09T13:25:00.000Z",
     "criadoPorId": 202,
     "instituicaoId": 3,
-    "disciplinaId": 11,
-    "turmasIds": [],
+    "disciplinaId": [11],
     "calendario": false,
     "destaque": false
   },
@@ -502,8 +487,7 @@
     "dataEvento": "2025-11-08T00:00:00.000Z",
     "criadoPorId": 201,
     "instituicaoId": 1,
-    "disciplinaId": 2,
-    "turmasIds": [],
+    "disciplinaId": [2],
     "calendario": true,
     "destaque": false
   },
@@ -514,8 +498,7 @@
     "ultimaAtualizacao": "2025-11-08T09:00:00.000Z",
     "criadoPorId": 301,
     "instituicaoId": 1,
-    "disciplinaId": 3,
-    "turmasIds": [],
+    "disciplinaId": [3],
     "calendario": false,
     "destaque": true
   },
@@ -526,8 +509,7 @@
     "ultimaAtualizacao": "2025-11-08T10:00:00.000Z",
     "criadoPorId": 302,
     "instituicaoId": 3,
-    "disciplinaId": 9,
-    "turmasIds": [],
+    "disciplinaId": [9],
     "calendario": false,
     "destaque": false
   },
@@ -539,8 +521,7 @@
     "dataEvento": "2025-11-08T00:00:00.000Z",
     "criadoPorId": 202,
     "instituicaoId": 3,
-    "disciplinaId": 7,
-    "turmasIds": [],
+    "disciplinaId": [7],
     "calendario": true,
     "destaque": true
   },
@@ -552,8 +533,7 @@
     "dataEvento": "2025-11-15T00:00:00.000Z",
     "criadoPorId": 301,
     "instituicaoId": 1,
-    "disciplinaId": 1,
-    "turmasIds": [],
+    "disciplinaId": [1],
     "calendario": true,
     "destaque": true
   },
@@ -565,8 +545,7 @@
   "dataEvento": "2026-02-10T00:00:00.000Z",
   "criadoPorId": 201,
   "instituicaoId": 1,
-  "disciplinaId": 1,
-  "turmasIds": [11, 12, 13],
+  "disciplinaId": [1, 11, 12, 13],
   "calendario": true,
   "destaque": true
 },
@@ -578,8 +557,7 @@
   "dataEvento": "2026-02-05T00:00:00.000Z",
   "criadoPorId": 301,
   "instituicaoId": 1,
-  "disciplinaId": null,
-  "turmasIds": [11, 12, 13, 14, 15],
+  "disciplinaId": [11, 12, 13, 14, 15],
   "calendario": true,
   "destaque": false
 },
@@ -591,8 +569,7 @@
   "dataEvento": "2026-02-12T00:00:00.000Z",
   "criadoPorId": 201,
   "instituicaoId": 1,
-  "disciplinaId": 2,
-  "turmasIds": [12, 14],
+  "disciplinaId": [2, 12, 14],
   "calendario": true,
   "destaque": false
 },
@@ -604,8 +581,7 @@
   "dataEvento": "2026-02-15T00:00:00.000Z",
   "criadoPorId": 202,
   "instituicaoId": 1,
-  "disciplinaId": 3,
-  "turmasIds": [11, 13, 15],
+  "disciplinaId": [3, 11, 13, 15],
   "calendario": true,
   "destaque": true
 }

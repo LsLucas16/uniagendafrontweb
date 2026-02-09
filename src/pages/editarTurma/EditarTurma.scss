@@ -1,494 +1,493 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 
-/* tokens */
-$azul-primario: #334E68;
-$azul-claro: #7FB3D5;
-$cinza-borda: #E2E8F0;
-$fundo-page: #F4F4F4;
-$fundo-input: #F3F5F7;
+/* tokens (somente desta tela) */
+$et-azul-primario: #334e68;
+$et-azul-claro: #7fb3d5;
+$et-cinza-borda: #e2e8f0;
+$et-fundo-page: #f4f4f4;
+$et-fundo-input: #f3f5f7;
 
-/* page */
+/* =========================================================
+   ✅ TUDO ESCOPADO: nada aqui vaza pra outras telas
+========================================================= */
 .editar-turma-page {
-  background: $fundo-page;
+  font-family: "Inter", sans-serif;
+  background: $et-fundo-page;
   min-height: 100vh;
   padding: 0;
   display: flex;
   align-items: flex-start;
   justify-content: center;
   overflow-x: hidden;
-  font-family: "Inter", sans-serif;
-}
 
-.editar-turma-card {
-  width: min(1128px, calc(100% - 10px));
-  margin: 0;
-  background: #fff;
-
-  /* esquerda arredondada e direita reta */
-  border-radius: 20px 0 0 20px;
-
-  border: 1px solid #e9edf3;
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.04);
-  padding: 34px 42px;
-  align-self: flex-start;
-}
-
-/* header */
-.page-header {
-  margin-bottom: 24px;
-
-  h1 {
+  /* Card principal */
+  .editar-turma-card {
+    width: min(1128px, calc(100% - 10px));
     margin: 0;
-    font-size: 28px;
-    line-height: 1.2;
+    background: #fff;
+
+    /* esquerda arredondada e direita reta */
+    border-radius: 20px 0 0 20px;
+
+    border: 1px solid #e9edf3;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.04);
+    padding: 34px 42px;
+    align-self: flex-start;
+  }
+
+  /* Header */
+  .page-header {
+    margin-bottom: 24px;
+
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: $et-azul-primario;
+      letter-spacing: -0.2px;
+    }
+
+    p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      color: #6f7d8c;
+    }
+  }
+
+  .page-title {
+    display: none;
+  }
+
+  /* Layout */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+
+    @media (max-width: 720px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .section {
+    margin-top: 18px;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    @media (max-width: 720px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  /* Títulos (somente desta tela) */
+  .section-title {
+    font-size: 18px;
     font-weight: 700;
-    color: $azul-primario;
-    letter-spacing: -0.2px;
+    color: $et-azul-primario;
+    margin: 6px 0 12px;
   }
 
-  p {
-    margin: 4px 0 0;
-    font-size: 14px;
-    color: #6f7d8c;
-  }
-}
-
-.page-title { display: none; }
-
-/* layout */
-.grid-2 {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-
-  @media (max-width: 720px) {
-    grid-template-columns: 1fr;
-  }
-}
-
-.section { margin-top: 18px; }
-
-.section-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
-
-  @media (max-width: 720px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-/* Títulos */
-.section-title {
-  font-size: 22px;
-  font-weight: 700;
-  color: $azul-primario;
-  margin: 6px 0 18px;
-}
-
-.sub-title {
-  font-size: 15px;
-  font-weight: 600;
-  color: $azul-primario;
-  margin: 6px 0 10px;
-}
-
-/* fields padrão */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  label {
-    display: block;
-    color: $azul-primario;
-    font-weight: 600;
+  .sub-title {
     font-size: 15px;
+    font-weight: 600;
+    color: $et-azul-primario;
+    margin: 6px 0 10px;
   }
 
-  input {
-    width: 100%;
-    height: 44px;
-    border-radius: 6px;
-    border: 1px solid $cinza-borda;
-    background: $fundo-input;
-    padding: 0 14px;
-    font-size: 14px;
-    color: $azul-primario;
-    outline: none;
+  /* Campos */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 
-    &::placeholder { color: #CBD5E0; }
+    label {
+      display: block;
+      color: $et-azul-primario;
+      font-weight: 600;
+      font-size: 15px;
+    }
 
-    &:focus {
-      border-color: rgba(127, 179, 213, 0.9);
-      box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
+    input {
+      width: 100%;
+      height: 44px;
+      border-radius: 6px;
+      border: 1px solid $et-cinza-borda;
+      background: $et-fundo-input;
+      padding: 0 14px;
+      font-size: 14px;
+      color: $et-azul-primario;
+      outline: none;
+
+      &::placeholder {
+        color: #cbd5e0;
+      }
+
+      &:focus {
+        border-color: rgba(127, 179, 213, 0.9);
+        box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
+      }
     }
   }
-}
 
-/* ===== RESPONSÁVEIS (igual Figma) ===== */
-.responsaveis {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* sem “card” visível */
-.responsavel-card {
-  border: 0;
-  padding: 0;
-  background: transparent;
-}
-
-/* topo: chip + botão editar à direita */
-.responsavel-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-/* chip do nome: INÍCIO RETO, FINAL BOLEADO */
-.chip {
-  display: inline-flex;
-  align-items: center;
-
-  height: 44px;
-  min-width: 220px;
-  padding: 0 22px;
-
-  background: #DDE3EA;
-  color: $azul-primario;
-  font-size: 18px;
-  font-weight: 600;
-
-  /* ✅ esquerda reta, direita arredondada */
-  border-radius: 0 999px 999px 0;
-}
-
-/* botão editar pequeno (igual sensação do figma) */
-.btn-edit {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
-  border: 1px solid $cinza-borda;
-  background: #fff;
-  cursor: pointer;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  color: #607089;
-
-  &:hover {
-    background: #f7f9fc;
-    border-color: #dbe3ee;
-  }
-}
-
-/* inputs do responsável no figma são brancos */
-.inner .field input {
-  background: #fff;
-}
-
-/* ===== botões ===== */
-.btn-primary {
-  height: 44px;
-  border: 0;
-  border-radius: 6px;
-  background: $azul-claro;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 0 14px;
-
-  transition: filter 0.15s ease, transform 0.02s ease, box-shadow 0.15s ease;
-
-  &:hover {
-    filter: brightness(0.97);
-    box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
+  /* Divider */
+  .divider {
+    height: 1px;
+    background: #e9edf3;
+    margin: 18px 0;
   }
 
-  &:active { transform: translateY(1px); }
-
-  &.wide { width: 100%; }
-
-  &.small {
-    height: 36px;
-    border-radius: 999px;
-    font-size: 13px;
-    padding: 0 14px;
+  /* =========================
+     RESPONSÁVEIS
+  ========================= */
+  .responsaveis {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
   }
 
-  &.muted {
-    background: #c8d6e7;
-    color: #2b3b4f;
-
-    &:hover { filter: brightness(0.99); box-shadow: none; }
-  }
-}
-
-.btn-secondary {
-  height: 44px;
-  border-radius: 6px;
-  border: 1px solid $cinza-borda;
-  background: #fff;
-  font-size: 14px;
-  font-weight: 600;
-  color: $azul-primario;
-  cursor: pointer;
-
-  &:hover { background: #f7f9fc; }
-}
-
-/* ===== busca alunos ===== */
-.search-wrap {
-  position: relative;
-
-  .search-ico {
-    position: absolute;
-    left: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #93a0b2;
-    pointer-events: none;
-  }
-
-  input {
-    width: 100%;
-    height: 44px;
-    border-radius: 6px;
-    border: 1px solid $cinza-borda;
-    background: $fundo-input;
-    padding: 0 14px 0 42px;
-    font-size: 14px;
-    color: $azul-primario;
-    outline: none;
-
-    &::placeholder { color: #CBD5E0; }
-
-    &:focus {
-      border-color: rgba(127, 179, 213, 0.9);
-      box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
-    }
-  }
-}
-
-.search-dropdown {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 8px);
-  background: #ffffff;
-  border: 1px solid #e9edf3;
-  border-radius: 10px;
-  box-shadow: 0 12px 24px rgba(16, 24, 40, 0.14);
-  overflow: hidden;
-  z-index: 30;
-
-  .dropdown-item {
-    width: 100%;
-    text-align: left;
+  .responsavel-card {
     border: 0;
-    background: #ffffff;
-    padding: 12px 14px;
+    padding: 0;
+    background: transparent;
+  }
+
+  .responsavel-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* ✅ IMPORTANTE: restringe chip APENAS dentro de EditarTurma
+     Isso evita conflito com .chip de EventosPublicados */
+  .responsavel-card .chip {
+    display: inline-flex;
+    align-items: center;
+
+    height: 36px;
+    min-width: 0;
+    max-width: 100%;
+    padding: 0 14px;
+
+    background: #dde3ea;
+    color: $et-azul-primario;
+    font-size: 14px;
+    font-weight: 600;
+
+    /* esquerda reta, direita arredondada */
+    border-radius: 0 999px 999px 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* botão editar */
+  .btn-edit {
+    height: 34px;
+    width: auto;
+    padding: 0 12px;
+    border-radius: 10px;
+    border: 1px solid $et-cinza-borda;
+    background: #fff;
     cursor: pointer;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    color: #607089;
+
+    &:hover {
+      background: #f7f9fc;
+      border-color: #dbe3ee;
+    }
+
+    .btn-edit__text {
+      font-size: 13px;
+      font-weight: 600;
+      line-height: 1;
+      color: inherit;
+      white-space: nowrap;
+    }
+  }
+
+  /* inputs do responsável brancos */
+  .inner .field input {
+    background: #fff;
+  }
+
+  /* =========================
+     BOTÕES (somente desta tela)
+  ========================= */
+  .btn-primary {
+    height: 44px;
+    border: 0;
+    border-radius: 6px;
+    background: $et-azul-claro;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 14px;
+    transition: filter 0.15s ease, transform 0.02s ease, box-shadow 0.15s ease;
+
+    &:hover {
+      filter: brightness(0.97);
+      box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+
+    &.wide {
+      width: 100%;
+    }
+
+    &.small {
+      height: 36px;
+      border-radius: 999px;
+      font-size: 13px;
+      padding: 0 14px;
+    }
+
+    &.muted {
+      background: #c8d6e7;
+      color: #2b3b4f;
+
+      &:hover {
+        filter: brightness(0.99);
+        box-shadow: none;
+      }
+    }
+  }
+
+  .btn-secondary {
+    height: 44px;
+    border-radius: 6px;
+    border: 1px solid $et-cinza-borda;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    color: $et-azul-primario;
+    cursor: pointer;
+
+    &:hover {
+      background: #f7f9fc;
+    }
+  }
+
+  /* =========================
+     BUSCA ALUNOS
+  ========================= */
+  .search-wrap {
+    position: relative;
+
+    .search-ico {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #93a0b2;
+      pointer-events: none;
+    }
+
+    input {
+      width: 100%;
+      height: 44px;
+      border-radius: 6px;
+      border: 1px solid $et-cinza-borda;
+      background: $et-fundo-input;
+      padding: 0 14px 0 42px;
+      font-size: 14px;
+      color: $et-azul-primario;
+      outline: none;
+
+      &::placeholder {
+        color: #cbd5e0;
+      }
+
+      &:focus {
+        border-color: rgba(127, 179, 213, 0.9);
+        box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
+      }
+    }
+  }
+
+  .search-dropdown {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 8px);
+    background: #ffffff;
+    border: 1px solid #e9edf3;
+    border-radius: 10px;
+    box-shadow: 0 12px 24px rgba(16, 24, 40, 0.14);
+    overflow: hidden;
+    z-index: 30;
+
+    .dropdown-item {
+      width: 100%;
+      text-align: left;
+      border: 0;
+      background: #ffffff;
+      padding: 12px 14px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .d-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #1f2937;
+      }
+
+      .d-sub {
+        font-size: 12px;
+        color: #8a96a8;
+      }
+
+      &:hover {
+        background: #f7f9fc;
+      }
+
+      &.active {
+        background: rgba(127, 179, 213, 0.14);
+      }
+    }
+  }
+
+  .actions-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 14px 0;
+
+    @media (max-width: 720px) {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+
+  /* ✅ Link escopado nesta tela */
+  .link {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    color: #607089;
+    font-weight: 600;
+    padding: 0;
+    white-space: nowrap;
+
+    &:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 720px) {
+      text-align: right;
+    }
+  }
+
+  /* Lista alunos */
+  .alunos-list {
+    border: 1px solid #eef2f7;
+    border-radius: 10px;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  .aluno-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid #eef2f7;
+
+    &:last-child {
+      border-bottom: 0;
+    }
+  }
+
+  .aluno-info {
     display: flex;
     flex-direction: column;
     gap: 4px;
+  }
 
-    .d-name {
-      font-size: 14px;
-      font-weight: 700;
-      color: #1f2937;
+  .aluno-nome {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1f2937;
+  }
+
+  .aluno-matricula {
+    font-size: 12px;
+    color: #9aa4b2;
+  }
+
+  .btn-x {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    background: transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+
+    &:hover {
+      background: #f7f9fc;
+      border-color: #e9edf3;
+      color: #64748b;
     }
-
-    .d-sub {
-      font-size: 12px;
-      color: #8a96a8;
-    }
-
-    &:hover { background: #f7f9fc; }
-    &.active { background: rgba(127, 179, 213, 0.14); }
-  }
-}
-
-.actions-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin: 14px 0;
-
-  @media (max-width: 720px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-.link {
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font-size: 13px;
-  color: #607089;
-  font-weight: 600;
-  padding: 0;
-  white-space: nowrap;
-
-  &:hover { text-decoration: underline; }
-
-  @media (max-width: 720px) { text-align: right; }
-}
-
-/* ===== lista alunos ===== */
-.alunos-list {
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
-  background: #ffffff;
-  overflow: hidden;
-}
-
-.aluno-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 14px;
-  border-bottom: 1px solid #eef2f7;
-
-  &:last-child { border-bottom: 0; }
-}
-
-.aluno-info {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.aluno-nome {
-  font-size: 14px;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.aluno-matricula {
-  font-size: 12px;
-  color: #9aa4b2;
-}
-
-.btn-x {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  border: 1px solid transparent;
-  background: transparent;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: #94a3b8;
-
-  &:hover {
-    background: #f7f9fc;
-    border-color: #e9edf3;
-    color: #64748b;
-  }
-}
-
-/* states */
-.empty-text {
-  font-size: 14px;
-  color: #6b7280;
-  margin: 10px 0 14px;
-}
-
-.empty-small {
-  padding: 12px 14px;
-  font-size: 14px;
-  color: #6b7280;
-}
-
-.skeleton-title {
-  height: 18px;
-  width: 180px;
-  border-radius: 10px;
-  background: #eef2f7;
-  margin-bottom: 14px;
-}
-
-.skeleton-line {
-  height: 44px;
-  width: 100%;
-  border-radius: 10px;
-  background: #eef2f7;
-  margin-bottom: 12px;
-}
-
-
-/* Título "Responsáveis da turma" menor */
-.section-title {
-  font-size: 18px;
-  margin: 6px 0 12px;
-}
-
-/* Chip do nome menor + não estourar */
-.chip {
-  height: 36px;
-  min-width: 0;          /* tira a largura mínima */
-  max-width: 100%;       /* limita no container */
-  padding: 0 14px;
-  font-size: 14px;
-  font-weight: 600;
-
-  white-space: nowrap;   /* não quebrar linha */
-  overflow: hidden;      /* corta se passar */
-  text-overflow: ellipsis; /* coloca "..." */
-}
-
-
-.btn-edit {
-  height: 34px;
-  width: auto;                /* <<< deixa crescer */
-  padding: 0 12px;            /* <<< espaço pro texto */
-  border-radius: 10px;
-  border: 1px solid $cinza-borda;
-  background: #fff;
-  cursor: pointer;
-
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;                   /* <<< espaço entre ícone e texto */
-
-  color: #607089;
-
-  &:hover {
-    background: #f7f9fc;
-    border-color: #dbe3ee;
   }
 
-  .btn-edit__text {
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1;
-    color: inherit;
-    white-space: nowrap;
+  /* States */
+  .empty-text {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 10px 0 14px;
   }
-}
 
+  .empty-small {
+    padding: 12px 14px;
+    font-size: 14px;
+    color: #6b7280;
+  }
 
-.divider {
-  height: 1px;
-  background: #e9edf3;
-  margin: 18px 0;
+  .skeleton-title {
+    height: 18px;
+    width: 180px;
+    border-radius: 10px;
+    background: #eef2f7;
+    margin-bottom: 14px;
+  }
+
+  .skeleton-line {
+    height: 44px;
+    width: 100%;
+    border-radius: 10px;
+    background: #eef2f7;
+    margin-bottom: 12px;
+  }
 }
