@@ -41,7 +41,9 @@ function normStr(s) {
  */
 function getTurmasDoEvento(ev) {
   const fromTurmasIds =
-    Array.isArray(ev?.turmasIds) && ev.turmasIds.length > 0 ? ev.turmasIds : null;
+    Array.isArray(ev?.turmasIds) && ev.turmasIds.length > 0
+      ? ev.turmasIds
+      : null;
 
   if (fromTurmasIds) return fromTurmasIds.map(Number).filter(Number.isFinite);
 
@@ -94,11 +96,13 @@ export default function EventosPublicados() {
   const [apenasCoordenadores, setApenasCoordenadores] = useState(false);
 
   useEffect(() => {
-    const onDisciplinaChanged = () => setDisciplinaAtualId(getDisciplinaAtualId());
+    const onDisciplinaChanged = () =>
+      setDisciplinaAtualId(getDisciplinaAtualId());
 
     const onStorage = (e) => {
       if (e.key === "usuario") setUsuarioLogado(getUsuarioLogado());
-      if (e.key === "disciplinaAtualId") setDisciplinaAtualId(getDisciplinaAtualId());
+      if (e.key === "disciplinaAtualId")
+        setDisciplinaAtualId(getDisciplinaAtualId());
     };
 
     const onEventosChanged = () => setRefreshKey((k) => k + 1);
@@ -108,7 +112,10 @@ export default function EventosPublicados() {
     window.addEventListener("eventos:changed", onEventosChanged);
 
     return () => {
-      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
+      window.removeEventListener(
+        "disciplinaAtual:changed",
+        onDisciplinaChanged,
+      );
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("eventos:changed", onEventosChanged);
     };
@@ -129,10 +136,15 @@ export default function EventosPublicados() {
   const user = useMemo(() => {
     const id = usuarioLogado?.id;
     if (!id) return null;
-    return (data.usuarios || []).find((u) => Number(u.id) === Number(id)) || null;
+    return (
+      (data.usuarios || []).find((u) => Number(u.id) === Number(id)) || null
+    );
   }, [usuarioLogado]);
 
-  const tipo = useMemo(() => getTipoUsuario(user || usuarioLogado), [user, usuarioLogado]);
+  const tipo = useMemo(
+    () => getTipoUsuario(user || usuarioLogado),
+    [user, usuarioLogado],
+  );
 
   const isCoordenador = tipo === "coordenador";
   const isProfessor = tipo === "professor";
@@ -142,7 +154,8 @@ export default function EventosPublicados() {
   const userTurmasSet = useMemo(() => {
     const ids =
       (Array.isArray(user?.disciplinas) && user.disciplinas) ||
-      (Array.isArray(usuarioLogado?.disciplinas) && usuarioLogado.disciplinas) ||
+      (Array.isArray(usuarioLogado?.disciplinas) &&
+        usuarioLogado.disciplinas) ||
       [];
     return new Set(ids.map(Number).filter(Number.isFinite));
   }, [user, usuarioLogado]);
@@ -165,57 +178,62 @@ export default function EventosPublicados() {
 
     const q = normStr(busca);
 
-    return eventosFinal
-      .filter((ev) => Number(ev.instituicaoId) === instId)
+    return (
+      eventosFinal
+        .filter((ev) => Number(ev.instituicaoId) === instId)
 
-      // ✅ ÚNICO filtro: apenas coordenadores (quando toggle ligado)
-      .filter((ev) => {
-        if (!isCoordenador) return true;
-        if (!apenasCoordenadores) return true;
-        return isEventoCriadoPorCoordenador(ev);
-      })
+        // ✅ ÚNICO filtro: apenas coordenadores (quando toggle ligado)
+        .filter((ev) => {
+          if (!isCoordenador) return true;
+          if (!apenasCoordenadores) return true;
+          return isEventoCriadoPorCoordenador(ev);
+        })
 
-      .filter((ev) => {
-        const turmasEv = getTurmasDoEvento(ev);
+        .filter((ev) => {
+          const turmasEv = getTurmasDoEvento(ev);
 
-        if (isCoordenador) {
-          const meuId = Number(user?.id ?? usuarioLogado?.id);
-          const criou = Number(ev.criadoPorId) === meuId;
-          if (criou) return true;
+          if (isCoordenador) {
+            const meuId = Number(user?.id ?? usuarioLogado?.id);
+            const criou = Number(ev.criadoPorId) === meuId;
+            if (criou) return true;
 
-          if (!userTurmasSet || userTurmasSet.size === 0) return true;
+            if (!userTurmasSet || userTurmasSet.size === 0) return true;
 
-          return turmasEv.some((id) => userTurmasSet.has(Number(id)));
-        }
+            return turmasEv.some((id) => userTurmasSet.has(Number(id)));
+          }
 
-        if (isProfessor || isResponsavel || isAluno) {
+          if (isProfessor || isResponsavel || isAluno) {
+            if (!discAtualNum) return true;
+            return turmasEv.includes(discAtualNum);
+          }
+
           if (!discAtualNum) return true;
           return turmasEv.includes(discAtualNum);
-        }
+        })
 
-        if (!discAtualNum) return true;
-        return turmasEv.includes(discAtualNum);
-      })
+        .filter((ev) => {
+          if (!q) return true;
 
-      .filter((ev) => {
-        if (!q) return true;
+          const criadoPor =
+            usuariosById.get(Number(ev.criadoPorId))?.nome || "";
+          const turmasEv = getTurmasDoEvento(ev);
 
-        const criadoPor = usuariosById.get(Number(ev.criadoPorId))?.nome || "";
-        const turmasEv = getTurmasDoEvento(ev);
+          const nomesTurmas = (turmasEv || [])
+            .map((id) => disciplinasById.get(Number(id))?.nome || `Turma ${id}`)
+            .join(" ");
 
-        const nomesTurmas = (turmasEv || [])
-          .map((id) => disciplinasById.get(Number(id))?.nome || `Turma ${id}`)
-          .join(" ");
+          const hay = normStr(
+            `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`,
+          );
+          return hay.includes(q);
+        })
 
-        const hay = normStr(`${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`);
-        return hay.includes(q);
-      })
-
-      .sort((a, b) => {
-        const ta = new Date(a.ultimaAtualizacao || 0).getTime();
-        const tb = new Date(b.ultimaAtualizacao || 0).getTime();
-        return tb - ta;
-      });
+        .sort((a, b) => {
+          const ta = new Date(a.ultimaAtualizacao || 0).getTime();
+          const tb = new Date(b.ultimaAtualizacao || 0).getTime();
+          return tb - ta;
+        })
+    );
   }, [
     user,
     usuarioLogado,
@@ -285,7 +303,11 @@ export default function EventosPublicados() {
 
             <div className="filtros-row">
               <div className="filtro-search">
-                <Search size={16} className="filtro-search__icon" aria-hidden="true" />
+                <Search
+                  size={16}
+                  className="filtro-search__icon"
+                  aria-hidden="true"
+                />
                 <input
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
@@ -300,7 +322,11 @@ export default function EventosPublicados() {
         {!isCoordenador && (
           <div className="filtros-row only-search">
             <div className="filtro-search">
-              <Search size={16} className="filtro-search__icon" aria-hidden="true" />
+              <Search
+                size={16}
+                className="filtro-search__icon"
+                aria-hidden="true"
+              />
               <input
                 value={busca}
                 onChange={(e) => setBusca(e.target.value)}
@@ -312,11 +338,14 @@ export default function EventosPublicados() {
 
         <div className="eventos-publicados-list">
           {eventosFiltrados.map((ev) => {
-            const criadoPor = usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
+            const criadoPor =
+              usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
             const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
             const temDataEvento = !!ev.dataEvento;
-            const dataEventoFmt = temDataEvento ? formatarDataPtBR(ev.dataEvento) : "";
+            const dataEventoFmt = temDataEvento
+              ? formatarDataPtBR(ev.dataEvento)
+              : "";
 
             const podeEditar = !!ev.calendario;
             const temCalendario = !!ev.calendario;
@@ -330,7 +359,9 @@ export default function EventosPublicados() {
               nome: disciplinasById.get(Number(id))?.nome || `Turma ${id}`,
             }));
 
-            const turmasOrdenadas = [...turmasNomes].sort((a, b) => a.id - b.id);
+            const turmasOrdenadas = [...turmasNomes].sort(
+              (a, b) => a.id - b.id,
+            );
             const mostrarTodasTurmas = isCoordenador;
 
             return (
@@ -346,25 +377,41 @@ export default function EventosPublicados() {
 
                     {turmasOrdenadas.length > 0 && (
                       <div className="evento-card-turmaschips">
-                        {(mostrarTodasTurmas ? turmasOrdenadas : turmasOrdenadas.slice(0, 1)).map(
-                          (t) => (
-                            <span key={t.id} className="chip chip--turma">
-                              {t.nome}
-                            </span>
-                          ),
-                        )}
+                        {(mostrarTodasTurmas
+                          ? turmasOrdenadas
+                          : turmasOrdenadas.slice(0, 1)
+                        ).map((t) => (
+                          <span key={t.id} className="chip chip--turma">
+                            {t.nome}
+                          </span>
+                        ))}
                       </div>
                     )}
 
                     <div className="evento-card-meta">
                       <div className="evento-card-dates">
-                        {temDataEvento && <span>Data do evento: {dataEventoFmt}</span>}
-                        <span>Última atualização: {dataAtual}</span>
-                      </div>
+                        {temDataEvento && (
+                          <span>Data do evento: {dataEventoFmt}</span>
+                        )}
 
-                      <div className="evento-card-chips">
-                        {temCalendario && <span className="chip chip--calendario">Calendário</span>}
-                        {temDestaque && <span className="chip chip--destaque">Destaque</span>}
+                        <div className="evento-card-lastline">
+                          <span>Última atualização: {dataAtual}</span>
+
+                          {(temCalendario || temDestaque) && (
+                            <div className="evento-card-chips">
+                              {temCalendario && (
+                                <span className="chip chip--calendario">
+                                  Calendário
+                                </span>
+                              )}
+                              {temDestaque && (
+                                <span className="chip chip--destaque">
+                                  Destaque
+                                </span>
+                              )}
+                            </div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

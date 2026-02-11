@@ -229,8 +229,21 @@
   margin-top: 14px;
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
+  justify-content: flex-start; /* <<< NÃO empurra mais pra ponta */
   gap: 10px;
+}
+
+.evento-card-lastline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap; /* se faltar espaço, quebra bonito */
+}
+
+.evento-card-chips {
+  display: inline-flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .evento-card-dates {
