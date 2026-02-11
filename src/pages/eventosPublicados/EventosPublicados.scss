@@ -168,7 +168,7 @@
 
 /* Card com sombra mais suave (no seu estava forte) */
 .evento-card {
-  background: #ffffff;
+  background-color: #fafafa;
   border: 1px solid #e6edf7;
   border-radius: 12px;
   padding: 18px 18px 14px;
@@ -199,9 +199,9 @@
 }
 
 .evento-card-title {
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1.12;
-  font-weight: 800;
+  font-weight: 500;
   color: #2e4a67;
   margin: 0 0 10px 0;
   letter-spacing: -0.2px;
