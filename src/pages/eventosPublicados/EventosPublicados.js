@@ -33,17 +33,49 @@ function normStr(s) {
     .trim();
 }
 
+/**
+ * Pega as turmas/disciplinas associadas ao evento:
+ * - turmasIds (novo)
+ * - disciplinaId (pode ser number ou array)
+ * - disciplinaCoordenadorId / disciplinacoordenadorId / disciplinCoordenadoraId / etc (chaves inconsistentes do JSON)
+ */
 function getTurmasDoEvento(ev) {
   const fromTurmasIds =
     Array.isArray(ev?.turmasIds) && ev.turmasIds.length > 0 ? ev.turmasIds : null;
 
   if (fromTurmasIds) return fromTurmasIds.map(Number).filter(Number.isFinite);
 
-  if (Array.isArray(ev?.disciplinaId))
-    return ev.disciplinaId.map(Number).filter(Number.isFinite);
+  if (Array.isArray(ev?.disciplinaId)) {
+    const arr = ev.disciplinaId.map(Number).filter(Number.isFinite);
+    if (arr.length) return arr;
+  }
+
+  const candidates = [
+    ev?.disciplinaCoordenadorId,
+    ev?.disciplinacoordenadorId,
+    ev?.disciplinCoordenadoraId,
+    ev?.disciplinaCoordenadorID,
+    ev?.disciplina_coordenador_id,
+    ev?.disciplicoordenadornaId,
+  ].filter((v) => v != null);
+
+  for (const v of candidates) {
+    if (Array.isArray(v)) {
+      const arr = v.map(Number).filter(Number.isFinite);
+      if (arr.length) return arr;
+    } else {
+      const single = Number(v);
+      if (Number.isFinite(single)) return [single];
+    }
+  }
 
   const single = Number(ev?.disciplinaId);
   return Number.isFinite(single) ? [single] : [];
+}
+
+function getTipoUsuario(u) {
+  const raw = u?.tipo ?? u?.cargo ?? u?.perfil ?? "";
+  return String(raw).toLowerCase().trim();
 }
 
 export default function EventosPublicados() {
@@ -54,8 +86,12 @@ export default function EventosPublicados() {
   );
 
   const [refreshKey, setRefreshKey] = useState(0);
-  const [apenasMeus, setApenasMeus] = useState(false);
+
+  // busca (mantive para todos)
   const [busca, setBusca] = useState("");
+
+  // ✅ ÚNICO filtro do coordenador (toggle): false = mostra todos / true = só eventos criados por coordenadores
+  const [apenasCoordenadores, setApenasCoordenadores] = useState(false);
 
   useEffect(() => {
     const onDisciplinaChanged = () => setDisciplinaAtualId(getDisciplinaAtualId());
@@ -80,7 +116,7 @@ export default function EventosPublicados() {
 
   const usuariosById = useMemo(() => {
     const map = new Map();
-    (data.usuarios || []).forEach((u) => map.set(u.id, u));
+    (data.usuarios || []).forEach((u) => map.set(Number(u.id), u));
     return map;
   }, []);
 
@@ -93,22 +129,15 @@ export default function EventosPublicados() {
   const user = useMemo(() => {
     const id = usuarioLogado?.id;
     if (!id) return null;
-    return (data.usuarios || []).find((u) => u.id === id) || null;
+    return (data.usuarios || []).find((u) => Number(u.id) === Number(id)) || null;
   }, [usuarioLogado]);
 
-  const tipo = useMemo(() => {
-    const raw =
-      user?.tipo ??
-      usuarioLogado?.tipo ??
-      usuarioLogado?.cargo ??
-      usuarioLogado?.perfil ??
-      "";
-    return String(raw).toLowerCase().trim();
-  }, [user, usuarioLogado]);
+  const tipo = useMemo(() => getTipoUsuario(user || usuarioLogado), [user, usuarioLogado]);
 
   const isCoordenador = tipo === "coordenador";
   const isProfessor = tipo === "professor";
   const isResponsavel = tipo === "responsavel";
+  const isAluno = tipo === "aluno";
 
   const userTurmasSet = useMemo(() => {
     const ids =
@@ -117,6 +146,13 @@ export default function EventosPublicados() {
       [];
     return new Set(ids.map(Number).filter(Number.isFinite));
   }, [user, usuarioLogado]);
+
+  // ✅ normaliza "coordenador" no evento baseado em quem criou (criadoPorId)
+  function isEventoCriadoPorCoordenador(ev) {
+    const criador = usuariosById.get(Number(ev?.criadoPorId));
+    const t = getTipoUsuario(criador);
+    return t === "coordenador";
+  }
 
   const eventosFiltrados = useMemo(() => {
     if (!user && !usuarioLogado) return [];
@@ -131,10 +167,14 @@ export default function EventosPublicados() {
 
     return eventosFinal
       .filter((ev) => Number(ev.instituicaoId) === instId)
+
+      // ✅ ÚNICO filtro: apenas coordenadores (quando toggle ligado)
       .filter((ev) => {
-        if (!apenasMeus) return true;
-        return Number(ev.criadoPorId) === Number(user?.id ?? usuarioLogado?.id);
+        if (!isCoordenador) return true;
+        if (!apenasCoordenadores) return true;
+        return isEventoCriadoPorCoordenador(ev);
       })
+
       .filter((ev) => {
         const turmasEv = getTurmasDoEvento(ev);
 
@@ -148,7 +188,7 @@ export default function EventosPublicados() {
           return turmasEv.some((id) => userTurmasSet.has(Number(id)));
         }
 
-        if (isProfessor || isResponsavel) {
+        if (isProfessor || isResponsavel || isAluno) {
           if (!discAtualNum) return true;
           return turmasEv.includes(discAtualNum);
         }
@@ -156,10 +196,11 @@ export default function EventosPublicados() {
         if (!discAtualNum) return true;
         return turmasEv.includes(discAtualNum);
       })
+
       .filter((ev) => {
         if (!q) return true;
 
-        const criadoPor = usuariosById.get(ev.criadoPorId)?.nome || "";
+        const criadoPor = usuariosById.get(Number(ev.criadoPorId))?.nome || "";
         const turmasEv = getTurmasDoEvento(ev);
 
         const nomesTurmas = (turmasEv || [])
@@ -169,6 +210,7 @@ export default function EventosPublicados() {
         const hay = normStr(`${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`);
         return hay.includes(q);
       })
+
       .sort((a, b) => {
         const ta = new Date(a.ultimaAtualizacao || 0).getTime();
         const tb = new Date(b.ultimaAtualizacao || 0).getTime();
@@ -179,14 +221,15 @@ export default function EventosPublicados() {
     usuarioLogado,
     disciplinaAtualId,
     refreshKey,
-    apenasMeus,
     busca,
     isCoordenador,
     isProfessor,
     isResponsavel,
+    isAluno,
     usuariosById,
     disciplinasById,
     userTurmasSet,
+    apenasCoordenadores,
   ]);
 
   const handleEditar = (eventoId) => navigate(`/eventos/${eventoId}/editar`);
@@ -215,26 +258,47 @@ export default function EventosPublicados() {
           <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
         </header>
 
-        <section className="filtros-card">
-          <div className="filtros-top">
-            <div className="filtros-title">
-              <Filter size={16} className="filtros-icon" aria-hidden="true" />
-              Filtros
+        {/* ✅ Filtros só para coordenador */}
+        {isCoordenador && (
+          <section className="filtros-card">
+            <div className="filtros-top">
+              <div className="filtros-title">
+                <Filter size={16} className="filtros-icon" aria-hidden="true" />
+                Filtros
+              </div>
+
+              {/* ✅ UM ÚNICO BOTÃO (toggle) */}
+              <button
+                type="button"
+                className={`filtros-pill ${apenasCoordenadores ? "is-on" : ""}`}
+                onClick={() => setApenasCoordenadores((v) => !v)}
+                aria-pressed={apenasCoordenadores}
+                title="Apenas eventos criados por coordenadores"
+              >
+                Criado por coordenadores
+                <span
+                  className={`filtros-pill-dot ${apenasCoordenadores ? "is-filled" : "is-empty"}`}
+                  aria-hidden="true"
+                />
+              </button>
             </div>
 
-            <button
-              type="button"
-              className={`filtros-pill ${apenasMeus ? "is-on" : ""}`}
-              onClick={() => setApenasMeus((v) => !v)}
-              aria-pressed={apenasMeus}
-              title="Selecionar apenas meus eventos"
-            >
-              Selecionar apenas meus eventos
-              <span className="filtros-pill-dot" aria-hidden="true" />
-            </button>
-          </div>
+            <div className="filtros-row">
+              <div className="filtro-search">
+                <Search size={16} className="filtro-search__icon" aria-hidden="true" />
+                <input
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  placeholder="Buscar por nome, disciplina ou professor..."
+                />
+              </div>
+            </div>
+          </section>
+        )}
 
-          <div className="filtros-row">
+        {/* ✅ Para não-coordenador: NÃO mostra o card de filtros */}
+        {!isCoordenador && (
+          <div className="filtros-row only-search">
             <div className="filtro-search">
               <Search size={16} className="filtro-search__icon" aria-hidden="true" />
               <input
@@ -244,11 +308,11 @@ export default function EventosPublicados() {
               />
             </div>
           </div>
-        </section>
+        )}
 
         <div className="eventos-publicados-list">
           {eventosFiltrados.map((ev) => {
-            const criadoPor = usuariosById.get(ev.criadoPorId)?.nome || "—";
+            const criadoPor = usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
             const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
             const temDataEvento = !!ev.dataEvento;
@@ -257,6 +321,8 @@ export default function EventosPublicados() {
             const podeEditar = !!ev.calendario;
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
+
+            const coordenador = isEventoCriadoPorCoordenador(ev);
 
             const turmasEv = getTurmasDoEvento(ev);
             const turmasNomes = (turmasEv || []).map((id) => ({

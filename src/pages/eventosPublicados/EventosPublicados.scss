@@ -344,3 +344,28 @@
     gap: 10px;
   }
 }
+
+.filtros-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filtros-pill-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 999px;
+  border: 2px solid #ffffff; // contorno branco
+  background: transparent;    // padrão: círculo vazio
+  flex: 0 0 auto;
+}
+
+/* quando selecionado: bolinha branca preenchida */
+.filtros-pill-dot.is-filled {
+  background: #ffffff;
+}
+
+/* quando não selecionado: só círculo vazio */
+.filtros-pill-dot.is-empty {
+  background: transparent;
+}
