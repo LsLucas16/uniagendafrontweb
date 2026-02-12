@@ -90,16 +90,29 @@ const MenuLateral = () => {
             <span>UniAgenda - Sua rotina acadêmica sob controle!</span>
           </div>
         ) : (
-          <div className="menuLateral__user-details">
-            <strong>{user.nome}</strong>
-            <span className="menuLateral__user-name">{user.user}</span>
-            <span className="menuLateral__user-login">{user.login}</span>
+          <>
+            <div className="menuLateral__user-details">
+              <strong className="menuLateral__user-title">{user.nome}</strong>
 
-            <button className="btn-sair" onClick={handleLogout}>
+              {/* use só o que fizer sentido no seu JSON */}
+              {user?.user && (
+                <span className="menuLateral__user-sub">{user.user}</span>
+              )}
+              {user?.login && (
+                <span className="menuLateral__user-sub">{user.login}</span>
+              )}
+            </div>
+
+            {/* ✅ botão não interfere no layout do conteúdo */}
+            <button
+              type="button"
+              className="menuLateral__btn-sair"
+              onClick={handleLogout}
+            >
               <LogOut size={16} />
               <span>Sair</span>
             </button>
-          </div>
+          </>
         )}
       </header>
 

@@ -1,7 +1,7 @@
 .menuLateral {
-  width: 260px;        
-  min-width: 260px;    
-  flex: 0 0 260px;     
+  width: 260px;
+  min-width: 260px;
+  flex: 0 0 260px;
   height: 100vh;
   background-color: #ffffff;
   border-right: 1px solid #f0f4f8;
@@ -10,66 +10,106 @@
   padding: 16px;
   font-family: 'Inter', sans-serif;
 
-  // Header e Card de Perfil (Baseado na imagem {2C3C819A...})
+  $sidePad: 16px;
+
+  /* =====================================================
+     HEADER
+  ====================================================== */
+
+  &__divider {
+  display: none;
+  margin: 0;
+  border: 0;
+  height: 0;
+}
+
+&__turmaLabel {
+  font-size: 14px;
+  font-weight: 700;
+  color: rgba(46, 74, 103, 1);
+}
+
+/* select igual figma: cinza + seta */
+&__turmaSelect {
+  width: 100%;
+  height: 44px;                 /* figma parece mais alto */
+  padding: 0 44px 0 14px;       /* espaço pra seta */
+  border-radius: 8px;
+  border: 1px solid #D7DEE8;
+
+  background-color: rgba(244, 244, 244, 1); /* ✅ cinza dentro */
+  color: rgba(46, 74, 103, 1);
+  font-size: 16px;              /* ajuste fino (no figma parece grande) */
+  font-weight: 500;
+
+  /* remove estilo nativo e força aparecer nossa seta */
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  /* seta (chevron down) */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%232E4A67' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 18px 18px;
+
+  &:focus {
+    outline: none;
+    border-color: #76A8D9;
+    box-shadow: 0 0 0 3px rgba(118, 168, 217, 0.22);
+  }
+}
+
+/* IE/Edge antigo: remove seta nativa */
+&__turmaSelect::-ms-expand {
+  display: none;
+}
+
+
+
   &__header {
     display: flex;
     align-items: center;
     gap: 12px;
-    margin-bottom: 20px;
-    padding: 8px;
     cursor: pointer;
-    border-radius: 12px;
     transition: all 0.2s ease-in-out;
 
-    &.active {
-      background-color: #ebf1f9; // Azul muito claro da imagem de perfil
-      border: 1px solid #d9e2ec;
-      flex-direction: column;
-      padding: 16px;
-      margin-top: 10px;
+    /* --- HEADER FECHADO --- */
+    &:not(.active) {
+      position: relative;
+      margin-left: -$sidePad;
+      margin-right: -$sidePad;
+      padding: 0 $sidePad 10px $sidePad;
+      border-radius: 0;
 
-      .menuLateral__avatar {
-        margin-bottom: 8px;
-        width: 48px;
-        height: 48px;
+      &::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        height: 1px;
+        background: #E1E6EF;
       }
     }
-  }
 
-  &__user-details {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-
-    strong {
-      font-size: 14px;
-      color: #3e5166;
-      font-weight: 700;
-      margin-bottom: 2px;
-    }
-
-    span {
-      font-size: 11px;
-      color: #7a8ba1;
-      margin-bottom: 12px;
-    }
-
-    .btn-sair {
-      display: flex;
+    /* --- HEADER ABERTO (CARD PERFIL) --- */
+    &.active {
+      position: relative;
+      flex-direction: column;
       align-items: center;
-      gap: 6px;
-      background: transparent;
-      border: none;
-      color: #f87171; // Vermelho suave da imagem
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      padding: 4px 8px;
-      
-      &:hover {
-        background-color: rgba(248, 113, 113, 0.05);
-        border-radius: 4px;
+      text-align: center;
+
+      background-color: #ebf1f9;
+      border: 1px solid #d9e2ec;
+      border-radius: 12px;
+
+      padding: 16px;
+      padding-bottom: 48px;
+      margin-top: 10px;
+
+      &::after {
+        display: none;
       }
     }
   }
@@ -88,19 +128,80 @@
     flex-shrink: 0;
   }
 
-  &__brand {
-    span {
-      color: #727A8E;
-      font-family: 'Inter', sans-serif;
-      font-size: 13px;
-      font-style: normal;
-      font-weight: 600;
-      line-height: normal;
-      letter-spacing: -0.13px;
+  &__header.active &__avatar {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+  }
+
+  &__brand span {
+    color: #727A8E;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: -0.13px;
+  }
+
+  /* =====================================================
+     PERFIL ABERTO
+  ====================================================== */
+
+  &__user-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+
+  &__user-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #3e5166;
+    max-width: 210px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__user-sub {
+    font-size: 11px;
+    color: #7a8ba1;
+    line-height: 1.2;
+  }
+
+  &__btn-sair {
+    position: absolute;
+    left: 12px;
+    bottom: 12px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    padding: 6px 10px;
+    border-radius: 8px;
+
+    background: transparent;
+    border: none;
+
+    color: #f87171;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+
+    svg {
+      flex-shrink: 0;
+    }
+
+    &:hover {
+      background-color: rgba(248, 113, 113, 0.08);
     }
   }
 
-  // Card da Instituição
+  /* =====================================================
+     CARD INSTITUIÇÃO
+  ====================================================== */
+
   &__uni-card {
     border: 1px solid #e8eff5;
     border-radius: 10px;
@@ -108,163 +209,112 @@
     display: flex;
     align-items: center;
     gap: 10px;
-  }
 
-  &__uni-logo img { width: 32px; height: auto; }
+    margin-top: 10px;
+    margin-bottom: 18px;
+    position: relative;
 
-  &__uni-info {
-   .menuLateral__uni-label {
-      font-size: 11px;        /* era 10px */
-      font-weight: 600;       /* era normal */
-      color: #66788A;         /* era #94a3b8 (muito claro) */
-      line-height: 1.1;
-    }
-
-    .menuLateral__uni-name {
-      font-size: 14px;
-      color: #3e5166;
-      font-weight: 700;
+    &::after {
+      content: "";
+      position: absolute;
+      left: -$sidePad;
+      right: -$sidePad;
+      bottom: -12px;
+      border-bottom: 1px dashed #DCDDE3;
     }
   }
 
-  &__divider {
-    border: 0;
-    border-top: 1.5px dashed #e2e8f0;
-    margin: 18px 0;
-    width: 100%;
-    display: none;
+  &__uni-logo img {
+    width: 32px;
   }
 
-  &__label {
-    font-size: 13px;
-    font-weight: 700;
-    color: #5d7285;
-    margin-bottom: 8px;
-    display: block;
+  &__uni-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #66788A;
   }
 
-  &__select {
-    width: 100%;
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid #e2e8f0;
-    background-color: #f8fafc;
-    color: #3e5166;
+  &__uni-name {
     font-size: 14px;
-    cursor: pointer;
+    font-weight: 700;
+    color: #3e5166;
   }
+
+  /* =====================================================
+     BOTÕES PRINCIPAIS
+  ====================================================== */
 
   &__actions {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    padding-top: 12px;
   }
 
-  // Botões e Hovers (Baseado na imagem {2C3C819A...})
   &__btn {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 12px 20px;
+
     border: none;
-    background: transparent;
-    color: #4a5d73;
+    border-radius: 30px;
+    background-color: #eef2ff;
+    color: #2e4a67;
+
     font-size: 15px;
     font-weight: 600;
-    border-radius: 30px;
     cursor: pointer;
-    transition: all 0.2s ease;
 
-    svg { color: #7a8ba1; transition: color 0.2s; }
-
-    // Hover dos botões secundários (Fundo azul lavanda claro)
-    &--secondary:hover {
-      background-color: #eff4ff; // Azul suave do hover enviado
-      color: #5a88c0;
-      svg { color: #5a88c0; }
-    }
-
-    &--primary {
-      background-color: #7db0db;
-      color: white;
-      margin-bottom: 4px;
-      box-shadow: 0 4px 10px rgba(125, 176, 219, 0.25);
-      
-      svg { color: white; }
-      &:hover { background-color: #6da0cf; }
-    }
-  }
-}
-
-/* ===== BOTÕES (coordenador / professor / responsável) ===== */
-.menuLateral__btn {
-  background-color: rgba(238, 242, 255, 1);
-  color: rgba(46, 74, 103, 1);
-  border-radius: 30px;
-  transition: background-color .2s ease, color .2s ease, transform .2s ease, box-shadow .2s ease;
-
-  svg {
-    color: rgba(46, 74, 103, 1);
-    transition: color .2s ease;
-  }
-
-  /* ✅ Hover igual ao "active", com efeito */
-  &:hover {
-    background-color: rgba(118, 168, 217, 1);
-    color: rgba(238, 242, 255, 1);
-
-    transform: translateY(-1px);
-    box-shadow: 0 6px 14px rgba(46, 74, 103, 0.14);
+    transition: all .2s ease;
 
     svg {
-      color: rgba(238, 242, 255, 1);
+      color: #2e4a67;
+      transition: color .2s ease;
+    }
+
+    &:hover {
+      background-color: #76A8D9;
+      color: #eef2ff;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(46, 74, 103, 0.14);
+
+      svg {
+        color: #eef2ff;
+      }
+    }
+
+    &.active {
+      background-color: #76A8D9;
+      color: #eef2ff;
+      box-shadow: 0 6px 14px rgba(46, 74, 103, 0.14);
+
+      svg {
+        color: #eef2ff;
+      }
     }
   }
 
-  /* ✅ Active (clicado) */
-  &.active {
-    background-color: rgba(118, 168, 217, 1);
-    color: rgba(238, 242, 255, 1);
-    box-shadow: 0 6px 14px rgba(46, 74, 103, 0.14);
+  /* =====================================================
+     ALUNO (ACORDEÃO)
+  ====================================================== */
 
-    svg {
-      color: rgba(238, 242, 255, 1);
-    }
-  }
-
-  /* ✅ Quando está active e passa o mouse, mantém igual (sem “piscar”) */
-  &.active:hover {
-    transform: translateY(-1px);
-  }
-}
-
-
-.menuLateral {
-  // ---------- ALUNO ----------
   &__materias {
     display: flex;
     flex-direction: column;
     gap: 10px;
   }
 
-  &__materiaWrap {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-
   &__materiaItem {
-    width: 100%;
     border: 1px solid #e8eff5;
-    background: #fff;
     border-radius: 10px;
     padding: 10px 12px;
-    cursor: pointer;
-
+    background: #fff;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 10px;
+    cursor: pointer;
 
     transition: all .2s ease;
 
@@ -284,225 +334,69 @@
     height: 10px;
     border-radius: 999px;
     background: var(--discColor);
-    flex-shrink: 0;
   }
 
   &__materiaTitle {
     flex: 1;
-    text-align: left;
     font-size: 13px;
     font-weight: 700;
     color: #2e4a67;
-    line-height: 1.2;
-  }
-
-  &__chev {
-    color: #94a3b8;
-    flex-shrink: 0;
-    transition: transform .18s ease;
-  }
-
-  &__materiaItem.open &__chev {
-    transform: rotate(90deg);
   }
 
   &__materiaDetails {
     border: 1px solid #e8eff5;
     border-left: 4px solid var(--discColor);
-    background: #fff;
     border-radius: 10px;
     padding: 10px 12px;
+    background: #fff;
 
-    .menuLateral__detailsTitle {
-      font-size: 12px;
-      font-weight: 800;
+    font-size: 12px;
+    color: #526a82;
+
+    strong {
       color: #2e4a67;
-      margin-bottom: 6px;
-    }
-
-    .menuLateral__detailsLine {
-      font-size: 12px;
-      color: #526a82;
-      margin-top: 4px;
-
-      strong {
-        color: #2e4a67;
-        font-weight: 800;
-      }
+      font-weight: 800;
     }
   }
 }
 
-.menuLateral {
-  $sidePad: 16px;
 
-  &__turmaBox {
-    margin-top: 8px;
-    margin-bottom: 22px; /* vai ser controlado pela linha abaixo */
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+/* =========================
+   FIX: linha perto do botão Sair
+========================= */
 
-    position: relative;
-    padding-bottom: 18px; /* espaço até a linha pontilhada */
-  }
-
-  /* ✅ linha pontilhada full-bleed DEPOIS do “Turma atual” */
-  &__turmaBox::after {
-    content: "";
-    position: absolute;
-    left: -$sidePad;
-    right: -$sidePad;
-    bottom: 0;
-    border-bottom: 1px dashed #DCDDE3;
-  }
-
-  /* para os botões não colarem na linha */
-  &__actions {
-    padding-top: 12px;
-  }
-
-
-  &__turmaSelect {
-    width: 100%;
-    height: 40px;
-    padding: 0 12px;
-    border-radius: 8px;
-    border: 1px solid #D7DEE8;
-    background: #FFFFFF;
-    color: #334E68;
-    font-size: 14px;
-    outline: none;
-
-    /* ✅ quando clica (focus) */
-    &:focus {
-      border-color: #76A8D9;
-      box-shadow: 0 0 0 3px rgba(118, 168, 217, 0.22);
-    }
-
-    /* ✅ melhora o “clique” no Chrome/Edge */
-    &:focus-visible {
-      border-color: #76A8D9;
-      box-shadow: 0 0 0 3px rgba(118, 168, 217, 0.22);
-    }
-
-    /* ✅ (opcional) deixa o “anel” mais suave */
-    &:active {
-      border-color: #76A8D9;
-    }
-  }
-
-  /* ⚠️ Options: funciona em alguns navegadores, não em todos */
-  &__turmaSelect option:checked {
-    background: #76A8D9;
-    color: #fff;
-  }
-
-  $sidePad: 16px;
-
-  /* garante que o <hr> não interfira */
-  &__divider {
-    display: none;
-    margin: 0;
-    height: 0;
-    border: 0;
-  }
-
-  /* =========================
-     HEADER (frase) + linha reta
-     ========================= */
-  &__header {
-    /* zera os espaçamentos antigos para não “brigar” */
-    margin: 0;
-    border: 0;
-
-    /* mantém seu layout */
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-
-    /* Quando NÃO está aberto, vira “faixa” full-bleed com linha reta */
-    &:not(.active) {
-      position: relative;
-
-      /* full-bleed */
-      margin-left: -$sidePad;
-      margin-right: -$sidePad;
-      padding-left: $sidePad;
-      padding-right: $sidePad;
-
-      /* ⬆️ sobe a frase e aproxima a linha */
-      padding-top: 0px;     /* diminua para 0px se quiser subir mais */
-      padding-bottom: 9px; /* diminua para “colar” mais na linha */
-
-      border-radius: 0;     /* linha reta sem arredondado */
-    }
-
-    /* linha reta */
-    &:not(.active)::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 1px;
-      background: #E1E6EF;
-    }
-
-    /* Quando está active (perfil aberto), mantém seu “card” e tira a linha full-bleed */
-    &.active {
-      margin-top: 10px;
-      border-radius: 12px;
-      border: 1px solid #d9e2ec;
-      background-color: #ebf1f9;
-
-      /* importante: não usar full-bleed no active */
-      margin-left: 0;
-      margin-right: 0;
-
-      /* o padding do active você já tinha */
-      padding: 16px;
-      flex-direction: column;
-
-      &::after {
-        display: none;
-      }
-    }
-  }
-
-  /* =========================
-     CARD FACULDADE + linha pontilhada abaixo
-     ========================= */
-  &__uni-card {
-    /* mantém seu card */
-    border: 1px solid #e8eff5;
-    border-radius: 10px;
-    padding: 10px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    /* espaço acima menor e estável */
-    margin-top: 10px;
-
-    /* cria um “gap” até a linha pontilhada (igual Figma) */
-    margin-bottom: 18px;
-
-    position: relative;
-  }
-
-  /* linha pontilhada full-bleed abaixo do card */
-  &__uni-card::after {
-    content: "";
-    position: absolute;
-    left: -$sidePad;
-    right: -$sidePad;
-
-    /* distância da linha em relação ao card (ajuste fino) */
-    bottom: -12px;
-
-    border-bottom: 1px dashed #DCDDE3;
-  }
+/* 1) Garante que o header aberto não tenha nenhuma “linha” extra */
+.menuLateral__header.active {
+  border-bottom: 0 !important;
+  box-shadow: none !important;
 }
+
+/* 2) Se existir algum ::after antigo vazando, mata */
+.menuLateral__header.active::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* 3) Remove qualquer separador interno que possa estar aparecendo */
+.menuLateral__header.active hr,
+.menuLateral__header.active .menuLateral__divider {
+  display: none !important;
+}
+
+/* 4) Zera qualquer “linha” vinda do botão (borda/outline/sombra) */
+.menuLateral__btn-sair {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 5) Remove highlight/linha ao clicar (Chrome/Safari) */
+.menuLateral__btn-sair:focus,
+.menuLateral__btn-sair:focus-visible,
+.menuLateral__btn-sair:active {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+
