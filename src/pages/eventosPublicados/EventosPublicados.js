@@ -250,7 +250,10 @@ export default function EventosPublicados() {
     apenasCoordenadores,
   ]);
 
-  const handleEditar = (eventoId) => navigate(`/eventos/${eventoId}/editar`);
+  const handleEditar = (eventoId, ev) => {
+    if (isDataEventoPassada(ev?.dataEvento)) return; // bloqueia edição de evento passado
+    navigate(`/eventos/${eventoId}/editar`);
+  };
 
   if (!user && !usuarioLogado) {
     return (
@@ -266,6 +269,19 @@ export default function EventosPublicados() {
         </div>
       </div>
     );
+  }
+
+  function startOfDay(d) {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    return x;
+  }
+
+  function isDataEventoPassada(dataEvento) {
+    if (!dataEvento) return false; // se não tem dataEvento, não bloqueia (ajuste se quiser)
+    const dt = new Date(dataEvento);
+    if (Number.isNaN(dt.getTime())) return false;
+    return startOfDay(dt).getTime() < startOfDay(new Date()).getTime();
   }
 
   return (
@@ -293,7 +309,7 @@ export default function EventosPublicados() {
                 aria-pressed={apenasCoordenadores}
                 title="Apenas eventos criados por coordenadores"
               >
-                Criado por coordenadores
+                Criados por essa coordenação
                 <span
                   className={`filtros-pill-dot ${apenasCoordenadores ? "is-filled" : "is-empty"}`}
                   aria-hidden="true"
@@ -346,8 +362,9 @@ export default function EventosPublicados() {
             const dataEventoFmt = temDataEvento
               ? formatarDataPtBR(ev.dataEvento)
               : "";
+            const eventoPassado = isDataEventoPassada(ev.dataEvento);
+            const podeEditar = !!ev.calendario && !eventoPassado;
 
-            const podeEditar = !!ev.calendario;
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
 
@@ -419,10 +436,19 @@ export default function EventosPublicados() {
                   {podeEditar && (
                     <button
                       type="button"
-                      className="btn-editar-icononly"
-                      onClick={() => handleEditar(ev.id)}
-                      aria-label="Editar evento"
-                      title="Editar"
+                      className={`btn-editar-icononly ${eventoPassado ? "is-disabled" : ""}`}
+                      onClick={() => handleEditar(ev.id, ev)}
+                      disabled={eventoPassado}
+                      aria-label={
+                        eventoPassado
+                          ? "Edição bloqueada (evento já ocorreu)"
+                          : "Editar evento"
+                      }
+                      title={
+                        eventoPassado
+                          ? "Não é possível editar eventos com data anterior"
+                          : "Editar"
+                      }
                     >
                       <Pencil size={16} />
                     </button>
