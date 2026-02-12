@@ -141,10 +141,20 @@ export default function EventosPublicados() {
     );
   }, [usuarioLogado]);
 
-  const tipo = useMemo(
-    () => getTipoUsuario(user || usuarioLogado),
-    [user, usuarioLogado],
-  );
+  const userReal = useMemo(() => {
+    const id = usuarioLogado?.id;
+    if (!id) return null;
+    return (
+      (data.usuarios || []).find((u) => Number(u.id) === Number(id)) || null
+    );
+  }, [usuarioLogado]);
+
+  const tipo = useMemo(() => {
+    // 👇 Só confia no JSON (fonte de verdade)
+    return String(userReal?.tipo || "")
+      .toLowerCase()
+      .trim();
+  }, [userReal]);
 
   const isCoordenador = tipo === "coordenador";
   const isProfessor = tipo === "professor";
@@ -166,6 +176,14 @@ export default function EventosPublicados() {
     const t = getTipoUsuario(criador);
     return t === "coordenador";
   }
+
+  useEffect(() => {
+  if (!isCoordenador) {
+    setBusca("");
+    setApenasCoordenadores(false);
+  }
+}, [isCoordenador]);
+
 
   const eventosFiltrados = useMemo(() => {
     if (!user && !usuarioLogado) return [];
@@ -292,65 +310,44 @@ export default function EventosPublicados() {
           <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
         </header>
 
-        {/* ✅ Filtros só para coordenador */}
-        {isCoordenador && (
-          <section className="filtros-card">
-            <div className="filtros-top">
-              <div className="filtros-title">
-                <Filter size={16} className="filtros-icon" aria-hidden="true" />
-                Filtros
-              </div>
+       {/* ✅ FILTROS APENAS PARA COORDENADOR */}
+{isCoordenador && (
+  <section className="filtros-card">
+    <div className="filtros-top">
+      <div className="filtros-title">
+        <Filter size={16} className="filtros-icon" aria-hidden="true" />
+        Filtros
+      </div>
 
-              {/* ✅ UM ÚNICO BOTÃO (toggle) */}
-              <button
-                type="button"
-                className={`filtros-pill ${apenasCoordenadores ? "is-on" : ""}`}
-                onClick={() => setApenasCoordenadores((v) => !v)}
-                aria-pressed={apenasCoordenadores}
-                title="Apenas eventos criados por coordenadores"
-              >
-                Criados por essa coordenação
-                <span
-                  className={`filtros-pill-dot ${apenasCoordenadores ? "is-filled" : "is-empty"}`}
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
+      <button
+        type="button"
+        className={`filtros-pill ${apenasCoordenadores ? "is-on" : ""}`}
+        onClick={() => setApenasCoordenadores((v) => !v)}
+        aria-pressed={apenasCoordenadores}
+        title="Apenas eventos criados por coordenadores"
+      >
+        Criados por essa coordenação
+        <span
+          className={`filtros-pill-dot ${
+            apenasCoordenadores ? "is-filled" : "is-empty"
+          }`}
+          aria-hidden="true"
+        />
+      </button>
+    </div>
 
-            <div className="filtros-row">
-              <div className="filtro-search">
-                <Search
-                  size={16}
-                  className="filtro-search__icon"
-                  aria-hidden="true"
-                />
-                <input
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                  placeholder="Buscar por nome, disciplina ou professor..."
-                />
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ✅ Para não-coordenador: NÃO mostra o card de filtros */}
-        {!isCoordenador && (
-          <div className="filtros-row only-search">
-            <div className="filtro-search">
-              <Search
-                size={16}
-                className="filtro-search__icon"
-                aria-hidden="true"
-              />
-              <input
-                value={busca}
-                onChange={(e) => setBusca(e.target.value)}
-                placeholder="Buscar por nome, disciplina ou professor..."
-              />
-            </div>
-          </div>
-        )}
+    <div className="filtros-row">
+      <div className="filtro-search">
+        <Search size={16} className="filtro-search__icon" aria-hidden="true" />
+        <input
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          placeholder="Buscar por nome, disciplina ou professor..."
+        />
+      </div>
+    </div>
+  </section>
+)}
 
         <div className="eventos-publicados-list">
           {eventosFiltrados.map((ev) => {

@@ -1,29 +1,30 @@
+/* EditarEvento.scss */
+
 @import "../criarEvento/CriarEvento.scss";
 
 .painel-evento.editar-evento {
-    justify-content: flex-start;
-    align-items: flex-start;
-    margin-top: -12px;
+  justify-content: flex-start;
+  align-items: flex-start;
+  margin-top: -12px;
 }
 
 .painel-evento.editar-evento .editar-wrapper {
-    width: min(1128px, calc(100% - 10px));
-    margin: 0 auto; 
-    display: flex;
-    flex-direction: column;
-    padding-top: 8px;
+  width: min(1128px, calc(100% - 10px));
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  padding-top: 8px;
 }
 
 .painel-evento.editar-evento .editar-topbar {
   width: min(1128px, calc(100% - 10px));
-  margin: 0 auto;           
-  padding-top: 0px;         
-  padding-bottom: 15px;     
+  margin: 0 auto;
+  padding-top: 0px;
+  padding-bottom: 15px;
   display: flex;
   align-items: center;
   justify-content: flex-start;
 }
-
 
 .painel-evento.editar-evento .btn-voltar {
   border: 0;
@@ -39,8 +40,8 @@
   color: rgba(51, 78, 104, 0.85);
 
   font-family: "Inter", sans-serif;
-  font-size: 15px;        /* um pouco maior */
-  font-weight: 600;       /* <<< deixa o texto mais grosso */
+  font-size: 15px;
+  font-weight: 600;
 
   &:hover {
     color: rgba(51, 78, 104, 1);
@@ -52,35 +53,21 @@
 }
 
 .painel-evento.editar-evento .btn-voltar__seta {
-  font-size: 20px;        /* <<< seta maior */
-  font-weight: 700;       /* <<< seta mais grossa */
+  font-size: 20px;
+  font-weight: 700;
   line-height: 1;
-
-  /* truque visual para “engrossar” ainda mais */
   text-shadow: 0.3px 0 0 currentColor;
 }
-
-
-.painel-evento.editar-evento .item-bolinha--disabled {
-  cursor: default;
-
-  &:hover { background: transparent; }
-}
-
-/* mantém seu import */
-@import "../criarEvento/CriarEvento.scss";
-
-/* ...seu CSS atual fica... */
 
 .painel-evento.editar-evento .container-btn {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center; /* botão salvar fica central */
+  justify-content: center; /* botão salvar central */
   margin-top: 12px;
 }
 
-/* Botão excluir no canto direito, estilo “pill” com borda vermelha */
+/* Botão excluir no canto direito */
 .painel-evento.editar-evento .btn-excluir {
   position: absolute;
   right: 0;
@@ -108,25 +95,8 @@
   }
 }
 
-/* Quando “Aviso no calendário” estiver desmarcado, desabilita o datepicker */
-.painel-evento.editar-evento .input-calendario-wrapper.is-disabled {
-  opacity: 0.55;
-}
-
-/* Se você quiser impedir clique totalmente via wrapper também (além do disabled do DatePicker) */
-.painel-evento.editar-evento .input-calendario-wrapper.is-disabled .date-input {
-  cursor: not-allowed;
-}
-
-
-/* Garante alinhamento e não “encolhe” */
-.calendario-customizado .react-datepicker__week {
-  display: flex;
-}
-
-
 .popper-calendario {
-  margin-top: 0px; /* desce um pouco */
+  margin-top: 0px;
 }
 
 .contador-campo {

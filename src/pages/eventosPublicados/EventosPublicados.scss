@@ -389,3 +389,12 @@
   cursor: not-allowed;
   pointer-events: none;
 }
+
+.filtros-row.only-search {
+  margin-bottom: 16px;
+
+  .filtro-search {
+    box-shadow: none;
+    border-radius: 12px;
+  }
+}

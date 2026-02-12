@@ -1,15 +1,20 @@
+// EditarEvento.jsx
 import React, { useEffect, useMemo, useState, forwardRef } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ptBR from "date-fns/locale/pt-BR";
 import Swal from "sweetalert2";
-import { Calendar } from "lucide-react";
+import { Calendar, X } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { ReactComponent as ArrowLeftIcon } from "../../assets/seta.svg";
 import dados from "../../data/dados.json";
 import "./EditarEvento.scss";
 
-import { getEventos, upsertEvento, deleteEvento } from "../../services/eventosStore";
+import {
+  getEventos,
+  upsertEvento,
+  deleteEvento,
+} from "../../services/eventosStore";
 
 registerLocale("pt-BR", ptBR);
 
@@ -49,6 +54,32 @@ function parseDataEvento(ev) {
   return null;
 }
 
+function getUsuarioLogado() {
+  try {
+    return JSON.parse(localStorage.getItem("usuario")) || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * TURMAS = disciplinas da instituição do usuário logado
+ */
+function getTurmasDisponiveis({ instituicaoId }) {
+  const disciplinas = Array.isArray(dados?.disciplinas) ? dados.disciplinas : [];
+
+  return disciplinas
+    .filter((d) => Number(d?.instituicaoId) === Number(instituicaoId))
+    .map((d) => ({
+      id: Number(d.id),
+      nome:
+        typeof d?.nome === "string" && d.nome.trim()
+          ? d.nome
+          : `Turma ${d?.id ?? ""}`.trim(),
+    }))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}
+
 const EditarEvento = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -65,13 +96,61 @@ const EditarEvento = () => {
     destaque: false,
   });
 
-  const usuarioLogado = useMemo(() => {
-    try {
-      return JSON.parse(localStorage.getItem("usuario")) || null;
-    } catch {
-      return null;
-    }
-  }, []);
+  const usuarioLogado = useMemo(() => getUsuarioLogado(), []);
+
+  const isCoordenador = useMemo(() => {
+    const raw = usuarioLogado?.tipo ?? usuarioLogado?.cargo ?? "";
+    return String(raw).toLowerCase().trim() === "coordenador";
+  }, [usuarioLogado]);
+
+  const instituicaoId = useMemo(() => {
+    const inst = Number(usuarioLogado?.faculdadeId);
+    return Number.isFinite(inst) && inst > 0 ? inst : null;
+  }, [usuarioLogado]);
+
+  // ✅ Turmas disponíveis (para coordenador)
+  const turmasDisponiveis = useMemo(() => {
+    if (!isCoordenador) return [];
+    if (!instituicaoId) return [];
+    return getTurmasDisponiveis({ instituicaoId });
+  }, [isCoordenador, instituicaoId]);
+
+  const turmaIdToNome = useMemo(() => {
+    const m = new Map();
+    turmasDisponiveis.forEach((t) => m.set(Number(t.id), t.nome));
+    return m;
+  }, [turmasDisponiveis]);
+
+  // ✅ UI Turmas (igual CriarEvento)
+  const [modoTurmas, setModoTurmas] = useState("all"); // "all" | "some"
+  const [turmaSelecionadaId, setTurmaSelecionadaId] = useState("");
+  const [turmasIds, setTurmasIds] = useState([]); // selecionadas (some)
+
+  const setAllTurmas = () => {
+    setModoTurmas("all");
+    setTurmaSelecionadaId("");
+    setTurmasIds([]);
+  };
+
+  const setSomeTurmas = () => {
+    setModoTurmas("some");
+    setTurmaSelecionadaId("");
+    // não limpa turmasIds para não perder seleção
+  };
+
+  const addTurma = () => {
+    if (modoTurmas !== "some") return;
+
+    const idNum = Number(turmaSelecionadaId);
+    if (!idNum || Number.isNaN(idNum)) return;
+
+    setTurmasIds((prev) => (prev.includes(idNum) ? prev : [...prev, idNum]));
+    setTurmaSelecionadaId("");
+  };
+
+  const removeTurma = (id) => {
+    setTurmasIds((prev) => prev.filter((x) => x !== Number(id)));
+  };
 
   // 🔹 Busca evento final (base + overrides) pelo id
   const getEventoAtual = () => {
@@ -80,6 +159,7 @@ const EditarEvento = () => {
     return todos.find((e) => String(e.id) === String(id)) || null;
   };
 
+  // ✅ carrega evento + inicializa turmas já selecionadas
   useEffect(() => {
     const evento = getEventoAtual();
 
@@ -124,13 +204,41 @@ const EditarEvento = () => {
     setDescricao(evento.descricao || "");
 
     setNotificacoes({
-      calendario: !!evento.calendario, // inicia com o que existe
+      calendario: !!evento.calendario,
       destaque: !!evento.destaque,
     });
 
     setStartDate(parseDataEvento(evento));
+
+    // ✅ inicializa turmas do evento (somente coordenador)
+    // evento.turmasIds é o padrão criado no CriarEvento
+    if (isCoordenador) {
+      const idsEv = Array.isArray(evento?.turmasIds)
+        ? evento.turmasIds.map(Number).filter((n) => Number.isFinite(n) && n > 0)
+        : [];
+
+      const idsAll = turmasDisponiveis.map((t) => Number(t.id)).filter(Boolean);
+
+      // Se idsEv está vazio, assumimos "all" (ou evento antigo sem turmasIds)
+      // Se idsEv cobre todas as turmas disponíveis, "all"
+      // Caso contrário, "some" com os ids atuais
+      const allSet = new Set(idsAll);
+      const evSet = new Set(idsEv.filter((x) => allSet.has(Number(x))));
+      const cobreTudo = idsAll.length > 0 && idsAll.every((x) => evSet.has(x));
+
+      if (!idsEv.length || cobreTudo) {
+        setModoTurmas("all");
+        setTurmasIds([]); // quando all, chips ficam ocultos (igual CriarEvento)
+      } else {
+        setModoTurmas("some");
+        setTurmasIds(Array.from(evSet));
+      }
+
+      setTurmaSelecionadaId("");
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, navigate, usuarioLogado]);
+  }, [id, navigate, usuarioLogado, isCoordenador, turmasDisponiveis]);
 
   const handleSalvar = async () => {
     if (!titulo.trim()) {
@@ -166,6 +274,18 @@ const EditarEvento = () => {
       return;
     }
 
+    // ✅ se coordenador estiver em "Selecionar", exige 1+ turma
+    if (isCoordenador && modoTurmas === "some" && turmasIds.length === 0) {
+      Swal.fire({
+        title: "Selecione ao menos uma turma",
+        text: "Você está em 'Selecionar'. Adicione pelo menos uma turma ou troque para 'Todas'.",
+        icon: "warning",
+        confirmButtonText: "Ok",
+        confirmButtonColor: "#2E4A67",
+      });
+      return;
+    }
+
     try {
       Swal.fire({
         title: "Salvando alterações...",
@@ -173,7 +293,6 @@ const EditarEvento = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      // opcional: simular latência
       await new Promise((resolve) => setTimeout(resolve, 600));
 
       const original = getEventoAtual();
@@ -190,6 +309,18 @@ const EditarEvento = () => {
             ).toISOString()
           : null;
 
+      // ✅ regra final turmasIds (somente coordenador)
+      const turmasIdsFinal = isCoordenador
+        ? Array.from(
+            new Set(
+              (modoTurmas === "all"
+                ? turmasDisponiveis.map((t) => Number(t.id))
+                : turmasIds
+              ).filter((x) => Number.isFinite(x) && x > 0),
+            ),
+          )
+        : undefined;
+
       const atualizado = {
         ...original,
         titulo: titulo.trim(),
@@ -197,12 +328,13 @@ const EditarEvento = () => {
         calendario: !!notificacoes.calendario,
         destaque: !!notificacoes.destaque,
         ...(dataEventoISO ? { dataEvento: dataEventoISO } : {}),
-        // Se desligou calendário, remova a dataEvento do objeto final
         ...(dataEventoISO ? {} : { dataEvento: undefined }),
         ultimaAtualizacao: agoraISO,
+
+        // ✅ salva as turmas (coordenador)
+        ...(isCoordenador ? { turmasIds: turmasIdsFinal } : {}),
       };
 
-      // remove campos undefined antes de salvar
       Object.keys(atualizado).forEach((k) => {
         if (atualizado[k] === undefined) delete atualizado[k];
       });
@@ -274,38 +406,25 @@ const EditarEvento = () => {
     }
   };
 
-  const InputDataComIcone = forwardRef(
-    ({ value, onClick, placeholder }, ref) => {
-      return (
-        <button
-          type="button"
-          className="date-input"
-          onClick={onClick}
-          ref={ref}
-        >
-          <span className="date-input__icon" aria-hidden="true">
-            <Calendar size={16} />
-          </span>
+  const InputDataComIcone = forwardRef(({ value, onClick, placeholder }, ref) => {
+    return (
+      <button type="button" className="date-input" onClick={onClick} ref={ref}>
+        <span className="date-input__icon" aria-hidden="true">
+          <Calendar size={16} />
+        </span>
 
-          <span
-            className={value ? "date-input__value" : "date-input__placeholder"}
-          >
-            {value || placeholder}
-          </span>
-        </button>
-      );
-    },
-  );
+        <span className={value ? "date-input__value" : "date-input__placeholder"}>
+          {value || placeholder}
+        </span>
+      </button>
+    );
+  });
 
   return (
     <div className="painel-evento editar-evento">
       <div className="editar-wrapper">
         <div className="editar-topbar">
-          <button
-            type="button"
-            className="btn-voltar"
-            onClick={() => navigate(-1)}
-          >
+          <button type="button" className="btn-voltar" onClick={() => navigate(-1)}>
             <span className="btn-voltar__seta" aria-hidden="true">
               <ArrowLeftIcon className="icon-arrow" />
             </span>
@@ -356,7 +475,103 @@ const EditarEvento = () => {
               </div>
             </div>
 
-            <div className="campo">
+            {/* ✅ TURMAS (SOMENTE COORDENADOR) */}
+            {isCoordenador && (
+              <section className="card-bloco" style={{ padding: 0, boxShadow: "none" }}>
+                <h2 className="titulo-bloco" style={{ marginTop: 8 }}>
+                  Turmas
+                </h2>
+
+                <div className="turmas-toggle">
+                  <button
+                    type="button"
+                    className={`turmas-toggle__btn ${
+                      modoTurmas === "all" ? "is-active" : ""
+                    }`}
+                    onClick={setAllTurmas}
+                  >
+                    Todas
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`turmas-toggle__btn ${
+                      modoTurmas === "some" ? "is-active" : ""
+                    }`}
+                    onClick={setSomeTurmas}
+                  >
+                    Selecionar
+                  </button>
+                </div>
+
+                <div className="campo" style={{ marginBottom: 0 }}>
+                  <div className="turmas-select-row">
+                    <div className="select-wrap">
+                      <select
+                        className="select-estilizado"
+                        value={turmaSelecionadaId}
+                        onChange={(e) => setTurmaSelecionadaId(e.target.value)}
+                        disabled={modoTurmas === "all"}
+                      >
+                        <option value="" disabled>
+                          Selecionar turma
+                        </option>
+
+                        {turmasDisponiveis
+                          .filter((t) => !turmasIds.includes(Number(t.id)))
+                          .map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.nome}
+                            </option>
+                          ))}
+                      </select>
+
+                      <span className="select-arrow" aria-hidden="true">
+                        ▾
+                      </span>
+                    </div>
+
+                    <button
+                      type="button"
+                      className="btn-add-turma"
+                      onClick={addTurma}
+                      disabled={modoTurmas === "all" || !turmaSelecionadaId}
+                    >
+                      Adicionar
+                    </button>
+                  </div>
+
+                  {modoTurmas === "some" && turmasIds.length > 0 && (
+                    <div className="turmas-chips">
+                      {turmasIds.map((tid) => (
+                        <div className="chip-turma" key={tid}>
+                          <span className="chip-text">
+                            {turmaIdToNome.get(tid) || `Turma ${tid}`}
+                          </span>
+                          <button
+                            type="button"
+                            className="chip-remove"
+                            onClick={() => removeTurma(tid)}
+                            aria-label="Remover turma"
+                            title="Remover"
+                          >
+                            <X size={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {modoTurmas === "all" && (
+                    <div className="turmas-info">
+                      Todas as turmas desta instituição serão notificadas.
+                    </div>
+                  )}
+                </div>
+              </section>
+            )}
+
+            <div className="campo" style={{ marginTop: 18 }}>
               <label className="label-notificacao">Tipo de notificação</label>
 
               <div className="opcoes-bolinha">
@@ -435,17 +650,11 @@ const EditarEvento = () => {
                     dateFormat="dd/MM/yyyy"
                     minDate={new Date()}
                     placeholderText="Escolha uma data"
-                    customInput={
-                      <InputDataComIcone placeholder="Escolha uma data" />
-                    }
+                    customInput={<InputDataComIcone placeholder="Escolha uma data" />}
                     calendarClassName="calendario-customizado"
                     popperClassName="popper-calendario"
                     showPopperArrow={false}
-                    renderCustomHeader={({
-                      date,
-                      decreaseMonth,
-                      increaseMonth,
-                    }) => {
+                    renderCustomHeader={({ date, decreaseMonth, increaseMonth }) => {
                       const hoje = new Date();
                       const firstOfCurrentMonth = new Date(
                         hoje.getFullYear(),
@@ -457,8 +666,7 @@ const EditarEvento = () => {
                         date.getMonth(),
                         1,
                       );
-                      const prevDisabled =
-                        firstOfShownMonth <= firstOfCurrentMonth;
+                      const prevDisabled = firstOfShownMonth <= firstOfCurrentMonth;
 
                       return (
                         <div className="cal-header cal-header--figma">
@@ -506,11 +714,7 @@ const EditarEvento = () => {
                 Salvar alterações
               </button>
 
-              <button
-                type="button"
-                className="btn-excluir"
-                onClick={handleExcluir}
-              >
+              <button type="button" className="btn-excluir" onClick={handleExcluir}>
                 Excluir evento
               </button>
             </div>
