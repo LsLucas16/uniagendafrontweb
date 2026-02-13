@@ -37,7 +37,7 @@ function normStr(s) {
  * Pega as turmas/disciplinas associadas ao evento:
  * - turmasIds (novo)
  * - disciplinaId (pode ser number ou array)
- * - disciplinaCoordenadorId / disciplinacoordenadorId / disciplinCoordenadoraId / etc (chaves inconsistentes do JSON)
+ * - disciplinaCoordenadorId / etc (chaves inconsistentes do JSON)
  */
 function getTurmasDoEvento(ev) {
   const fromTurmasIds =
@@ -80,6 +80,154 @@ function getTipoUsuario(u) {
   return String(raw).toLowerCase().trim();
 }
 
+/* =========================
+   Cards (2 variantes Figma)
+========================= */
+
+function CardCoordenador({
+  ev,
+  criadoPor,
+  dataAtual,
+  temDataEvento,
+  dataEventoFmt,
+  podeEditar,
+  eventoPassado,
+  handleEditar,
+  temCalendario,
+  temDestaque,
+  turmasOrdenadas,
+  mostrarTodasTurmas,
+}) {
+  return (
+    <article key={ev.id} className="evento-card evento-card--coord">
+      <div className="evento-card-top">
+        <div className="evento-card-titleblock">
+          <div className="evento-card-createdbyline">
+            Criado por: <strong>{criadoPor}</strong>
+          </div>
+
+          <div className="evento-card-title">{ev.titulo}</div>
+          <div className="evento-card-desc">{ev.descricao}</div>
+
+          {turmasOrdenadas.length > 0 && (
+            <div className="evento-card-turmaschips">
+              {(mostrarTodasTurmas ? turmasOrdenadas : turmasOrdenadas.slice(0, 1)).map((t) => (
+                <span key={t.id} className="chip chip--turma">
+                  {t.nome}
+                </span>
+              ))}
+            </div>
+          )}
+
+          <div className="evento-card-meta">
+            <div className="evento-card-dates">
+              {temDataEvento && <span>Data do evento: {dataEventoFmt}</span>}
+
+              <div className="evento-card-lastline">
+                <span>Última atualização: {dataAtual}</span>
+
+                {(temCalendario || temDestaque) && (
+                  <div className="evento-card-chips">
+                    {temCalendario && (
+                      <span className="chip chip--calendario">Calendário</span>
+                    )}
+                    {temDestaque && (
+                      <span className="chip chip--destaque">Destaque</span>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {podeEditar && (
+          <button
+            type="button"
+            className={`btn-editar-icononly ${eventoPassado ? "is-disabled" : ""}`}
+            onClick={() => handleEditar(ev.id, ev)}
+            disabled={eventoPassado}
+            aria-label={
+              eventoPassado
+                ? "Edição bloqueada (evento já ocorreu)"
+                : "Editar evento"
+            }
+            title={
+              eventoPassado
+                ? "Não é possível editar eventos com data anterior"
+                : "Editar"
+            }
+          >
+            <Pencil size={16} />
+          </button>
+        )}
+      </div>
+    </article>
+  );
+}
+
+function CardDefault({
+  ev,
+  criadoPor,
+  dataAtual,
+  temDataEvento,
+  dataEventoFmt,
+  podeEditar,
+  eventoPassado,
+  handleEditar,
+  temCalendario,
+  temDestaque,
+}) {
+  return (
+    <article key={ev.id} className="evento-card evento-card--default">
+      <div className="evento-default-top">
+        <div className="evento-default-left">
+          <div className="evento-default-title">{ev.titulo}</div>
+
+          <div className="evento-default-date">
+            {temDataEvento ? `Data do evento: ${dataEventoFmt}` : "\u00A0"}
+          </div>
+
+          {(temCalendario || temDestaque) && (
+            <div className="evento-default-chips">
+              {temCalendario && (
+                <span className="chip chip--calendario">Calendário</span>
+              )}
+              {temDestaque && (
+                <span className="chip chip--destaque">Destaque</span>
+              )}
+            </div>
+          )}
+        </div>
+
+        {podeEditar && (
+          <button
+            type="button"
+            className={`btn-editar-text ${eventoPassado ? "is-disabled" : ""}`}
+            onClick={() => handleEditar(ev.id, ev)}
+            disabled={eventoPassado}
+            title={
+              eventoPassado
+                ? "Não é possível editar eventos com data anterior"
+                : "Editar"
+            }
+          >
+            <Pencil size={14} />
+            <span>Editar</span>
+          </button>
+        )}
+      </div>
+
+      {ev.descricao ? <div className="evento-default-desc">{ev.descricao}</div> : null}
+
+      <div className="evento-default-bottom">
+        <div className="evento-default-created">Criado por: {criadoPor}</div>
+        <div className="evento-default-updated">Última atualização: {dataAtual}</div>
+      </div>
+    </article>
+  );
+}
+
 export default function EventosPublicados() {
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const navigate = useNavigate();
@@ -89,10 +237,10 @@ export default function EventosPublicados() {
 
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // busca (mantive para todos)
+  // busca (vamos usar para todos, mas UI só aparece para coordenador)
   const [busca, setBusca] = useState("");
 
-  // ✅ ÚNICO filtro do coordenador (toggle): false = mostra todos / true = só eventos criados por coordenadores
+  // ✅ toggle do coordenador
   const [apenasCoordenadores, setApenasCoordenadores] = useState(false);
 
   useEffect(() => {
@@ -112,10 +260,7 @@ export default function EventosPublicados() {
     window.addEventListener("eventos:changed", onEventosChanged);
 
     return () => {
-      window.removeEventListener(
-        "disciplinaAtual:changed",
-        onDisciplinaChanged,
-      );
+      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("eventos:changed", onEventosChanged);
     };
@@ -141,20 +286,9 @@ export default function EventosPublicados() {
     );
   }, [usuarioLogado]);
 
-  const userReal = useMemo(() => {
-    const id = usuarioLogado?.id;
-    if (!id) return null;
-    return (
-      (data.usuarios || []).find((u) => Number(u.id) === Number(id)) || null
-    );
-  }, [usuarioLogado]);
-
   const tipo = useMemo(() => {
-    // 👇 Só confia no JSON (fonte de verdade)
-    return String(userReal?.tipo || "")
-      .toLowerCase()
-      .trim();
-  }, [userReal]);
+    return String(user?.tipo || "").toLowerCase().trim();
+  }, [user]);
 
   const isCoordenador = tipo === "coordenador";
   const isProfessor = tipo === "professor";
@@ -164,13 +298,12 @@ export default function EventosPublicados() {
   const userTurmasSet = useMemo(() => {
     const ids =
       (Array.isArray(user?.disciplinas) && user.disciplinas) ||
-      (Array.isArray(usuarioLogado?.disciplinas) &&
-        usuarioLogado.disciplinas) ||
+      (Array.isArray(usuarioLogado?.disciplinas) && usuarioLogado.disciplinas) ||
       [];
     return new Set(ids.map(Number).filter(Number.isFinite));
   }, [user, usuarioLogado]);
 
-  // ✅ normaliza "coordenador" no evento baseado em quem criou (criadoPorId)
+  // ✅ evento criado por coordenador (via criadoPorId)
   function isEventoCriadoPorCoordenador(ev) {
     const criador = usuariosById.get(Number(ev?.criadoPorId));
     const t = getTipoUsuario(criador);
@@ -178,12 +311,24 @@ export default function EventosPublicados() {
   }
 
   useEffect(() => {
-  if (!isCoordenador) {
-    setBusca("");
-    setApenasCoordenadores(false);
-  }
-}, [isCoordenador]);
+    if (!isCoordenador) {
+      setBusca("");
+      setApenasCoordenadores(false);
+    }
+  }, [isCoordenador]);
 
+  function startOfDay(d) {
+    const x = new Date(d);
+    x.setHours(0, 0, 0, 0);
+    return x;
+  }
+
+  function isDataEventoPassada(dataEvento) {
+    if (!dataEvento) return false;
+    const dt = new Date(dataEvento);
+    if (Number.isNaN(dt.getTime())) return false;
+    return startOfDay(dt).getTime() < startOfDay(new Date()).getTime();
+  }
 
   const eventosFiltrados = useMemo(() => {
     if (!user && !usuarioLogado) return [];
@@ -196,62 +341,58 @@ export default function EventosPublicados() {
 
     const q = normStr(busca);
 
-    return (
-      eventosFinal
-        .filter((ev) => Number(ev.instituicaoId) === instId)
+    return eventosFinal
+      .filter((ev) => Number(ev.instituicaoId) === instId)
 
-        // ✅ ÚNICO filtro: apenas coordenadores (quando toggle ligado)
-        .filter((ev) => {
-          if (!isCoordenador) return true;
-          if (!apenasCoordenadores) return true;
-          return isEventoCriadoPorCoordenador(ev);
-        })
+      // ✅ filtro toggle (só coordenador vê/usa)
+      .filter((ev) => {
+        if (!isCoordenador) return true;
+        if (!apenasCoordenadores) return true;
+        return isEventoCriadoPorCoordenador(ev);
+      })
 
-        .filter((ev) => {
-          const turmasEv = getTurmasDoEvento(ev);
+      // filtro por permissão/turma
+      .filter((ev) => {
+        const turmasEv = getTurmasDoEvento(ev);
 
-          if (isCoordenador) {
-            const meuId = Number(user?.id ?? usuarioLogado?.id);
-            const criou = Number(ev.criadoPorId) === meuId;
-            if (criou) return true;
+        if (isCoordenador) {
+          const meuId = Number(user?.id ?? usuarioLogado?.id);
+          const criou = Number(ev.criadoPorId) === meuId;
+          if (criou) return true;
 
-            if (!userTurmasSet || userTurmasSet.size === 0) return true;
+          if (!userTurmasSet || userTurmasSet.size === 0) return true;
+          return turmasEv.some((id) => userTurmasSet.has(Number(id)));
+        }
 
-            return turmasEv.some((id) => userTurmasSet.has(Number(id)));
-          }
-
-          if (isProfessor || isResponsavel || isAluno) {
-            if (!discAtualNum) return true;
-            return turmasEv.includes(discAtualNum);
-          }
-
+        if (isProfessor || isResponsavel || isAluno) {
           if (!discAtualNum) return true;
           return turmasEv.includes(discAtualNum);
-        })
+        }
 
-        .filter((ev) => {
-          if (!q) return true;
+        if (!discAtualNum) return true;
+        return turmasEv.includes(discAtualNum);
+      })
 
-          const criadoPor =
-            usuariosById.get(Number(ev.criadoPorId))?.nome || "";
-          const turmasEv = getTurmasDoEvento(ev);
+      // busca (se coordenador)
+      .filter((ev) => {
+        if (!q) return true;
 
-          const nomesTurmas = (turmasEv || [])
-            .map((id) => disciplinasById.get(Number(id))?.nome || `Turma ${id}`)
-            .join(" ");
+        const criadoPor = usuariosById.get(Number(ev.criadoPorId))?.nome || "";
+        const turmasEv = getTurmasDoEvento(ev);
 
-          const hay = normStr(
-            `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`,
-          );
-          return hay.includes(q);
-        })
+        const nomesTurmas = (turmasEv || [])
+          .map((id) => disciplinasById.get(Number(id))?.nome || `Turma ${id}`)
+          .join(" ");
 
-        .sort((a, b) => {
-          const ta = new Date(a.ultimaAtualizacao || 0).getTime();
-          const tb = new Date(b.ultimaAtualizacao || 0).getTime();
-          return tb - ta;
-        })
-    );
+        const hay = normStr(`${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`);
+        return hay.includes(q);
+      })
+
+      .sort((a, b) => {
+        const ta = new Date(b.ultimaAtualizacao || 0).getTime();
+        const tb = new Date(a.ultimaAtualizacao || 0).getTime();
+        return ta - tb;
+      });
   }, [
     user,
     usuarioLogado,
@@ -269,7 +410,7 @@ export default function EventosPublicados() {
   ]);
 
   const handleEditar = (eventoId, ev) => {
-    if (isDataEventoPassada(ev?.dataEvento)) return; // bloqueia edição de evento passado
+    if (isDataEventoPassada(ev?.dataEvento)) return;
     navigate(`/eventos/${eventoId}/editar`);
   };
 
@@ -289,19 +430,6 @@ export default function EventosPublicados() {
     );
   }
 
-  function startOfDay(d) {
-    const x = new Date(d);
-    x.setHours(0, 0, 0, 0);
-    return x;
-  }
-
-  function isDataEventoPassada(dataEvento) {
-    if (!dataEvento) return false; // se não tem dataEvento, não bloqueia (ajuste se quiser)
-    const dt = new Date(dataEvento);
-    if (Number.isNaN(dt.getTime())) return false;
-    return startOfDay(dt).getTime() < startOfDay(new Date()).getTime();
-  }
-
   return (
     <div className="eventos-publicados-page">
       <div className="eventos-publicados-container">
@@ -310,148 +438,103 @@ export default function EventosPublicados() {
           <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
         </header>
 
-       {/* ✅ FILTROS APENAS PARA COORDENADOR */}
-{isCoordenador && (
-  <section className="filtros-card">
-    <div className="filtros-top">
-      <div className="filtros-title">
-        <Filter size={16} className="filtros-icon" aria-hidden="true" />
-        Filtros
-      </div>
+        {/* ✅ FILTROS APENAS PARA COORDENADOR (como seu print 2) */}
+        {isCoordenador && (
+          <section className="filtros-card">
+            <div className="filtros-top">
+              <div className="filtros-title">
+                <Filter size={16} className="filtros-icon" aria-hidden="true" />
+                Filtros
+              </div>
 
-      <button
-        type="button"
-        className={`filtros-pill ${apenasCoordenadores ? "is-on" : ""}`}
-        onClick={() => setApenasCoordenadores((v) => !v)}
-        aria-pressed={apenasCoordenadores}
-        title="Apenas eventos criados por coordenadores"
-      >
-        Criados por essa coordenação
-        <span
-          className={`filtros-pill-dot ${
-            apenasCoordenadores ? "is-filled" : "is-empty"
-          }`}
-          aria-hidden="true"
-        />
-      </button>
-    </div>
+              <button
+                type="button"
+                className={`filtros-pill ${apenasCoordenadores ? "is-on" : ""}`}
+                onClick={() => setApenasCoordenadores((v) => !v)}
+                aria-pressed={apenasCoordenadores}
+                title="Apenas eventos criados por coordenadores"
+              >
+                Criados por essa coordenação
+                <span
+                  className={`filtros-pill-dot ${
+                    apenasCoordenadores ? "is-filled" : "is-empty"
+                  }`}
+                  aria-hidden="true"
+                />
+              </button>
+            </div>
 
-    <div className="filtros-row">
-      <div className="filtro-search">
-        <Search size={16} className="filtro-search__icon" aria-hidden="true" />
-        <input
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          placeholder="Buscar por nome, disciplina ou professor..."
-        />
-      </div>
-    </div>
-  </section>
-)}
+            <div className="filtros-row">
+              <div className="filtro-search">
+                <Search size={16} className="filtro-search__icon" aria-hidden="true" />
+                <input
+                  value={busca}
+                  onChange={(e) => setBusca(e.target.value)}
+                  placeholder="Buscar por nome, disciplina ou professor..."
+                />
+              </div>
+            </div>
+          </section>
+        )}
 
         <div className="eventos-publicados-list">
           {eventosFiltrados.map((ev) => {
-            const criadoPor =
-              usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
+            const criadoPor = usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
             const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
             const temDataEvento = !!ev.dataEvento;
-            const dataEventoFmt = temDataEvento
-              ? formatarDataPtBR(ev.dataEvento)
-              : "";
+            const dataEventoFmt = temDataEvento ? formatarDataPtBR(ev.dataEvento) : "";
             const eventoPassado = isDataEventoPassada(ev.dataEvento);
-            const podeEditar = !!ev.calendario && !eventoPassado;
 
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
 
-            const coordenador = isEventoCriadoPorCoordenador(ev);
+            // regra de edição que você já tinha
+            const podeEditar = !!ev.calendario && !eventoPassado;
 
             const turmasEv = getTurmasDoEvento(ev);
             const turmasNomes = (turmasEv || []).map((id) => ({
               id: Number(id),
               nome: disciplinasById.get(Number(id))?.nome || `Turma ${id}`,
             }));
-
-            const turmasOrdenadas = [...turmasNomes].sort(
-              (a, b) => a.id - b.id,
-            );
+            const turmasOrdenadas = [...turmasNomes].sort((a, b) => a.id - b.id);
             const mostrarTodasTurmas = isCoordenador;
 
+            // ✅ Troca de layout por tipo (Figma)
+            if (isCoordenador) {
+              return (
+                <CardCoordenador
+                  key={ev.id}
+                  ev={ev}
+                  criadoPor={criadoPor}
+                  dataAtual={dataAtual}
+                  temDataEvento={temDataEvento}
+                  dataEventoFmt={dataEventoFmt}
+                  podeEditar={podeEditar}
+                  eventoPassado={eventoPassado}
+                  handleEditar={handleEditar}
+                  temCalendario={temCalendario}
+                  temDestaque={temDestaque}
+                  turmasOrdenadas={turmasOrdenadas}
+                  mostrarTodasTurmas={mostrarTodasTurmas}
+                />
+              );
+            }
+
             return (
-              <article key={ev.id} className="evento-card">
-                <div className="evento-card-top">
-                  <div className="evento-card-titleblock">
-                    <div className="evento-card-createdbyline">
-                      Criado por: <strong>{criadoPor}</strong>
-                    </div>
-
-                    <div className="evento-card-title">{ev.titulo}</div>
-                    <div className="evento-card-desc">{ev.descricao}</div>
-
-                    {turmasOrdenadas.length > 0 && (
-                      <div className="evento-card-turmaschips">
-                        {(mostrarTodasTurmas
-                          ? turmasOrdenadas
-                          : turmasOrdenadas.slice(0, 1)
-                        ).map((t) => (
-                          <span key={t.id} className="chip chip--turma">
-                            {t.nome}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-
-                    <div className="evento-card-meta">
-                      <div className="evento-card-dates">
-                        {temDataEvento && (
-                          <span>Data do evento: {dataEventoFmt}</span>
-                        )}
-
-                        <div className="evento-card-lastline">
-                          <span>Última atualização: {dataAtual}</span>
-
-                          {(temCalendario || temDestaque) && (
-                            <div className="evento-card-chips">
-                              {temCalendario && (
-                                <span className="chip chip--calendario">
-                                  Calendário
-                                </span>
-                              )}
-                              {temDestaque && (
-                                <span className="chip chip--destaque">
-                                  Destaque
-                                </span>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {podeEditar && (
-                    <button
-                      type="button"
-                      className={`btn-editar-icononly ${eventoPassado ? "is-disabled" : ""}`}
-                      onClick={() => handleEditar(ev.id, ev)}
-                      disabled={eventoPassado}
-                      aria-label={
-                        eventoPassado
-                          ? "Edição bloqueada (evento já ocorreu)"
-                          : "Editar evento"
-                      }
-                      title={
-                        eventoPassado
-                          ? "Não é possível editar eventos com data anterior"
-                          : "Editar"
-                      }
-                    >
-                      <Pencil size={16} />
-                    </button>
-                  )}
-                </div>
-              </article>
+              <CardDefault
+                key={ev.id}
+                ev={ev}
+                criadoPor={criadoPor}
+                dataAtual={dataAtual}
+                temDataEvento={temDataEvento}
+                dataEventoFmt={dataEventoFmt}
+                podeEditar={podeEditar}
+                eventoPassado={eventoPassado}
+                handleEditar={handleEditar}
+                temCalendario={temCalendario}
+                temDestaque={temDestaque}
+              />
             );
           })}
 
