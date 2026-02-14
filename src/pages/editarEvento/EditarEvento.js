@@ -10,11 +10,7 @@ import { ReactComponent as ArrowLeftIcon } from "../../assets/seta.svg";
 import dados from "../../data/dados.json";
 import "./EditarEvento.scss";
 
-import {
-  getEventos,
-  upsertEvento,
-  deleteEvento,
-} from "../../services/eventosStore";
+import { getEventos, upsertEvento, deleteEvento } from "../../services/eventosStore";
 
 registerLocale("pt-BR", ptBR);
 
@@ -124,18 +120,23 @@ const EditarEvento = () => {
   // ✅ UI Turmas (igual CriarEvento)
   const [modoTurmas, setModoTurmas] = useState("all"); // "all" | "some"
   const [turmaSelecionadaId, setTurmaSelecionadaId] = useState("");
-  const [turmasIds, setTurmasIds] = useState([]); // selecionadas (some)
+  const [turmasIds, setTurmasIds] = useState([]); // selecionadas (some) OU todas (all)
 
+  // ✅ ALTERADO: em "all" agora preenche com TODAS as turmas (para não ficar em branco)
   const setAllTurmas = () => {
+    const idsAll = turmasDisponiveis
+      .map((t) => Number(t.id))
+      .filter((n) => Number.isFinite(n) && n > 0);
+
     setModoTurmas("all");
     setTurmaSelecionadaId("");
-    setTurmasIds([]);
+    setTurmasIds(idsAll);
   };
 
+  // ✅ ALTERADO: não limpa turmasIds ao trocar para "some"
   const setSomeTurmas = () => {
     setModoTurmas("some");
     setTurmaSelecionadaId("");
-    // não limpa turmasIds para não perder seleção
   };
 
   const addTurma = () => {
@@ -210,28 +211,37 @@ const EditarEvento = () => {
 
     setStartDate(parseDataEvento(evento));
 
-    // ✅ inicializa turmas do evento (somente coordenador)
-    // evento.turmasIds é o padrão criado no CriarEvento
+    // ✅ ALTERADO: inicializa turmas do evento (somente coordenador) sem ficar em branco
     if (isCoordenador) {
-      const idsEv = Array.isArray(evento?.turmasIds)
-        ? evento.turmasIds.map(Number).filter((n) => Number.isFinite(n) && n > 0)
-        : [];
+      const idsFromEvento = (() => {
+        if (Array.isArray(evento?.turmasIds) && evento.turmasIds.length) {
+          return evento.turmasIds;
+        }
+        if (Array.isArray(evento?.disciplinaId) && evento.disciplinaId.length) {
+          return evento.disciplinaId;
+        }
+        const one = Number(evento?.disciplinaId);
+        return Number.isFinite(one) && one > 0 ? [one] : [];
+      })();
 
-      const idsAll = turmasDisponiveis.map((t) => Number(t.id)).filter(Boolean);
+      const idsEv = idsFromEvento
+        .map(Number)
+        .filter((n) => Number.isFinite(n) && n > 0);
 
-      // Se idsEv está vazio, assumimos "all" (ou evento antigo sem turmasIds)
-      // Se idsEv cobre todas as turmas disponíveis, "all"
-      // Caso contrário, "some" com os ids atuais
+      const idsAll = turmasDisponiveis
+        .map((t) => Number(t.id))
+        .filter((n) => Number.isFinite(n) && n > 0);
+
       const allSet = new Set(idsAll);
       const evSet = new Set(idsEv.filter((x) => allSet.has(Number(x))));
       const cobreTudo = idsAll.length > 0 && idsAll.every((x) => evSet.has(x));
 
       if (!idsEv.length || cobreTudo) {
         setModoTurmas("all");
-        setTurmasIds([]); // quando all, chips ficam ocultos (igual CriarEvento)
+        setTurmasIds(idsAll); // ✅ mostra todas no UI
       } else {
         setModoTurmas("some");
-        setTurmasIds(Array.from(evSet));
+        setTurmasIds(Array.from(evSet)); // ✅ mostra 1,2,3... turmas do evento
       }
 
       setTurmaSelecionadaId("");
@@ -310,6 +320,8 @@ const EditarEvento = () => {
           : null;
 
       // ✅ regra final turmasIds (somente coordenador)
+      // - "all": usa TODAS as turmasDisponiveis
+      // - "some": usa turmasIds selecionadas
       const turmasIdsFinal = isCoordenador
         ? Array.from(
             new Set(
@@ -513,9 +525,8 @@ const EditarEvento = () => {
                         onChange={(e) => setTurmaSelecionadaId(e.target.value)}
                         disabled={modoTurmas === "all"}
                       >
-                        <option value="" disabled>
-                          Selecionar turma
-                        </option>
+                        {/* ✅ ALTERADO: não fica em branco */}
+                        <option value="">Selecionar turma</option>
 
                         {turmasDisponiveis
                           .filter((t) => !turmasIds.includes(Number(t.id)))
@@ -541,22 +552,26 @@ const EditarEvento = () => {
                     </button>
                   </div>
 
-                  {modoTurmas === "some" && turmasIds.length > 0 && (
+                  {/* ✅ ALTERADO: chips aparecem em "some" E em "all" (em all sem remover) */}
+                  {turmasIds.length > 0 && (
                     <div className="turmas-chips">
                       {turmasIds.map((tid) => (
                         <div className="chip-turma" key={tid}>
                           <span className="chip-text">
                             {turmaIdToNome.get(tid) || `Turma ${tid}`}
                           </span>
-                          <button
-                            type="button"
-                            className="chip-remove"
-                            onClick={() => removeTurma(tid)}
-                            aria-label="Remover turma"
-                            title="Remover"
-                          >
-                            <X size={14} />
-                          </button>
+
+                          {modoTurmas === "some" && (
+                            <button
+                              type="button"
+                              className="chip-remove"
+                              onClick={() => removeTurma(tid)}
+                              aria-label="Remover turma"
+                              title="Remover"
+                            >
+                              <X size={14} />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
