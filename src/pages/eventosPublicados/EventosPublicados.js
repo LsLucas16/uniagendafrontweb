@@ -111,7 +111,10 @@ function CardCoordenador({
 
           {turmasOrdenadas.length > 0 && (
             <div className="evento-card-turmaschips">
-              {(mostrarTodasTurmas ? turmasOrdenadas : turmasOrdenadas.slice(0, 1)).map((t) => (
+              {(mostrarTodasTurmas
+                ? turmasOrdenadas
+                : turmasOrdenadas.slice(0, 1)
+              ).map((t) => (
                 <span key={t.id} className="chip chip--turma">
                   {t.nome}
                 </span>
@@ -177,16 +180,26 @@ function CardDefault({
   handleEditar,
   temCalendario,
   temDestaque,
+
+  // ✅ NOVO (só pra mexer nessa regra)
+  substituirDataPorUltimaAlteracao,
 }) {
+  const showTopLine = temDataEvento || substituirDataPorUltimaAlteracao;
+
   return (
     <article key={ev.id} className="evento-card evento-card--default">
       <div className="evento-default-top">
         <div className="evento-default-left">
           <div className="evento-default-title">{ev.titulo}</div>
 
-          <div className="evento-default-date">
-            {temDataEvento ? `Data do evento: ${dataEventoFmt}` : "\u00A0"}
-          </div>
+          {/* ✅ ALTERADO: sem "\u00A0" e com "Última alteração" quando não tem dataEvento */}
+          {showTopLine && (
+            <div className="evento-default-date">
+              {temDataEvento
+                ? `Data do evento: ${dataEventoFmt}`
+                : `Última alteração: ${dataAtual}`}
+            </div>
+          )}
 
           {(temCalendario || temDestaque) && (
             <div className="evento-default-chips">
@@ -218,11 +231,19 @@ function CardDefault({
         )}
       </div>
 
-      {ev.descricao ? <div className="evento-default-desc">{ev.descricao}</div> : null}
+      {ev.descricao ? (
+        <div className="evento-default-desc">{ev.descricao}</div>
+      ) : null}
 
       <div className="evento-default-bottom">
         <div className="evento-default-created">Criado por: {criadoPor}</div>
-        <div className="evento-default-updated">Última atualização: {dataAtual}</div>
+
+        {/* ✅ ALTERADO: evita duplicar quando já mostramos em cima */}
+        {!substituirDataPorUltimaAlteracao && (
+          <div className="evento-default-updated">
+            Última atualização: {dataAtual}
+          </div>
+        )}
       </div>
     </article>
   );
@@ -237,10 +258,7 @@ export default function EventosPublicados() {
 
   const [refreshKey, setRefreshKey] = useState(0);
 
-  // busca (vamos usar para todos, mas UI só aparece para coordenador)
   const [busca, setBusca] = useState("");
-
-  // ✅ toggle do coordenador
   const [apenasCoordenadores, setApenasCoordenadores] = useState(false);
 
   useEffect(() => {
@@ -303,7 +321,6 @@ export default function EventosPublicados() {
     return new Set(ids.map(Number).filter(Number.isFinite));
   }, [user, usuarioLogado]);
 
-  // ✅ evento criado por coordenador (via criadoPorId)
   function isEventoCriadoPorCoordenador(ev) {
     const criador = usuariosById.get(Number(ev?.criadoPorId));
     const t = getTipoUsuario(criador);
@@ -343,15 +360,11 @@ export default function EventosPublicados() {
 
     return eventosFinal
       .filter((ev) => Number(ev.instituicaoId) === instId)
-
-      // ✅ filtro toggle (só coordenador vê/usa)
       .filter((ev) => {
         if (!isCoordenador) return true;
         if (!apenasCoordenadores) return true;
         return isEventoCriadoPorCoordenador(ev);
       })
-
-      // filtro por permissão/turma
       .filter((ev) => {
         const turmasEv = getTurmasDoEvento(ev);
 
@@ -372,8 +385,6 @@ export default function EventosPublicados() {
         if (!discAtualNum) return true;
         return turmasEv.includes(discAtualNum);
       })
-
-      // busca (se coordenador)
       .filter((ev) => {
         if (!q) return true;
 
@@ -384,10 +395,11 @@ export default function EventosPublicados() {
           .map((id) => disciplinasById.get(Number(id))?.nome || `Turma ${id}`)
           .join(" ");
 
-        const hay = normStr(`${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`);
+        const hay = normStr(
+          `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`,
+        );
         return hay.includes(q);
       })
-
       .sort((a, b) => {
         const ta = new Date(b.ultimaAtualizacao || 0).getTime();
         const tb = new Date(a.ultimaAtualizacao || 0).getTime();
@@ -438,7 +450,6 @@ export default function EventosPublicados() {
           <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
         </header>
 
-        {/* ✅ FILTROS APENAS PARA COORDENADOR (como seu print 2) */}
         {isCoordenador && (
           <section className="filtros-card">
             <div className="filtros-top">
@@ -466,7 +477,11 @@ export default function EventosPublicados() {
 
             <div className="filtros-row">
               <div className="filtro-search">
-                <Search size={16} className="filtro-search__icon" aria-hidden="true" />
+                <Search
+                  size={16}
+                  className="filtro-search__icon"
+                  aria-hidden="true"
+                />
                 <input
                   value={busca}
                   onChange={(e) => setBusca(e.target.value)}
@@ -479,7 +494,8 @@ export default function EventosPublicados() {
 
         <div className="eventos-publicados-list">
           {eventosFiltrados.map((ev) => {
-            const criadoPor = usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
+            const criadoPor =
+              usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
             const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
             const temDataEvento = !!ev.dataEvento;
@@ -489,7 +505,6 @@ export default function EventosPublicados() {
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
 
-            // regra de edição que você já tinha
             const podeEditar = !!ev.calendario && !eventoPassado;
 
             const turmasEv = getTurmasDoEvento(ev);
@@ -500,7 +515,6 @@ export default function EventosPublicados() {
             const turmasOrdenadas = [...turmasNomes].sort((a, b) => a.id - b.id);
             const mostrarTodasTurmas = isCoordenador;
 
-            // ✅ Troca de layout por tipo (Figma)
             if (isCoordenador) {
               return (
                 <CardCoordenador
@@ -521,6 +535,10 @@ export default function EventosPublicados() {
               );
             }
 
+            // ✅ NOVO: só professor/responsável substitui quando não tem dataEvento
+            const substituirDataPorUltimaAlteracao =
+              !temDataEvento && (isProfessor || isResponsavel);
+
             return (
               <CardDefault
                 key={ev.id}
@@ -534,6 +552,7 @@ export default function EventosPublicados() {
                 handleEditar={handleEditar}
                 temCalendario={temCalendario}
                 temDestaque={temDestaque}
+                substituirDataPorUltimaAlteracao={substituirDataPorUltimaAlteracao}
               />
             );
           })}
