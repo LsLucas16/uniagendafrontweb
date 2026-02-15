@@ -169,6 +169,15 @@ function CardCoordenador({
   );
 }
 
+/**
+ * ✅ DEFAULT (Professor/Responsável) — igual ao Figma:
+ * Título (grosso/azul escuro)
+ * Última atualização abaixo do título (sempre)
+ * Chips abaixo
+ * Descrição
+ * Data do evento (se existir) embaixo
+ * Criado por embaixo
+ */
 function CardDefault({
   ev,
   criadoPor,
@@ -180,26 +189,16 @@ function CardDefault({
   handleEditar,
   temCalendario,
   temDestaque,
-
-  // ✅ NOVO (só pra mexer nessa regra)
-  substituirDataPorUltimaAlteracao,
 }) {
-  const showTopLine = temDataEvento || substituirDataPorUltimaAlteracao;
-
   return (
     <article key={ev.id} className="evento-card evento-card--default">
       <div className="evento-default-top">
         <div className="evento-default-left">
           <div className="evento-default-title">{ev.titulo}</div>
 
-          {/* ✅ ALTERADO: sem "\u00A0" e com "Última alteração" quando não tem dataEvento */}
-          {showTopLine && (
-            <div className="evento-default-date">
-              {temDataEvento
-                ? `Data do evento: ${dataEventoFmt}`
-                : `Última alteração: ${dataAtual}`}
-            </div>
-          )}
+          <div className="evento-default-createdTop">
+            Criado por: <strong>{criadoPor}</strong>
+          </div>
 
           {(temCalendario || temDestaque) && (
             <div className="evento-default-chips">
@@ -235,25 +234,26 @@ function CardDefault({
         <div className="evento-default-desc">{ev.descricao}</div>
       ) : null}
 
-      <div className="evento-default-bottom">
-        <div className="evento-default-created">Criado por: {criadoPor}</div>
+      {/* ✅ Rodapé: Data do evento (esq) + Última atualização (dir) */}
+      <div className="evento-default-footer">
+        <div className="evento-default-eventdate">
+          {temDataEvento ? `Data do evento: ${dataEventoFmt}` : ""}
+        </div>
 
-        {/* ✅ ALTERADO: evita duplicar quando já mostramos em cima */}
-        {!substituirDataPorUltimaAlteracao && (
-          <div className="evento-default-updated">
-            Última atualização: {dataAtual}
-          </div>
-        )}
+        <div className="evento-default-updatedBottom">
+          Última atualização: {dataAtual}
+        </div>
       </div>
     </article>
   );
 }
 
+
 export default function EventosPublicados() {
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const navigate = useNavigate();
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
-    getDisciplinaAtualId(),
+    getDisciplinaAtualId()
   );
 
   const [refreshKey, setRefreshKey] = useState(0);
@@ -396,7 +396,7 @@ export default function EventosPublicados() {
           .join(" ");
 
         const hay = normStr(
-          `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`,
+          `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`
         );
         return hay.includes(q);
       })
@@ -499,7 +499,9 @@ export default function EventosPublicados() {
             const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
             const temDataEvento = !!ev.dataEvento;
-            const dataEventoFmt = temDataEvento ? formatarDataPtBR(ev.dataEvento) : "";
+            const dataEventoFmt = temDataEvento
+              ? formatarDataPtBR(ev.dataEvento)
+              : "";
             const eventoPassado = isDataEventoPassada(ev.dataEvento);
 
             const temCalendario = !!ev.calendario;
@@ -535,10 +537,6 @@ export default function EventosPublicados() {
               );
             }
 
-            // ✅ NOVO: só professor/responsável substitui quando não tem dataEvento
-            const substituirDataPorUltimaAlteracao =
-              !temDataEvento && (isProfessor || isResponsavel);
-
             return (
               <CardDefault
                 key={ev.id}
@@ -552,7 +550,6 @@ export default function EventosPublicados() {
                 handleEditar={handleEditar}
                 temCalendario={temCalendario}
                 temDestaque={temDestaque}
-                substituirDataPorUltimaAlteracao={substituirDataPorUltimaAlteracao}
               />
             );
           })}
