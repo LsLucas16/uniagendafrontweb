@@ -7,7 +7,7 @@ import "./EditarTurma.scss";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const STORAGE_TURMAS = "turmas_override";
-const STORAGE_TURMA_ALUNOS = "turma_alunos_override"; // { [disciplinaId]: number[] alunoIds }
+const STORAGE_TURMA_ALUNOS = "turma_alunos_override"; 
 
 const defaultPerms = {
   eventos: true,

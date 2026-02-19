@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./EditarResponsavelModal.scss";
-import { X, Search, Trash2 } from "lucide-react";
+import { X, Search } from "lucide-react";
 
 const defaultPerms = {
   eventos: true,
   responsaveis: false,
   alunos: true,
 };
-
-const CARGOS = ["Professor", "Responsável", "Coordenador"];
 
 // ✅ ajuste para a SUA chave real no localStorage
 const RESPONSAVEIS_STORAGE_KEY = "responsaveis_v1";
@@ -22,6 +20,7 @@ export default function EditarResponsavelModal({
   onRemove,
 }) {
   const [draft, setDraft] = useState(null);
+  const [errors, setErrors] = useState({});
 
   const [queryUser, setQueryUser] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -32,7 +31,7 @@ export default function EditarResponsavelModal({
 
     const iv = initialValue || {};
     const next = {
-      userId: iv.userId ?? "", // login (string)
+      userId: iv.userId ?? "",
       nome: iv.nome ?? "",
       cargo: iv.cargo ?? "",
       contato: iv.contato ?? "",
@@ -43,15 +42,14 @@ export default function EditarResponsavelModal({
     };
 
     setDraft(next);
+    setErrors({});
     setQueryUser(next.nome || "");
     setDropdownOpen(false);
   }, [open, initialValue]);
 
   const opcoes = useMemo(() => {
     return (usuarios || [])
-      .filter((u) =>
-        ["professor", "responsavel", "coordenador"].includes(u.tipo),
-      )
+      .filter((u) => ["professor", "responsavel", "coordenador"].includes(u.tipo))
       .map((u) => ({
         user: u.user ?? u.login ?? u.username ?? "",
         nome: u.nome,
@@ -64,12 +62,10 @@ export default function EditarResponsavelModal({
   const candidatos = useMemo(() => {
     const q = queryUser.trim().toLowerCase();
     if (!q) return [];
-
     return opcoes
       .filter(
         (o) =>
-          o.nome?.toLowerCase().includes(q) ||
-          o.user?.toLowerCase().includes(q),
+          o.nome?.toLowerCase().includes(q) || o.user?.toLowerCase().includes(q)
       )
       .slice(0, 8);
   }, [queryUser, opcoes]);
@@ -94,21 +90,28 @@ export default function EditarResponsavelModal({
   };
 
   const pickUser = (o) => {
-    setDraft((prev) => ({
-      ...prev,
-      userId: o.user,
-      nome: o.nome,
-      cargo:
+    setDraft((prev) => {
+      const cargoSugerido =
         prev.cargo ||
         (o.tipo === "professor"
           ? "Professor"
           : o.tipo === "responsavel"
-            ? "Responsável"
-            : o.tipo === "coordenador"
-              ? "Coordenador"
-              : ""),
-      contato: prev.cargo ? o.contato || prev.contato : prev.contato,
-    }));
+          ? "Responsável"
+          : o.tipo === "coordenador"
+          ? "Coordenador"
+          : "");
+
+      // ✅ Se existir cargo (o atual ou o sugerido), podemos popular contato do usuário selecionado
+      const contatoNext = cargoSugerido ? (o.contato || prev.contato) : prev.contato;
+
+      return {
+        ...prev,
+        userId: o.user,
+        nome: o.nome,
+        cargo: cargoSugerido,
+        contato: contatoNext,
+      };
+    });
 
     setQueryUser(o.nome);
     setDropdownOpen(false);
@@ -127,17 +130,29 @@ export default function EditarResponsavelModal({
     }));
   };
 
+  // ✅ Cargo não apaga mais o contato
   const handleChangeCargo = (e) => {
     const value = e.target.value;
-    setDraft((prev) => ({
-      ...prev,
-      cargo: value,
-      contato: value ? prev.contato : "",
-    }));
+    setDraft((prev) => ({ ...prev, cargo: value }));
+    setErrors((prev) => ({ ...prev, contato: undefined })); // limpa erro ao editar
+  };
+
+  const validate = () => {
+    const next = {};
+    const hasCargo = !!String(draft.cargo || "").trim();
+
+    // ✅ Contato obrigatório somente quando cargo existir
+    if (hasCargo && !String(draft.contato || "").trim()) {
+      next.contato = "Contato é obrigatório quando houver cargo.";
+    }
+
+    setErrors(next);
+    return Object.keys(next).length === 0;
   };
 
   const save = () => {
     if (!draft.userId) return;
+    if (!validate()) return;
 
     onSave?.({
       userId: String(draft.userId),
@@ -148,14 +163,11 @@ export default function EditarResponsavelModal({
     });
   };
 
-  // ✅ remove + persiste no localStorage
   const remove = () => {
     if (!draft.userId) return;
 
-    // 1) callback pra você atualizar estado/UI no pai
     onRemove?.(String(draft.userId));
 
-    // 2) persistência no storage (ajuste a estrutura conforme seu projeto)
     try {
       const raw = localStorage.getItem(RESPONSAVEIS_STORAGE_KEY);
       const arr = raw ? JSON.parse(raw) : [];
@@ -166,12 +178,13 @@ export default function EditarResponsavelModal({
 
       localStorage.setItem(RESPONSAVEIS_STORAGE_KEY, JSON.stringify(nextArr));
     } catch (e) {
-      // se der erro, pelo menos remove no estado do pai via onRemove
       console.error("Erro ao remover responsável do storage:", e);
     }
 
     onClose?.();
   };
+
+  const hasCargo = !!String(draft.cargo || "").trim();
 
   return (
     <div
@@ -235,7 +248,9 @@ export default function EditarResponsavelModal({
                     <button
                       key={o.user}
                       type="button"
-                      className={`erm__item ${String(draft.userId) === String(o.user) ? "is-active" : ""}`}
+                      className={`erm__item ${
+                        String(draft.userId) === String(o.user) ? "is-active" : ""
+                      }`}
                       onClick={() => pickUser(o)}
                     >
                       <div className="erm__itemName">{o.nome}</div>
@@ -258,19 +273,26 @@ export default function EditarResponsavelModal({
             />
           </div>
 
-          {/* CONTATO */}
-          {draft.cargo ? (
-            <div className="erm__field">
-              <label>Contato</label>
-              <input
-                value={draft.contato}
-                onChange={(e) =>
-                  setDraft((p) => ({ ...p, contato: e.target.value }))
-                }
-                placeholder="Ex.: (61) 99999-9999"
-              />
-            </div>
-          ) : null}
+          {/* ✅ CONTATO: sempre aparece */}
+          <div className="erm__field">
+            <label>
+              Contato {hasCargo ? <span className="erm__req">*</span> : null}
+            </label>
+            <input
+              value={draft.contato}
+              onChange={(e) => {
+                const v = e.target.value;
+                setDraft((p) => ({ ...p, contato: v }));
+                if (errors.contato) setErrors((p) => ({ ...p, contato: undefined }));
+              }}
+              placeholder="Telefone, e-mail ou WhatsApp"
+              required={hasCargo}
+              aria-invalid={!!errors.contato}
+            />
+            {errors.contato ? (
+              <div className="erm__fieldError">{errors.contato}</div>
+            ) : null}
+          </div>
 
           <div className="erm__divider" />
 
@@ -315,7 +337,6 @@ export default function EditarResponsavelModal({
           </div>
         </div>
 
-        {/* ✅ FOOTER IGUAL FIGMA: remover (ghost/danger) + salvar (primary) alinhado à direita */}
         <div className="erm__footer">
           {!!draft.userId && !!onRemove && (
             <button
@@ -329,7 +350,9 @@ export default function EditarResponsavelModal({
 
           <button
             type="button"
-            className={`erm__btn erm__btn--primary ${!draft.userId ? "is-disabled" : ""}`}
+            className={`erm__btn erm__btn--primary ${
+              !draft.userId ? "is-disabled" : ""
+            }`}
             onClick={save}
             disabled={!draft.userId}
           >
