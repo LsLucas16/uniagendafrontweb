@@ -7,7 +7,7 @@ import "./EditarTurma.scss";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const STORAGE_TURMAS = "turmas_override";
-const STORAGE_TURMA_ALUNOS = "turma_alunos_override"; 
+const STORAGE_TURMA_ALUNOS = "turma_alunos_override";
 
 const defaultPerms = {
   eventos: true,
@@ -31,6 +31,7 @@ function getTurmasOverride() {
 
 function setTurmasOverride(map) {
   localStorage.setItem(STORAGE_TURMAS, JSON.stringify(map));
+  window.dispatchEvent(new Event("turmas:changed"));
 }
 
 function getTurmaAlunosOverride() {
@@ -47,6 +48,14 @@ function splitNomeComplemento(disciplinaNome = "") {
     return { nome: parts[0], complemento: parts.slice(1).join(" - ") };
   }
   return { nome: disciplinaNome, complemento: "" };
+}
+
+function buildNomeCompleto(nome = "", complemento = "") {
+  const n = String(nome || "").trim();
+  const c = String(complemento || "").trim();
+  if (!n && !c) return "";
+  if (!c) return n;
+  return `${n} - ${c}`;
 }
 
 function getUsuarioLogado() {
@@ -169,6 +178,23 @@ export default function EditarTurma() {
     const turmasOverride = getTurmasOverride();
     const turmaOverride = turmasOverride[String(turmaId)];
 
+    // 🔁 migra storage antigo (nomeCustom/complementoCustom) para "nome"
+    if (
+      turmaOverride &&
+      !turmaOverride.nome &&
+      (turmaOverride.nomeCustom || turmaOverride.complementoCustom)
+    ) {
+      const nomeCompleto = buildNomeCompleto(
+        turmaOverride.nomeCustom,
+        turmaOverride.complementoCustom,
+      );
+      turmasOverride[String(turmaId)] = {
+        ...turmaOverride,
+        nome: nomeCompleto,
+      };
+      setTurmasOverride(turmasOverride);
+    }
+
     const disciplinaMerged = {
       ...disciplinaBase,
       ...(turmaOverride || {}),
@@ -177,8 +203,8 @@ export default function EditarTurma() {
     const { nome: n, complemento: c } = splitNomeComplemento(
       disciplinaMerged.nome || "",
     );
-    setNome(disciplinaMerged.nomeCustom ?? n);
-    setComplemento(disciplinaMerged.complementoCustom ?? c);
+    setNome(n);
+    setComplemento(c);
 
     // responsaveis base (professor + responsavel)
     const professor = baseUsuarios.find(
@@ -265,9 +291,11 @@ export default function EditarTurma() {
         instituicaoId ? Number(u.faculdadeId) === Number(instituicaoId) : true,
       )
       .filter(
-        (u) => u.nome?.toLowerCase().includes(q) || String(u.id).includes(q) ||
-         String(u.user).toLowerCase().includes(q) || 
-        String(u.id).includes(q),
+        (u) =>
+          u.nome?.toLowerCase().includes(q) ||
+          String(u.id).includes(q) ||
+          String(u.user).toLowerCase().includes(q) ||
+          String(u.id).includes(q),
       )
       .slice(0, 8);
 
@@ -294,9 +322,15 @@ export default function EditarTurma() {
   }
 
   const handleSalvarTopo = () => {
+    const nomeCompleto = buildNomeCompleto(nome, complemento);
+
     persistTurma({
-      nomeCustom: nome,
-      complementoCustom: complemento,
+      // ✅ isso faz a alteração valer “em geral” quando você faz merge em outras telas
+      nome: nomeCompleto,
+
+      // ✅ mantém compatibilidade com o que você já tinha salvo antes
+      nomeCustom: String(nome || "").trim(),
+      complementoCustom: String(complemento || "").trim(),
     });
 
     Swal.fire({
@@ -568,7 +602,7 @@ export default function EditarTurma() {
             <div className="actions-row">
               <button
                 type="button"
-                className="btn-primary wide muted"
+                className="btn-primary wide"
                 onClick={handleAdicionarAluno}
               >
                 Adicionar aluno

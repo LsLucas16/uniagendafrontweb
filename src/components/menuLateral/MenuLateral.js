@@ -12,6 +12,20 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+const STORAGE_TURMAS = "turmas_override";
+
+function safeJsonParse(v, fallback) {
+  try {
+    return JSON.parse(v) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function getTurmasOverride() {
+  return safeJsonParse(localStorage.getItem(STORAGE_TURMAS), {});
+}
+
 const MenuLateral = () => {
   // Hooks sempre no topo
   const [perfilAberto, setPerfilAberto] = useState(false);
@@ -21,6 +35,25 @@ const MenuLateral = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
+
+  const [turmasOverrideVer, setTurmasOverrideVer] = useState(0);
+
+useEffect(() => {
+  const bump = () => setTurmasOverrideVer((v) => v + 1);
+
+  // evento interno que vamos disparar ao salvar na tela de editar
+  window.addEventListener("turmas:changed", bump);
+
+  // se mudar em outra aba/janela
+  window.addEventListener("storage", (e) => {
+    if (e.key === STORAGE_TURMAS) bump();
+  });
+
+  return () => {
+    window.removeEventListener("turmas:changed", bump);
+    window.removeEventListener("storage", bump);
+  };
+}, []);
 
   // pega do localStorage
   const usuarioStorage = useMemo(() => {
@@ -43,13 +76,20 @@ const MenuLateral = () => {
     return data.instituicoes.find((i) => i.id === user.faculdadeId) || null;
   }, [user]);
 
-  const disciplinasDoUsuario = useMemo(() => {
-    if (!user) return [];
-    const ids = Array.isArray(user.disciplinas) ? user.disciplinas : [];
-    return (data.disciplinas || [])
-      .filter((d) => ids.includes(d.id))
-      .filter((d) => d.instituicaoId === user.faculdadeId);
-  }, [user]);
+ const disciplinasDoUsuario = useMemo(() => {
+  if (!user) return [];
+
+  const ids = Array.isArray(user.disciplinas) ? user.disciplinas : [];
+  const overrides = getTurmasOverride();
+
+  return (data.disciplinas || [])
+    .filter((d) => ids.includes(d.id))
+    .filter((d) => d.instituicaoId === user.faculdadeId)
+    .map((d) => {
+      const ov = overrides[String(d.id)] || null;
+      return ov ? { ...d, ...ov } : d; // ✅ se ov tiver "nome", substitui
+    });
+}, [user, turmasOverrideVer]);
 
   // Define disciplinaAtualId quando existir lista
   useEffect(() => {
