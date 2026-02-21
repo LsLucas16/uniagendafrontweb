@@ -75,8 +75,10 @@ export default function EditarTurma() {
 
   // modal
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState("edit"); // "edit" | "add"
-  const [editIndex, setEditIndex] = useState(null); // number | null
+  const [modalMode, setModalMode] = useState("edit");
+  const [editIndex, setEditIndex] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const searchWrapRef = useRef(null);
 
   const openEditarResponsavel = (index) => {
     setModalMode("edit");
@@ -122,6 +124,17 @@ export default function EditarTurma() {
     };
   }, []);
 
+  useEffect(() => {
+  const onDown = (e) => {
+    if (!searchWrapRef.current) return;
+    if (!searchWrapRef.current.contains(e.target)) {
+      setDropdownOpen(false);
+    }
+  };
+  document.addEventListener("mousedown", onDown);
+  return () => document.removeEventListener("mousedown", onDown);
+}, []);
+
   const turmaId = useMemo(() => {
     const n = disciplinaAtualId ? Number(disciplinaAtualId) : 0;
     return Number.isNaN(n) ? 0 : n;
@@ -166,6 +179,7 @@ export default function EditarTurma() {
   const [buscaAluno, setBuscaAluno] = useState("");
   const [alunosIds, setAlunosIds] = useState([]);
   const [alunoSelecionadoId, setAlunoSelecionadoId] = useState(null);
+  const temAlunoSelecionado = Boolean(alunoSelecionadoId);
 
   useEffect(() => {
     setLoading(true);
@@ -300,7 +314,7 @@ export default function EditarTurma() {
       .slice(0, 8);
 
     return filtrados.map((u) => ({
-      id: u.user,
+      id: u.id,
       nome: u.nome,
       matricula: u.user,
     }));
@@ -360,6 +374,7 @@ export default function EditarTurma() {
 
     setBuscaAluno("");
     setAlunoSelecionadoId(null);
+    setDropdownOpen(false);
   };
 
   const handleRemoverAluno = (uid) => {
@@ -567,29 +582,38 @@ export default function EditarTurma() {
           <div className="subsection">
             <div className="sub-title">Adicione alunos</div>
 
-            <div className="search-wrap">
+            <div className="search-wrap" ref={searchWrapRef}>
               <Search size={16} className="search-ico" />
               <input
                 value={buscaAluno}
                 onChange={(e) => {
-                  setBuscaAluno(e.target.value);
+                  const v = e.target.value;
+                  setBuscaAluno(v);
                   setAlunoSelecionadoId(null);
+                  setDropdownOpen(true);
+                }}
+                onFocus={() => {
+                  if (candidatosBusca.length > 0) setDropdownOpen(true);
                 }}
                 placeholder="Busque por nome, matricula..."
               />
 
-              {candidatosBusca.length > 0 && (
+              {dropdownOpen && candidatosBusca.length > 0 && (
                 <div className="search-dropdown">
                   {candidatosBusca.map((c) => (
                     <button
-                      key={c.id}
+                      key={String(c.id)}
                       type="button"
                       className={`dropdown-item ${
                         Number(alunoSelecionadoId) === Number(c.id)
                           ? "active"
                           : ""
                       }`}
-                      onClick={() => setAlunoSelecionadoId(c.id)}
+                      onClick={() => {
+                        setAlunoSelecionadoId(c.id); // seleciona
+                        setBuscaAluno(`${c.nome} (${c.matricula})`); // mostra no input (feedback visual)
+                        setDropdownOpen(false); // fecha dropdown (não tampa o botão)
+                      }}
                     >
                       <div className="d-name">{c.nome}</div>
                       <div className="d-sub">{c.matricula}</div>
@@ -599,18 +623,22 @@ export default function EditarTurma() {
               )}
             </div>
 
-            <div className="actions-row">
+            <div className="actions-row add-aluno-actions">
               <button
                 type="button"
-                className="btn-primary wide"
+                className={`btn-primary wide add-aluno-btn ${
+                  temAlunoSelecionado ? "is-active" : "is-muted"
+                }`}
                 onClick={handleAdicionarAluno}
+                disabled={!temAlunoSelecionado}
+                aria-disabled={!temAlunoSelecionado}
               >
                 Adicionar aluno
               </button>
 
               <button
                 type="button"
-                className="link"
+                className="link add-aluno-link"
                 onClick={() => navigate(`/turma/${turmaId}/alunos`)}
               >
                 Ver lista completa de alunos

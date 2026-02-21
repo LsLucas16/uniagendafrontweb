@@ -222,11 +222,6 @@ $et-fundo-input: #f3f5f7;
     }
   }
 
-  /* inputs do responsável brancos */
-  .inner .field input {
-    background: #fff;
-  }
-
   /* =========================
      BOTÕES (somente desta tela)
   ========================= */
@@ -490,4 +485,52 @@ $et-fundo-input: #f3f5f7;
     background: #eef2f7;
     margin-bottom: 12px;
   }
+}
+
+.add-aluno-btn {
+  width: 100%;
+  height: 40px;
+  border-radius: 6px;
+  box-shadow: none;
+
+  &.is-muted {
+    background: #e2e8f0; /* cinza */
+    color: $et-azul-primario;
+    cursor: not-allowed;
+
+    &:hover {
+      background: #e2e8f0;
+      box-shadow: none;
+      filter: none;
+    }
+  }
+
+  &.is-active {
+    background: $et-azul-claro; /* azul */
+    color: #fff;
+    cursor: pointer;
+
+    &:hover {
+      filter: brightness(0.97);
+      box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
+    }
+  }
+
+  &:disabled {
+    opacity: 1; /* mantém igual figma, sem “apagado” */
+  }
+}
+
+/* === Área "Adicione alunos" (igual Figma) === */
+.add-aluno-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+  margin: 14px 0 0; /* sem margin embaixo pra não empurrar */
+}
+
+.add-aluno-link {
+  align-self: flex-end; /* joga pra direita */
+  margin-top: 2px;
 }

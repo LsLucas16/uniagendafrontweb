@@ -236,3 +236,75 @@ $input-bg: #f3f5f7;
   font-size: 13px;
   color: #6b7280;
 }
+
+
+/* buffer (selecionados antes de adicionar) */
+.la__buffer {
+  margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.la__chip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #eef2f7;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.la__chipName {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.la__chipSub {
+  font-size: 12px;
+  color: #8a96a8;
+  margin-left: auto; /* empurra o X pra direita mantendo texto */
+}
+
+.la__chipX {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+
+  &:hover {
+    background: #f7f9fc;
+    border-color: #e9edf3;
+    color: #64748b;
+  }
+}
+
+/* botão adicionar: cinza quando vazio, azul quando tiver selecionados */
+.la__add.is-muted {
+  background: #e9edf3;
+  color: $azul;
+  cursor: not-allowed;
+
+  &:hover {
+    background: #e9edf3;
+  }
+}
+
+.la__add.is-active {
+  background: $azul-claro;
+  color: #fff;
+  border-color: transparent;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.97);
+  }
+}

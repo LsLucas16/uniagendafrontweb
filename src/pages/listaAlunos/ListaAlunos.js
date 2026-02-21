@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Search, Upload, X, ArrowLeft } from "lucide-react";
 import Swal from "sweetalert2";
@@ -24,7 +24,6 @@ function setTurmaAlunosOverride(map) {
 }
 
 function getLoginDoUsuario(u) {
-  // futuro: matrícula = login/user
   const v = u?.user ?? u?.login ?? u?.matricula;
   if (v === null || v === undefined || v === "") return String(u?.id ?? "");
   return String(v);
@@ -50,10 +49,16 @@ export default function ListaAlunos() {
     return baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null;
   }, [turmaId, baseDisciplinas]);
 
-  // alunos atuais (IDs)
+  // alunos atuais (IDs) da turma
   const [alunosIds, setAlunosIds] = useState([]);
+
+  // busca/seleção
   const [buscaAluno, setBuscaAluno] = useState("");
-  const [alunoSelecionadoId, setAlunoSelecionadoId] = useState(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  // ✅ buffer: selecionados antes de adicionar em lote
+  const [selecionadosIds, setSelecionadosIds] = useState([]); // number[]
+  const searchWrapRef = useRef(null);
 
   useEffect(() => {
     if (!turmaId) return;
@@ -66,10 +71,27 @@ export default function ListaAlunos() {
 
     // override
     const map = getTurmaAlunosOverride();
-    const overrideIds = Array.isArray(map[String(turmaId)]) ? map[String(turmaId)].map(Number) : null;
+    const overrideIds = Array.isArray(map[String(turmaId)])
+      ? map[String(turmaId)].map(Number)
+      : null;
 
     setAlunosIds(overrideIds ?? alunosBase);
+
+    // reseta UI
+    setBuscaAluno("");
+    setDropdownOpen(false);
+    setSelecionadosIds([]);
   }, [turmaId, baseUsuarios]);
+
+  // fecha dropdown ao clicar fora
+  useEffect(() => {
+    const onDown = (e) => {
+      if (!searchWrapRef.current) return;
+      if (!searchWrapRef.current.contains(e.target)) setDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
 
   function persistAlunos(nextIds) {
     if (!turmaId) return;
@@ -86,50 +108,83 @@ export default function ListaAlunos() {
       .map((u) => ({
         id: u.id,
         nome: u.nome,
-        login: getLoginDoUsuario(u), // 👈 aqui troca o "id formatado" pelo user/login
+        login: getLoginDoUsuario(u),
       }))
       .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
   }, [alunosIds, baseUsuarios]);
 
+  // ✅ candidatos: não mostra quem já está na turma e nem quem já está no buffer
   const candidatosBusca = useMemo(() => {
     const q = buscaAluno.trim().toLowerCase();
     if (!q) return [];
 
     const instituicaoId = disciplina?.instituicaoId;
 
+    const jaVinculados = new Set(alunosIds.map(Number));
+    const jaNoBuffer = new Set(selecionadosIds.map(Number));
+
     return baseUsuarios
       .filter((u) => u.tipo === "aluno")
-      .filter((u) => (instituicaoId ? Number(u.faculdadeId) === Number(instituicaoId) : true))
+      .filter((u) =>
+        instituicaoId ? Number(u.faculdadeId) === Number(instituicaoId) : true,
+      )
       .filter((u) => {
         const nomeOk = (u.nome ?? "").toLowerCase().includes(q);
         const idOk = String(u.id ?? "").includes(q);
-        const loginOk = getLoginDoUsuario(u).toLowerCase().includes(q); // 👈 busca por login também
+        const loginOk = getLoginDoUsuario(u).toLowerCase().includes(q);
         return nomeOk || idOk || loginOk;
       })
+      .filter((u) => !jaVinculados.has(Number(u.id))) // ✅ remove já vinculados
+      .filter((u) => !jaNoBuffer.has(Number(u.id)))   // ✅ remove já selecionados
       .slice(0, 8)
       .map((u) => ({
-        id: u.id,
+        id: Number(u.id),
         nome: u.nome,
         login: getLoginDoUsuario(u),
       }));
-  }, [buscaAluno, baseUsuarios, disciplina]);
+  }, [buscaAluno, baseUsuarios, disciplina, alunosIds, selecionadosIds]);
 
-  const handleAdicionarAluno = () => {
-    if (!alunoSelecionadoId) {
+  function adicionarAoBuffer(id) {
+    const n = Number(id);
+    if (Number.isNaN(n)) return;
+
+    setSelecionadosIds((prev) => Array.from(new Set([...prev, n])));
+    setBuscaAluno("");        // pronto pra buscar o próximo
+    setDropdownOpen(false);   // não tampa o botão
+  }
+
+  function removerDoBuffer(id) {
+    setSelecionadosIds((prev) => prev.filter((x) => Number(x) !== Number(id)));
+  }
+
+  const handleAdicionarSelecionados = () => {
+    if (!selecionadosIds.length) {
       Swal.fire({
         icon: "warning",
-        title: "Selecione um aluno",
-        text: "Busque e selecione um aluno antes de adicionar.",
+        title: "Selecione alunos",
+        text: "Selecione um ou mais alunos na busca antes de adicionar.",
       });
       return;
     }
 
-    const next = Array.from(new Set([...alunosIds, Number(alunoSelecionadoId)]));
-    setAlunosIds(next);
-    persistAlunos(next);
+    const next = Array.from(
+      new Set([...alunosIds, ...selecionadosIds].map(Number)),
+    );
 
+    setAlunosIds(next);
+    persistAlunos(next); // ✅ salva em storage
+
+    setSelecionadosIds([]);
     setBuscaAluno("");
-    setAlunoSelecionadoId(null);
+    setDropdownOpen(false);
+
+    Swal.fire({
+      icon: "success",
+      title: "Alunos adicionados",
+      text: "Os alunos selecionados foram adicionados à turma.",
+      timer: 1200,
+      showConfirmButton: false,
+    });
   };
 
   const handleRemoverAluno = (uid) => {
@@ -152,6 +207,8 @@ export default function ListaAlunos() {
       </div>
     );
   }
+
+  const temSelecionados = selecionadosIds.length > 0;
 
   return (
     <div className="lista-alunos-page">
@@ -176,25 +233,28 @@ export default function ListaAlunos() {
 
         <div className="la__sub">Adicione alunos</div>
 
-        <div className="la__searchWrap">
+        <div className="la__searchWrap" ref={searchWrapRef}>
           <Search size={16} className="la__searchIco" />
           <input
             value={buscaAluno}
             onChange={(e) => {
               setBuscaAluno(e.target.value);
-              setAlunoSelecionadoId(null);
+              setDropdownOpen(true);
+            }}
+            onFocus={() => {
+              if (candidatosBusca.length > 0) setDropdownOpen(true);
             }}
             placeholder="Busque por nome, matrícula..."
           />
 
-          {candidatosBusca.length > 0 && (
+          {dropdownOpen && candidatosBusca.length > 0 && (
             <div className="la__dropdown">
               {candidatosBusca.map((c) => (
                 <button
                   key={c.id}
                   type="button"
-                  className={`la__item ${Number(alunoSelecionadoId) === Number(c.id) ? "is-active" : ""}`}
-                  onClick={() => setAlunoSelecionadoId(c.id)}
+                  className="la__item"
+                  onClick={() => adicionarAoBuffer(c.id)}
                 >
                   <div className="la__itemName">{c.nome}</div>
                   <div className="la__itemSub">{c.login}</div>
@@ -204,8 +264,38 @@ export default function ListaAlunos() {
           )}
         </div>
 
-        <button type="button" className="la__add" onClick={handleAdicionarAluno}>
-          Adicionar aluno
+        {/* ✅ buffer (selecionados antes de adicionar em lote) */}
+        {temSelecionados && (
+          <div className="la__buffer">
+            {selecionadosIds.map((id) => {
+              const u = baseUsuarios.find((x) => Number(x.id) === Number(id));
+              if (!u) return null;
+              return (
+                <div className="la__chip" key={id}>
+                  <div className="la__chipName">{u.nome}</div>
+                  <div className="la__chipSub">{getLoginDoUsuario(u)}</div>
+                  <button
+                    type="button"
+                    className="la__chipX"
+                    onClick={() => removerDoBuffer(id)}
+                    aria-label="Remover da seleção"
+                    title="Remover"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
+        <button
+          type="button"
+          className={`la__add ${temSelecionados ? "is-active" : "is-muted"}`}
+          onClick={handleAdicionarSelecionados}
+          disabled={!temSelecionados}
+        >
+          Adicionar selecionados
         </button>
 
         <div className="la__list">
@@ -228,7 +318,9 @@ export default function ListaAlunos() {
             </div>
           ))}
 
-          {!alunosDetalhes.length && <div className="la__empty">Nenhum aluno adicionado.</div>}
+          {!alunosDetalhes.length && (
+            <div className="la__empty">Nenhum aluno adicionado.</div>
+          )}
         </div>
       </div>
     </div>
