@@ -35,7 +35,7 @@ export default function EditarResponsavelModal({
     const next = {
       userId: iv.userId ?? "",
       // ✅ ao adicionar novo: NÃO autopreenche nome
-      nome: isAdd ? "" : iv.nome ?? "",
+      nome: isAdd ? "" : (iv.nome ?? ""),
       cargo: iv.cargo ?? "",
       contato: iv.contato ?? "",
       permissoes: {
@@ -53,7 +53,9 @@ export default function EditarResponsavelModal({
 
   const opcoes = useMemo(() => {
     return (usuarios || [])
-      .filter((u) => ["professor", "responsavel", "coordenador"].includes(u.tipo))
+      .filter((u) =>
+        ["professor", "responsavel", "coordenador"].includes(u.tipo),
+      )
       .map((u) => ({
         user: u.user ?? u.login ?? u.username ?? "",
         nome: u.nome,
@@ -69,7 +71,8 @@ export default function EditarResponsavelModal({
     return opcoes
       .filter(
         (o) =>
-          o.nome?.toLowerCase().includes(q) || o.user?.toLowerCase().includes(q)
+          o.nome?.toLowerCase().includes(q) ||
+          o.user?.toLowerCase().includes(q),
       )
       .slice(0, 8);
   }, [queryUser, opcoes]);
@@ -243,7 +246,9 @@ export default function EditarResponsavelModal({
                       key={o.user}
                       type="button"
                       className={`erm__item ${
-                        String(draft.userId) === String(o.user) ? "is-active" : ""
+                        String(draft.userId) === String(o.user)
+                          ? "is-active"
+                          : ""
                       }`}
                       onClick={() => pickUser(o)}
                     >
@@ -256,21 +261,25 @@ export default function EditarResponsavelModal({
             </div>
           </div>
 
-          {/* CARGO (SELECT) */}
+          {/* CARGO (DIGITÁVEL) */}
           <div className="erm__field">
             <label>
               Cargo {hasContato ? <span className="erm__req">*</span> : null}
             </label>
 
             <div className="erm__inputWrap">
-              <select value={draft.cargo} onChange={handleChangeCargo}>
-                <option value="">Selecione</option>
-                <option value="Professor">Professor</option>
-                <option value="Responsável">Responsável</option>
-              </select>
+              <input
+                type="text"
+                value={draft.cargo}
+                onChange={handleChangeCargo}
+                placeholder="Digite o cargo"
+                aria-invalid={!!errors.cargo}
+              />
             </div>
 
-            {errors.cargo ? <div className="erm__fieldError">{errors.cargo}</div> : null}
+            {errors.cargo ? (
+              <div className="erm__fieldError">{errors.cargo}</div>
+            ) : null}
           </div>
 
           {/* CONTATO */}
@@ -285,7 +294,8 @@ export default function EditarResponsavelModal({
                 // ✅ se existe erro de cargo e o contato mudou, revalida visualmente (remove erro só se contato ficou vazio)
                 if (errors.cargo) {
                   const contatoTrim = String(v || "").trim();
-                  if (!contatoTrim) setErrors((p) => ({ ...p, cargo: undefined }));
+                  if (!contatoTrim)
+                    setErrors((p) => ({ ...p, cargo: undefined }));
                 }
               }}
               placeholder="Telefone, e-mail ou WhatsApp"
