@@ -30,9 +30,12 @@ export default function EditarResponsavelModal({
     if (!open) return;
 
     const iv = initialValue || {};
+    const isAdd = !initialValue;
+
     const next = {
       userId: iv.userId ?? "",
-      nome: iv.nome ?? "",
+      // ✅ ao adicionar novo: NÃO autopreenche nome
+      nome: isAdd ? "" : iv.nome ?? "",
       cargo: iv.cargo ?? "",
       contato: iv.contato ?? "",
       permissoes: {
@@ -43,7 +46,8 @@ export default function EditarResponsavelModal({
 
     setDraft(next);
     setErrors({});
-    setQueryUser(next.nome || "");
+    // ✅ ao adicionar novo: input de busca vem vazio
+    setQueryUser(isAdd ? "" : next.nome || "");
     setDropdownOpen(false);
   }, [open, initialValue]);
 
@@ -89,30 +93,13 @@ export default function EditarResponsavelModal({
     if (e.target?.classList?.contains("erm__overlay")) onClose?.();
   };
 
+  // ✅ ao selecionar, só preenche userId e nome (NÃO sugere cargo nem contato)
   const pickUser = (o) => {
-    setDraft((prev) => {
-      const cargoSugerido =
-        prev.cargo ||
-        (o.tipo === "professor"
-          ? "Professor"
-          : o.tipo === "responsavel"
-          ? "Responsável"
-          : o.tipo === "coordenador"
-          ? "Coordenador"
-          : "");
-
-      // ✅ Se existir cargo (o atual ou o sugerido), podemos popular contato do usuário selecionado
-      const contatoNext = cargoSugerido ? (o.contato || prev.contato) : prev.contato;
-
-      return {
-        ...prev,
-        userId: o.user,
-        nome: o.nome,
-        cargo: cargoSugerido,
-        contato: contatoNext,
-      };
-    });
-
+    setDraft((prev) => ({
+      ...prev,
+      userId: o.user,
+      nome: o.nome,
+    }));
     setQueryUser(o.nome);
     setDropdownOpen(false);
   };
@@ -130,20 +117,23 @@ export default function EditarResponsavelModal({
     }));
   };
 
-  // ✅ Cargo não apaga mais o contato
   const handleChangeCargo = (e) => {
     const value = e.target.value;
     setDraft((prev) => ({ ...prev, cargo: value }));
-    setErrors((prev) => ({ ...prev, contato: undefined })); // limpa erro ao editar
+    // ✅ se o usuário ajustou cargo, remove erro de cargo
+    setErrors((prev) => ({ ...prev, cargo: undefined }));
   };
 
   const validate = () => {
     const next = {};
-    const hasCargo = !!String(draft.cargo || "").trim();
 
-    // ✅ Contato obrigatório somente quando cargo existir
-    if (hasCargo && !String(draft.contato || "").trim()) {
-      next.contato = "Contato é obrigatório quando houver cargo.";
+    const contatoTrim = String(draft.contato || "").trim();
+    const cargoTrim = String(draft.cargo || "").trim();
+
+    // ✅ REGRA NOVA (invertida):
+    // Se contato estiver preenchido -> cargo obrigatório
+    if (contatoTrim && !cargoTrim) {
+      next.cargo = "Cargo é obrigatório quando houver contato.";
     }
 
     setErrors(next);
@@ -156,9 +146,9 @@ export default function EditarResponsavelModal({
 
     onSave?.({
       userId: String(draft.userId),
-      nome: draft.nome,
-      cargo: draft.cargo,
-      contato: draft.contato,
+      nome: String(draft.nome || "").trim(),
+      cargo: String(draft.cargo || "").trim(),
+      contato: String(draft.contato || "").trim(),
       permissoes: { ...draft.permissoes },
     });
   };
@@ -184,7 +174,7 @@ export default function EditarResponsavelModal({
     onClose?.();
   };
 
-  const hasCargo = !!String(draft.cargo || "").trim();
+  const hasContato = !!String(draft.contato || "").trim();
 
   return (
     <div
@@ -219,12 +209,16 @@ export default function EditarResponsavelModal({
               <input
                 value={queryUser}
                 onChange={(e) => {
-                  setQueryUser(e.target.value);
+                  const v = e.target.value;
+                  setQueryUser(v);
                   setDropdownOpen(true);
+
+                  // ✅ deixa o nome ser digitado pelo usuário
+                  // mas NÃO define userId até selecionar alguém
                   setDraft((prev) => ({
                     ...prev,
                     userId: "",
-                    nome: e.target.value,
+                    nome: v,
                   }));
                 }}
                 onFocus={() => setDropdownOpen(true)}
@@ -262,36 +256,41 @@ export default function EditarResponsavelModal({
             </div>
           </div>
 
-          {/* CARGO */}
-          <div className="erm__field">
-            <label>Cargo</label>
-            <input
-              type="text"
-              value={draft.cargo}
-              onChange={handleChangeCargo}
-              placeholder="Ex.: Professor, Coordenador, Responsável..."
-            />
-          </div>
-
-          {/* ✅ CONTATO: sempre aparece */}
+          {/* CARGO (SELECT) */}
           <div className="erm__field">
             <label>
-              Contato {hasCargo ? <span className="erm__req">*</span> : null}
+              Cargo {hasContato ? <span className="erm__req">*</span> : null}
             </label>
+
+            <div className="erm__inputWrap">
+              <select value={draft.cargo} onChange={handleChangeCargo}>
+                <option value="">Selecione</option>
+                <option value="Professor">Professor</option>
+                <option value="Responsável">Responsável</option>
+              </select>
+            </div>
+
+            {errors.cargo ? <div className="erm__fieldError">{errors.cargo}</div> : null}
+          </div>
+
+          {/* CONTATO */}
+          <div className="erm__field">
+            <label>Contato</label>
             <input
               value={draft.contato}
               onChange={(e) => {
                 const v = e.target.value;
                 setDraft((p) => ({ ...p, contato: v }));
-                if (errors.contato) setErrors((p) => ({ ...p, contato: undefined }));
+
+                // ✅ se existe erro de cargo e o contato mudou, revalida visualmente (remove erro só se contato ficou vazio)
+                if (errors.cargo) {
+                  const contatoTrim = String(v || "").trim();
+                  if (!contatoTrim) setErrors((p) => ({ ...p, cargo: undefined }));
+                }
               }}
               placeholder="Telefone, e-mail ou WhatsApp"
-              required={hasCargo}
-              aria-invalid={!!errors.contato}
+              aria-invalid={!!errors.cargo}
             />
-            {errors.contato ? (
-              <div className="erm__fieldError">{errors.contato}</div>
-            ) : null}
           </div>
 
           <div className="erm__divider" />
@@ -350,9 +349,7 @@ export default function EditarResponsavelModal({
 
           <button
             type="button"
-            className={`erm__btn erm__btn--primary ${
-              !draft.userId ? "is-disabled" : ""
-            }`}
+            className={`erm__btn erm__btn--primary ${!draft.userId ? "is-disabled" : ""}`}
             onClick={save}
             disabled={!draft.userId}
           >
