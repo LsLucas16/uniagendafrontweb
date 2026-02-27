@@ -20,12 +20,7 @@ $et-fundo-input: #f3f5f7;
     margin-bottom: 24px;
 
     h1 {
-      margin: 0;
-      font-size: 28px;
-      line-height: 1.2;
-      font-weight: 700;
-      color: $et-azul-primario;
-      letter-spacing: -0.2px;
+      @include titulo;
     }
 
     p {

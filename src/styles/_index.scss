@@ -45,3 +45,12 @@ $ui-card-shadow: 0 8px 18px rgba(16, 24, 40, 0.05);
   padding: 20px 16px 18px;
   border-radius: 16px;
 } 
+
+@mixin titulo{
+  color: rgba(46, 74, 103, 1);
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}

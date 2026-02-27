@@ -17,12 +17,7 @@ $branco: #FFFFFF;
 
 
 .titulo-sessao {
-  margin: 0 0 14px;
-  color: $azul-primario;
-  font-size: 28px;
-  line-height: 1.15;
-  font-weight: 600;
-  letter-spacing: -0.2px;
+ @include titulo;
 }
 
 .titulo-evento{
