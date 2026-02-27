@@ -8,6 +8,8 @@ const defaultPerms = {
   alunos: true,
 };
 
+
+
 // ✅ ajuste para a SUA chave real no localStorage
 const RESPONSAVEIS_STORAGE_KEY = "responsaveis_v1";
 
@@ -25,6 +27,8 @@ export default function EditarResponsavelModal({
   const [queryUser, setQueryUser] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const searchRef = useRef(null);
+
+  const isAdd = !initialValue;
 
   useEffect(() => {
     if (!open) return;
@@ -197,8 +201,14 @@ export default function EditarResponsavelModal({
         </button>
 
         <div className="erm__header">
-          <div className="erm__title">Editar responsável</div>
-          <div className="erm__subtitle">Revise os dados do responsável</div>
+          <div className="erm__title">
+            {isAdd ? "Adicionar responsável" : "Editar responsável"}
+          </div>
+          <div className="erm__subtitle">
+            {isAdd
+              ? "Preencha os dados do novo responsável"
+              : "Revise os dados do responsável"}
+          </div>
         </div>
 
         <div className="erm__body">
@@ -263,9 +273,7 @@ export default function EditarResponsavelModal({
 
           {/* CARGO (DIGITÁVEL) */}
           <div className="erm__field">
-            <label>
-              Cargo
-            </label>
+            <label>Cargo</label>
 
             <div className="erm__inputWrap">
               <input
