@@ -8,8 +8,6 @@ const defaultPerms = {
   alunos: true,
 };
 
-
-
 // ✅ ajuste para a SUA chave real no localStorage
 const RESPONSAVEIS_STORAGE_KEY = "responsaveis_v1";
 
@@ -42,10 +40,16 @@ export default function EditarResponsavelModal({
       nome: isAdd ? "" : (iv.nome ?? ""),
       cargo: iv.cargo ?? "",
       contato: iv.contato ?? "",
-      permissoes: {
-        ...defaultPerms,
-        ...(iv.permissoes || {}),
-      },
+      permissoes: isAdd
+        ? {
+            eventos: false,
+            responsaveis: false,
+            alunos: false,
+          }
+        : {
+            ...defaultPerms,
+            ...(iv.permissoes || {}),
+          },
     };
 
     setDraft(next);
