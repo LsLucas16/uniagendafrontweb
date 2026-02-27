@@ -264,7 +264,7 @@ export default function EditarResponsavelModal({
           {/* CARGO (DIGITÁVEL) */}
           <div className="erm__field">
             <label>
-              Cargo {hasContato ? <span className="erm__req">*</span> : null}
+              Cargo
             </label>
 
             <div className="erm__inputWrap">

@@ -125,15 +125,15 @@ export default function EditarTurma() {
   }, []);
 
   useEffect(() => {
-  const onDown = (e) => {
-    if (!searchWrapRef.current) return;
-    if (!searchWrapRef.current.contains(e.target)) {
-      setDropdownOpen(false);
-    }
-  };
-  document.addEventListener("mousedown", onDown);
-  return () => document.removeEventListener("mousedown", onDown);
-}, []);
+    const onDown = (e) => {
+      if (!searchWrapRef.current) return;
+      if (!searchWrapRef.current.contains(e.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, []);
 
   const turmaId = useMemo(() => {
     const n = disciplinaAtualId ? Number(disciplinaAtualId) : 0;
@@ -375,6 +375,14 @@ export default function EditarTurma() {
     setBuscaAluno("");
     setAlunoSelecionadoId(null);
     setDropdownOpen(false);
+
+    Swal.fire({
+      icon: "success",
+      title: "Alunos adicionados",
+      text: "Os alunos selecionados foram adicionados à turma.",
+      timer: 1200,
+      showConfirmButton: false,
+    });
   };
 
   const handleRemoverAluno = (uid) => {
