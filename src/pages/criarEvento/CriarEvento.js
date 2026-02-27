@@ -36,7 +36,9 @@ function getDisciplinaAtualId() {
  * (No seu JSON não existe "turmas", então usamos dados.disciplinas)
  */
 function getTurmasDisponiveis({ instituicaoId }) {
-  const disciplinas = Array.isArray(dados?.disciplinas) ? dados.disciplinas : [];
+  const disciplinas = Array.isArray(dados?.disciplinas)
+    ? dados.disciplinas
+    : [];
 
   return disciplinas
     .filter((d) => Number(d?.instituicaoId) === Number(instituicaoId))
@@ -73,7 +75,7 @@ const CriarEvento = () => {
 
   const instituicaoId = useMemo(
     () => Number(usuario?.faculdadeId) || null,
-    [usuario]
+    [usuario],
   );
 
   const turmasDisponiveis = useMemo(() => {
@@ -176,7 +178,7 @@ const CriarEvento = () => {
         ? new Date(
             startDate.getFullYear(),
             startDate.getMonth(),
-            startDate.getDate()
+            startDate.getDate(),
           ).toISOString()
         : null;
 
@@ -230,8 +232,8 @@ const CriarEvento = () => {
               (modoTurmas === "all"
                 ? turmasDisponiveis.map((t) => Number(t.id))
                 : turmaIds
-              ).filter((x) => Number.isFinite(x) && x > 0)
-            )
+              ).filter((x) => Number.isFinite(x) && x > 0),
+            ),
           )
         : undefined;
 
@@ -297,15 +299,13 @@ const CriarEvento = () => {
           </span>
 
           <span
-            className={
-              value ? "date-input__value" : "date-input__placeholder"
-            }
+            className={value ? "date-input__value" : "date-input__placeholder"}
           >
             {value || placeholder}
           </span>
         </button>
       );
-    }
+    },
   );
 
   return (
@@ -504,7 +504,7 @@ const CriarEvento = () => {
               <label>Data do evento</label>
 
               <div className="input-calendario-wrapper">
-                <DatePicker
+                {/* <DatePicker
                   selected={startDate}
                   onChange={(date) => setStartDate(date)}
                   locale="pt-BR"
@@ -575,6 +575,13 @@ const CriarEvento = () => {
                       </div>
                     );
                   }}
+                />*/}
+                <input
+                  type="date"
+                  className="input-estilizado"
+                  value={startDate || ""}
+                  min={new Date().toISOString().split("T")[0]}
+                  onChange={(e) => setStartDate(e.target.value)}
                 />
               </div>
             </div>
