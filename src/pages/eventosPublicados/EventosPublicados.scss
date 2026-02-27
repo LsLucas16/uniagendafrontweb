@@ -496,7 +496,90 @@
   color: #98a2b3;
 }
 
-/* (Opcional) se ainda existir no arquivo, pode remover:
-.evento-default-updatedTop { ... }
-.evento-default-bottom { ... }
-*/
+/* Ajustes Professor conforme Figma */
+
+.evento-default-title {
+  font-size: 16px;
+  font-weight: 400; 
+  color: rgba(114, 122, 142, 1);
+  margin-bottom: 4px;
+}
+
+.evento-default-updatedTop {
+  font-size: 11px;
+  font-weight: 600;
+  color: #98a2b3;
+  margin-bottom: 8px;
+}
+
+.evento-default-createdBottom {
+  font-size: 11px;
+  color: #98a2b3;
+
+  strong {
+    font-weight: 700;
+    color: #667085;
+  }
+}
+
+.evento-default-desc {
+  font-size: 14px;
+  font-weight: 500; /* antes 600 */
+  color: #667085;
+}
+
+
+/* =========================
+   PROFESSOR — 3 VARIANTES
+   (cal+destaque / só cal / só destaque)
+========================= */
+
+.evento-default-createdTop,
+.evento-default-createdBottom {
+  font-size: 12px;
+  color: #98a2b3;
+
+  strong {
+    color: #667085;
+    font-weight: 800;
+  }
+}
+
+/* ✅ BOTH (cal + destaque): rodapé em linha (Data esq / Última atualização dir) */
+.evento-card--both .evento-default-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* ✅ SINGLE (só cal OU só destaque): rodapé vira coluna e "Criado por" fica embaixo */
+.evento-card--single .evento-default-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+/* Top updated (quando não é both) */
+.evento-default-updatedTop {
+  font-size: 11px;
+  font-weight: 600;
+  color: #98a2b3;
+  margin-bottom: 8px;
+}
+
+/* Bottom updated (quando é both) */
+.evento-default-updatedBottom {
+  font-size: 10px;
+  font-weight: 700;
+  color: #98a2b3;
+}
+
+/* Data do evento */
+.evento-default-eventdate {
+  font-size: 10px;
+  font-weight: 700;
+  color: #98a2b3;
+}

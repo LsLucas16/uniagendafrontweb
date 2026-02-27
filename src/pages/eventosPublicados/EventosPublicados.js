@@ -190,15 +190,32 @@ function CardDefault({
   temCalendario,
   temDestaque,
 }) {
+  const isBoth = temCalendario && temDestaque; // ✅ variante 1
+
   return (
-    <article key={ev.id} className="evento-card evento-card--default">
+    <article
+      key={ev.id}
+      className={`evento-card evento-card--default ${
+        isBoth ? "evento-card--both" : "evento-card--single"
+      }`}
+    >
       <div className="evento-default-top">
         <div className="evento-default-left">
           <div className="evento-default-title">{ev.titulo}</div>
 
-          <div className="evento-default-createdTop">
-            Criado por: <strong>{criadoPor}</strong>
-          </div>
+          {/* ✅ quando for SÓ 1 chip (cal OU dest), a "Última atualização" aparece aqui em cima */}
+          {!isBoth && (
+            <div className="evento-default-updatedTop">
+              Última atualização: {dataAtual}
+            </div>
+          )}
+
+          {/* ✅ Criado por muda de lugar conforme a combinação */}
+          {isBoth && (
+            <div className="evento-default-createdTop">
+              Criado por: <strong>{criadoPor}</strong>
+            </div>
+          )}
 
           {(temCalendario || temDestaque) && (
             <div className="evento-default-chips">
@@ -212,6 +229,7 @@ function CardDefault({
           )}
         </div>
 
+        {/* ✅ só aparece editar quando tem calendário (você já garante em podeEditar) */}
         {podeEditar && (
           <button
             type="button"
@@ -234,15 +252,21 @@ function CardDefault({
         <div className="evento-default-desc">{ev.descricao}</div>
       ) : null}
 
-      {/* ✅ Rodapé: Data do evento (esq) + Última atualização (dir) */}
       <div className="evento-default-footer">
         <div className="evento-default-eventdate">
           {temDataEvento ? `Data do evento: ${dataEventoFmt}` : ""}
         </div>
 
-        <div className="evento-default-updatedBottom">
-          Última atualização: {dataAtual}
-        </div>
+        {/* ✅ quando for BOTH, a última atualização vai para o rodapé (direita) */}
+        {isBoth ? (
+          <div className="evento-default-updatedBottom">
+            Última atualização: {dataAtual}
+          </div>
+        ) : (
+          <div className="evento-default-createdBottom">
+            Criado por: {criadoPor}
+          </div>
+        )}
       </div>
     </article>
   );
