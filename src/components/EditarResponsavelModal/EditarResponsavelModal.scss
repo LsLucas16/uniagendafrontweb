@@ -285,13 +285,17 @@ $focusBorder: rgba(115, 165, 215, 0.95);
 .erm__check input:checked + .erm__checkBox::after {
   content: "";
   position: absolute;
-  left: 4px;
-  top: 2px;
-  width: 5px;
+
+  top: 45%;
+  left: 50%;
+
+  width: 4px;
   height: 9px;
+
   border: solid $bg;
   border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
+
+  transform: translate(-50%, -55%) rotate(45deg);
 }
 
 /* ============ Footer / Buttons ============ */
