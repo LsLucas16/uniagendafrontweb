@@ -311,7 +311,6 @@ const CriarEvento = () => {
   return (
     <div className="painel-evento">
       <div className="eventos-wrap">
-        {/* CARD 1 */}
         <section className="card-bloco">
           <h1 className="titulo-sessao">Criar novo evento</h1>
 

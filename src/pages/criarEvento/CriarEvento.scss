@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
+@import "../../styles/index";
+
 $azul-primario: #334E68;
 $azul-claro: #7FB3D5;
 $cinza-borda: #E2E8F0;
@@ -9,49 +11,24 @@ $branco: #FFFFFF;
 * { box-sizing: border-box; }
 
 .painel-evento {
-  min-height: 100vh; 
-  min-height: 100dvh;
-  background: $fundo;
-  font-family: 'Inter', sans-serif;
-
-  /* 👇 diminui o espaço do lado esquerdo */
-  padding: 0px 0px 0px 0px;
-
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  overflow-x: hidden;
+  @include uiPageShell;
 }
 
-.card-form {
-  /* ✅ em telas grandes fica “próximo do figma”, mas nunca estoura */
-  width: min(1128px, calc(100% - 10px));  /* 48px = 24px + 24px do padding do container */
-  min-height: 658px;
-
-  background: #fff;
-  border-radius: 20px 0 0 20px;
-  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.04);
-
-  padding: 34px 42px;
-  align-self: flex-start;
-
-  margin-left: 0; /* ✅ remova o -12px para não empurrar pra fora */
-}
 
 
 .titulo-sessao {
+  margin: 0 0 14px;
   color: $azul-primario;
   font-size: 28px;
-  font-weight: 700;
-  margin-bottom: 18px;
+  line-height: 1.15;
   font-weight: 600;
+  letter-spacing: -0.2px;
 }
 
 .titulo-evento{
   font-weight: 600;
 }
 
-.formulario { margin-top: 10px; }
 
 .campo {
   margin-bottom: 22px;
@@ -162,18 +139,8 @@ textarea.input-estilizado {
 }
 
 @media (max-width: 900px) {
-  .painel-evento { padding: 16px; }
-  .card-form { padding: 26px 22px; border-radius: 14px; }
   .titulo-sessao { font-size: 24px; }
   .btn-publicar { width: 100%; }
-}
-
-@media (max-width: 1200px) {
-  .card-form {
-    width: 100%;
-    min-height: unset;
-    border-radius: 20px; /* em telas menores fica natural */
-  }
 }
 
 
@@ -795,23 +762,12 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
   }
 }
 
-/* ===============================
-   CARDS SEPARADOS (igual ao Figma)
-   =============================== */
-
-.eventos-wrap {
-  width: min(1128px, calc(100% - 10px));
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px 0; /* respiro vertical */
-}
 
 .card-bloco {
-  background: $branco;
-  border-radius: 16px;
-  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.04);
-  padding: 22px 24px;
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
 }
 
 .titulo-bloco {
@@ -828,18 +784,10 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
 
 /* em telas menores mantém o mesmo padrão */
 @media (max-width: 900px) {
-  .eventos-wrap {
-    width: 100%;
-    padding: 12px 0;
-    gap: 12px;
-  }
-
-  .card-bloco {
-    padding: 18px 16px;
-    border-radius: 14px;
-  }
+  .eventos-wrap { @include uiWhiteContainerMobile; }
+  .btn-publicar { width: 100%; }
+  .titulo-sessao { font-size: 24px; }
 }
-
 
 .turmas-toggle {
   display: inline-flex;

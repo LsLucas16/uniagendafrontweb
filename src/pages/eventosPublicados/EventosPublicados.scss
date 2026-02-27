@@ -1,23 +1,10 @@
 /* EventosPublicados.scss */
 
+@import "../../styles/index";
+
 /* Fundo geral (Figma parece um cinza MUITO leve) */
 .eventos-publicados-page {
-  background: #f4f6f9;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 18px 12px;
-}
-
-/* Container principal branco com sombra leve */
-.eventos-publicados-container {
-  width: min(1128px, 100%);
-  background: #ffffff;
-  border-radius: 18px;
-  border: 1px solid #e9eef6;
-  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.05);
-  padding: 26px 26px 22px;
+@include uiPageShell;
 }
 
 /* Header */
