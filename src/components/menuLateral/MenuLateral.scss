@@ -91,18 +91,20 @@
 
   &__header {
     display: flex;
-    align-items: center;
     gap: 12px;
     cursor: pointer;
     transition: all 0.2s ease-in-out;
+    align-items: flex-start;   
+    padding-top: 10px;
 
     /* --- HEADER FECHADO --- */
     &:not(.active) {
       position: relative;
       margin-left: -$sidePad;
       margin-right: -$sidePad;
-      padding: 0 $sidePad 10px $sidePad;
       border-radius: 0;
+
+      padding: 5.7px $sidePad;
 
       &::after {
         content: "";
@@ -137,8 +139,8 @@
   }
 
   &__avatar {
-    width: 42px;
-    height: 42px;
+    width: 34px;
+    height: 34px;
     background-color: #7db0db;
     color: white;
     border-radius: 50%;
@@ -146,7 +148,7 @@
     align-items: center;
     justify-content: center;
     font-weight: 600;
-    font-size: 18px;
+    font-size: 16px;
     flex-shrink: 0;
   }
 
@@ -159,8 +161,10 @@
   &__brand span {
     color: #727A8E;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: -0.13px;
+    position: relative;
+    top: -10px;
   }
 
   /* =====================================================
@@ -422,3 +426,7 @@
 }
 
 
+.menuLateral__avatar {
+  position: relative;
+  top: -6px;   /* ajuste fino */
+}
