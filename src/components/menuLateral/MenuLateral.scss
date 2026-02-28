@@ -64,8 +64,8 @@
 ========================= */
 &__turmaBox {
   margin-top: 0px;
-  padding-top: 16px;
-  padding-bottom: 16px;
+  padding-top: 0px;
+  padding-bottom: 25px;
   position: relative;
 
   /* ✅ só linha pontilhada embaixo */
@@ -84,7 +84,7 @@
   display: block;
   margin-bottom: 10px;       /* ✅ distancia do select como no figma */
   font-size: 18px;           /* no print parece maior */
-  font-weight: 700;
+  font-weight: 300;
   color: rgba(46, 74, 103, 1);
 }
 
@@ -311,15 +311,6 @@
       }
     }
 
-    &.active {
-      background-color: #76A8D9;
-      color: #eef2ff;
-      box-shadow: 0 6px 14px rgba(46, 74, 103, 0.14);
-
-      svg {
-        color: #eef2ff;
-      }
-    }
   }
 
   /* =====================================================
