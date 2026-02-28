@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useMemo } from "react";
+import React, { useState, forwardRef, useMemo, useRef } from "react";
 import DatePicker, { registerLocale } from "react-datepicker";
 import ptBR from "date-fns/locale/pt-BR";
 import Swal from "sweetalert2";
@@ -56,6 +56,7 @@ const CriarEvento = () => {
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [startDate, setStartDate] = useState(null);
+  const inputRef = useRef(null);
 
   const [notificacoes, setNotificacoes] = useState({
     calendario: false,
@@ -504,84 +505,17 @@ const CriarEvento = () => {
               <label>Data do evento</label>
 
               <div className="input-calendario-wrapper">
-                {/* <DatePicker
-                  selected={startDate}
-                  onChange={(date) => setStartDate(date)}
-                  locale="pt-BR"
-                  dateFormat="dd/MM/yyyy"
-                  minDate={new Date()}
-                  placeholderText="Escolha uma data"
-                  customInput={
-                    <InputDataComIcone placeholder="Escolha uma data" />
-                  }
-                  calendarClassName="calendario-customizado"
-                  popperClassName="popper-calendario"
-                  showPopperArrow={false}
-                  fixedHeight
-                  disabledKeyboardNavigation
-                  openToDate={startDate ?? new Date()}
-                  renderCustomHeader={({
-                    date,
-                    decreaseMonth,
-                    increaseMonth,
-                  }) => {
-                    const hoje = new Date();
-                    const firstOfCurrentMonth = new Date(
-                      hoje.getFullYear(),
-                      hoje.getMonth(),
-                      1
-                    );
-                    const firstOfShownMonth = new Date(
-                      date.getFullYear(),
-                      date.getMonth(),
-                      1
-                    );
-                    const prevDisabled =
-                      firstOfShownMonth <= firstOfCurrentMonth;
-
-                    return (
-                      <div className="cal-header cal-header--figma">
-                        <button
-                          type="button"
-                          className={`cal-nav cal-nav--figma ${
-                            prevDisabled ? "is-disabled" : ""
-                          }`}
-                          onClick={() => {
-                            if (!prevDisabled) decreaseMonth();
-                          }}
-                          aria-label="Mês anterior"
-                          disabled={prevDisabled}
-                        >
-                          ‹
-                        </button>
-
-                        <div className="cal-title cal-title--figma">
-                          {date
-                            .toLocaleDateString("pt-BR", {
-                              month: "long",
-                              year: "numeric",
-                            })
-                            .replace(/^./, (c) => c.toUpperCase())}
-                        </div>
-
-                        <button
-                          type="button"
-                          className="cal-nav cal-nav--figma"
-                          onClick={increaseMonth}
-                          aria-label="Próximo mês"
-                        >
-                          ›
-                        </button>
-                      </div>
-                    );
-                  }}
-                />*/}
                 <input
                   type="date"
                   className="input-estilizado"
-                  value={startDate || ""}
+                  value={startDate ? startDate.toISOString().split("T")[0] : ""}
                   min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) => setStartDate(e.target.value)}
+                  onChange={(e) =>
+                    setStartDate(
+                      e.target.value ? new Date(e.target.value) : null,
+                    )
+                  }
+                  onClick={(e) => e.target.showPicker?.()}
                 />
               </div>
             </div>

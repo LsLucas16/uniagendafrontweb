@@ -103,7 +103,7 @@ function CardCoordenador({
       <div className="evento-card-top">
         <div className="evento-card-titleblock">
           <div className="evento-card-createdbyline">
-            Criado por: <strong>{criadoPor}</strong>
+            Criado por: {criadoPor}
           </div>
 
           <div className="evento-card-title">{ev.titulo}</div>
@@ -213,7 +213,7 @@ function CardDefault({
           {/* ✅ Criado por muda de lugar conforme a combinação */}
           {isBoth && (
             <div className="evento-default-createdTop">
-              Criado por: <strong>{criadoPor}</strong>
+              Criado por: {criadoPor}
             </div>
           )}
 
