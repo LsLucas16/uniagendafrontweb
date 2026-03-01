@@ -278,40 +278,44 @@
     padding-top: 12px;
   }
 
-  &__btn {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 12px 20px;
+&__btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 20px;
 
-    border: none;
-    border-radius: 30px;
-    background-color: #eef2ff;
+  border: none;
+  border-radius: 30px;
+
+  background-color: transparent; /* ✅ sem fundo */
+  color: #2e4a67;
+
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition: all .2s ease;
+
+  svg {
     color: #2e4a67;
+    transition: color .2s ease;
+  }
 
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
+  /* ✅ Hover */
+  &:hover {
+    background-color: rgba(238, 242, 255, 1);
+  }
 
-    transition: all .2s ease;
+  /* ✅ Página ativa */
+  &.active {
+    background-color: rgba(118, 168, 217, 1);
+    color: rgba(255, 255, 255, 1);
 
     svg {
-      color: #2e4a67;
-      transition: color .2s ease;
+      color: rgba(255, 255, 255, 1);
     }
-
-    &:hover {
-      background-color: #76A8D9;
-      color: #eef2ff;
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(46, 74, 103, 0.14);
-
-      svg {
-        color: #eef2ff;
-      }
-    }
-
   }
+}
 
   /* =====================================================
      ALUNO (ACORDEÃO)

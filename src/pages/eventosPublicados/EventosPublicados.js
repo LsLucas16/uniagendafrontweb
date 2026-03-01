@@ -104,7 +104,7 @@ function CardCoordenador({
         <div className="evento-card-titleblock">
           <div className="evento-card-createdbyline">
             Criado por: {criadoPor}
-          </div>
+          </div>  
 
           <div className="evento-card-title">{ev.titulo}</div>
           <div className="evento-card-desc">{ev.descricao}</div>
