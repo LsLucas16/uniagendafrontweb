@@ -193,7 +193,7 @@ $azul-secundario: #667085;
 
 .evento-card-createdbyline {
   font-size: 12px;
-  color:$azul-principal;
+  color: $azul-secundario;
   margin-bottom: 6px;
   font-weight: 500;
 }
@@ -201,7 +201,7 @@ $azul-secundario: #667085;
 .evento-card-title {
   font-size: 24px;
   line-height: 1.12;
-  font-weight: 700;
+  font-weight: 600;
   color: $azul-principal;
   margin: 0 0 10px 0;
   letter-spacing: -0.2px;
@@ -210,8 +210,8 @@ $azul-secundario: #667085;
 .evento-card-desc {
   font-size: 20px;
   line-height: 1.25;
-  font-weight: 700;
-  color: $azul-principal;
+  font-weight: 600;
+  color: $azul-secundario;
   margin: 0;
   max-width: 920px;
 }
@@ -238,7 +238,7 @@ $azul-secundario: #667085;
   flex-direction: column;
   gap: 3px;
   font-size: 12px;
-  color: #98a2b3;
+  color: $azul-secundario;
   line-height: 1.2;
 }
 
@@ -509,3 +509,5 @@ $azul-secundario: #667085;
   font-weight: 400;
   color: #98a2b3;
 }
+
+
