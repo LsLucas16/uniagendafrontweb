@@ -443,7 +443,7 @@ const CriarEvento = () => {
 
               {modoTurmas === "all" && (
                 <div className="turmas-info">
-                  Todas as turmas aos cuidados desse coordenador serão
+                  Todas as turmas aos cuidados dessa coordenação serão
                   notificadas.
                 </div>
               )}
