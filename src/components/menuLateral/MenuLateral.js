@@ -292,7 +292,7 @@ useEffect(() => {
                 onClick={() => navigate("/editar-turma")}
               >
                 <Settings size={20} />
-                <span>Editar Turmas</span>
+                <span>Editar Turma</span>
               </button>
 
               <button
