@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Pencil, Upload, Search, X } from "lucide-react";
 import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
 import Swal from "sweetalert2";
@@ -71,14 +71,15 @@ function getDisciplinaAtualId() {
 }
 
 export default function EditarTurma() {
-  const navigate = useNavigate();
-
   // modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("edit");
   const [editIndex, setEditIndex] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const searchWrapRef = useRef(null);
+
+  const navigate = useNavigate();
+  const { id: routeTurmaId } = useParams();
 
   const openEditarResponsavel = (index) => {
     setModalMode("edit");
@@ -99,8 +100,8 @@ export default function EditarTurma() {
 
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
-    getDisciplinaAtualId(),
-  );
+  routeTurmaId || getDisciplinaAtualId(),
+);
 
   useEffect(() => {
     const onDisciplinaChanged = () =>
@@ -123,6 +124,15 @@ export default function EditarTurma() {
       window.removeEventListener("storage", onStorage);
     };
   }, []);
+
+  useEffect(() => {
+  if (!routeTurmaId) return;
+
+  const routeId = String(routeTurmaId);
+  setDisciplinaAtualId(routeId);
+  localStorage.setItem("disciplinaAtualId", routeId);
+  window.dispatchEvent(new Event("disciplinaAtual:changed"));
+}, [routeTurmaId]);
 
   useEffect(() => {
     const onDown = (e) => {

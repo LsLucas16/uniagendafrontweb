@@ -30,13 +30,35 @@ const MenuLateral = () => {
   // Hooks sempre no topo
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [disciplinaAbertaId, setDisciplinaAbertaId] = useState(null);
-  const [disciplinaAtualId, setDisciplinaAtualId] = useState("");
+  const [disciplinaAtualId, setDisciplinaAtualId] = useState(() => {
+    return localStorage.getItem("disciplinaAtualId") || "";
+  });
 
   const navigate = useNavigate();
   const location = useLocation();
   const isActive = (path) => location.pathname === path;
 
   const [turmasOverrideVer, setTurmasOverrideVer] = useState(0);
+
+  useEffect(() => {
+  const syncDisciplinaAtual = () => {
+    setDisciplinaAtualId(localStorage.getItem("disciplinaAtualId") || "");
+  };
+
+  const onStorage = (e) => {
+    if (e.key === "disciplinaAtualId") {
+      syncDisciplinaAtual();
+    }
+  };
+
+  window.addEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
+  window.addEventListener("storage", onStorage);
+
+  return () => {
+    window.removeEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
+    window.removeEventListener("storage", onStorage);
+  };
+}, []);
 
   useEffect(() => {
     const bump = () => setTurmasOverrideVer((v) => v + 1);
@@ -87,7 +109,7 @@ const MenuLateral = () => {
       .filter((d) => d.instituicaoId === user.faculdadeId)
       .map((d) => {
         const ov = overrides[String(d.id)] || null;
-        return ov ? { ...d, ...ov } : d; // ✅ se ov tiver "nome", substitui
+        return ov ? { ...d, ...ov } : d;
       });
   }, [user, turmasOverrideVer]);
 
@@ -118,8 +140,9 @@ const MenuLateral = () => {
   };
 
   const isEditarTurmaAtivo =
-  location.pathname === "/editar-turma" ||
-  location.pathname === "/editar-turma-coordenador";
+    location.pathname === "/editar-turma" ||
+    location.pathname === "/editar-turma-coordenador" ||
+    location.pathname.startsWith("/editar-turma/");
 
   return (
     <aside className="menuLateral">
@@ -294,7 +317,7 @@ const MenuLateral = () => {
               </button>
 
               <button
-                className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
+                className={`menuLateral__btn ${isEditarTurmaAtivo ? "active" : ""}`}
                 onClick={() =>
                   navigate(
                     isCoordenador
@@ -335,7 +358,7 @@ const MenuLateral = () => {
               </button>
 
               <button
-                className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
+                className={`menuLateral__btn ${isEditarTurmaAtivo ? "active" : ""}`}
                 onClick={() =>
                   navigate(
                     isCoordenador
