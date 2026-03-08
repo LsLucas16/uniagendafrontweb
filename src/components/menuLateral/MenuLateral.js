@@ -38,22 +38,22 @@ const MenuLateral = () => {
 
   const [turmasOverrideVer, setTurmasOverrideVer] = useState(0);
 
-useEffect(() => {
-  const bump = () => setTurmasOverrideVer((v) => v + 1);
+  useEffect(() => {
+    const bump = () => setTurmasOverrideVer((v) => v + 1);
 
-  // evento interno que vamos disparar ao salvar na tela de editar
-  window.addEventListener("turmas:changed", bump);
+    // evento interno que vamos disparar ao salvar na tela de editar
+    window.addEventListener("turmas:changed", bump);
 
-  // se mudar em outra aba/janela
-  window.addEventListener("storage", (e) => {
-    if (e.key === STORAGE_TURMAS) bump();
-  });
+    // se mudar em outra aba/janela
+    window.addEventListener("storage", (e) => {
+      if (e.key === STORAGE_TURMAS) bump();
+    });
 
-  return () => {
-    window.removeEventListener("turmas:changed", bump);
-    window.removeEventListener("storage", bump);
-  };
-}, []);
+    return () => {
+      window.removeEventListener("turmas:changed", bump);
+      window.removeEventListener("storage", bump);
+    };
+  }, []);
 
   // pega do localStorage
   const usuarioStorage = useMemo(() => {
@@ -76,20 +76,20 @@ useEffect(() => {
     return data.instituicoes.find((i) => i.id === user.faculdadeId) || null;
   }, [user]);
 
- const disciplinasDoUsuario = useMemo(() => {
-  if (!user) return [];
+  const disciplinasDoUsuario = useMemo(() => {
+    if (!user) return [];
 
-  const ids = Array.isArray(user.disciplinas) ? user.disciplinas : [];
-  const overrides = getTurmasOverride();
+    const ids = Array.isArray(user.disciplinas) ? user.disciplinas : [];
+    const overrides = getTurmasOverride();
 
-  return (data.disciplinas || [])
-    .filter((d) => ids.includes(d.id))
-    .filter((d) => d.instituicaoId === user.faculdadeId)
-    .map((d) => {
-      const ov = overrides[String(d.id)] || null;
-      return ov ? { ...d, ...ov } : d; // ✅ se ov tiver "nome", substitui
-    });
-}, [user, turmasOverrideVer]);
+    return (data.disciplinas || [])
+      .filter((d) => ids.includes(d.id))
+      .filter((d) => d.instituicaoId === user.faculdadeId)
+      .map((d) => {
+        const ov = overrides[String(d.id)] || null;
+        return ov ? { ...d, ...ov } : d; // ✅ se ov tiver "nome", substitui
+      });
+  }, [user, turmasOverrideVer]);
 
   // Define disciplinaAtualId quando existir lista
   useEffect(() => {
@@ -116,6 +116,10 @@ useEffect(() => {
     localStorage.removeItem("token");
     navigate("/");
   };
+
+  const isEditarTurmaAtivo =
+  location.pathname === "/editar-turma" ||
+  location.pathname === "/editar-turma-coordenador";
 
   return (
     <aside className="menuLateral">
@@ -177,7 +181,9 @@ useEffect(() => {
           {/* ✅ TURMA ATUAL (coordenador / professor / responsável) */}
           {!perfilAberto && !isAluno && (
             <div className="menuLateral__turmaBox">
-              <span className="menuLateral__turmaLabel">Turma atual</span>
+              {!isCoordenador && (
+                <span className="menuLateral__turmaLabel">Turma atual</span>
+              )}
 
               <select
                 className="menuLateral__turmaSelect"
@@ -289,7 +295,13 @@ useEffect(() => {
 
               <button
                 className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
-                onClick={() => navigate("/editar-turma")}
+                onClick={() =>
+                  navigate(
+                    isCoordenador
+                      ? "/editar-turma-coordenador"
+                      : "/editar-turma",
+                  )
+                }
               >
                 <Settings size={20} />
                 <span>Editar Turma</span>
@@ -324,7 +336,13 @@ useEffect(() => {
 
               <button
                 className={`menuLateral__btn ${isActive("/editar-turma") ? "active" : ""}`}
-                onClick={() => navigate("/editar-turma")}
+                onClick={() =>
+                  navigate(
+                    isCoordenador
+                      ? "/editar-turma-coordenador"
+                      : "/editar-turma",
+                  )
+                }
               >
                 <Settings size={20} />
                 <span>Editar Turma</span>

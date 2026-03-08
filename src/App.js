@@ -1,7 +1,5 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import dados from "./data/dados.json"; // ajuste o caminho se necessário
 
 import { Login } from "./pages/login/Login";
 import { PrivateRoute } from "./PrivateRoute";
@@ -14,6 +12,7 @@ import PaginaTemporaria from "./pages/temp/PaginaTemporaria";
 import EventosPublicados from "./pages/eventosPublicados/EventosPublicados";
 import EditarEvento from "./pages/editarEvento/EditarEvento";
 import EditarTurma from "./pages/editarTurma/EditarTurma";
+import EditarTurmaCoordenador from "./pages/editarTurmaCoordenador/EditarTurmaCoordenador";
 import ListaAlunos from "./pages/listaAlunos/ListaAlunos";
 
 function App() {
@@ -78,8 +77,10 @@ function App() {
                 </Layout>
               }
             />
+          </Route>
 
-            {/* deixe a rota real aqui */}
+          {/* Somente professor e responsável */}
+          <Route element={<RoleRoute allowed={["professor", "responsavel"]} />}>
             <Route
               path="/editar-turma"
               element={
@@ -101,12 +102,20 @@ function App() {
               }
             />
 
-            {/* MUDEI o path para não conflitar com /editar-turma real */}
             <Route
-              path="/editar-turma-dev"
+              path="/editar-turma-coordenador"
               element={
                 <Layout>
-                  <PaginaTemporaria titulo="Editar Turma (Em desenvolvimento)" />
+                  <EditarTurmaCoordenador />
+                </Layout>
+              }
+            />
+
+            <Route
+              path="/editar-turma/:id"
+              element={
+                <Layout>
+                  <EditarTurma />
                 </Layout>
               }
             />
