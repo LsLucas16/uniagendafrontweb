@@ -1,10 +1,13 @@
-import React, { useMemo, useState } from "react";
-import { Search, Pencil, Trash2, Users, X, Check } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Search, Pencil, Trash2, Users } from "lucide-react";
 import dados from "../../data/dados.json";
 import "./EditarTurmaCoordenador.scss";
 import { useNavigate } from "react-router-dom";
+import Swal from "sweetalert2";
 
 const STORAGE_TURMAS = "turmas_override";
+const STORAGE_TURMA_ALUNOS = "turma_alunos_override";
+const STORAGE_TURMAS_DELETED = "turmas_deleted";
 
 function safeJsonParse(value, fallback) {
   try {
@@ -20,6 +23,19 @@ function getTurmasOverride() {
 
 function saveTurmasOverride(next) {
   localStorage.setItem(STORAGE_TURMAS, JSON.stringify(next));
+  window.dispatchEvent(new Event("turmas:changed"));
+}
+
+function getTurmaAlunosOverride() {
+  return safeJsonParse(localStorage.getItem(STORAGE_TURMA_ALUNOS), {});
+}
+
+function getTurmasDeleted() {
+  return safeJsonParse(localStorage.getItem(STORAGE_TURMAS_DELETED), []);
+}
+
+function saveTurmasDeleted(next) {
+  localStorage.setItem(STORAGE_TURMAS_DELETED, JSON.stringify(next));
   window.dispatchEvent(new Event("turmas:changed"));
 }
 
@@ -42,13 +58,40 @@ function normStr(value) {
 export default function EditarTurmaCoordenador() {
   const [busca, setBusca] = useState("");
   const [overrideVersion, setOverrideVersion] = useState(0);
-
-  const [editingId, setEditingId] = useState(null);
-  const [editingNome, setEditingNome] = useState("");
   const navigate = useNavigate();
 
   const usuario = useMemo(() => getUsuarioLogado(), []);
   const overrides = useMemo(() => getTurmasOverride(), [overrideVersion]);
+  const alunosOverride = useMemo(
+    () => getTurmaAlunosOverride(),
+    [overrideVersion],
+  );
+  const turmasDeleted = useMemo(() => getTurmasDeleted(), [overrideVersion]);
+
+  useEffect(() => {
+    const refresh = () => setOverrideVersion((v) => v + 1);
+
+    const onStorage = (e) => {
+      if (
+        e.key === STORAGE_TURMAS ||
+        e.key === STORAGE_TURMA_ALUNOS ||
+        e.key === STORAGE_TURMAS_DELETED ||
+        e.key === "disciplinaAtualId"
+      ) {
+        refresh();
+      }
+    };
+
+    window.addEventListener("turmas:changed", refresh);
+    window.addEventListener("disciplinaAtual:changed", refresh);
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("turmas:changed", refresh);
+      window.removeEventListener("disciplinaAtual:changed", refresh);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
 
   const usuarioCompleto = useMemo(() => {
     if (!usuario?.id) return null;
@@ -65,12 +108,13 @@ export default function EditarTurmaCoordenador() {
     return (dados.disciplinas || [])
       .filter((disc) => disc.instituicaoId === usuarioCompleto.faculdadeId)
       .filter((disc) => idsDoUsuario.includes(disc.id))
+      .filter((disc) => !turmasDeleted.includes(Number(disc.id)))
       .map((disc) => {
         const ov = overrides[String(disc.id)] || {};
         const professor =
           dados.usuarios.find((u) => u.id === disc.professorId) || null;
 
-        const alunos = (dados.usuarios || []).filter(
+        const alunosBase = (dados.usuarios || []).filter(
           (u) =>
             u.tipo === "aluno" &&
             u.faculdadeId === disc.instituicaoId &&
@@ -78,15 +122,24 @@ export default function EditarTurmaCoordenador() {
             u.disciplinas.includes(disc.id),
         );
 
+        const alunosIdsOverride = Array.isArray(alunosOverride[String(disc.id)])
+          ? alunosOverride[String(disc.id)].map(Number)
+          : null;
+
+        const alunosCount =
+          alunosIdsOverride !== null
+            ? alunosIdsOverride.length
+            : alunosBase.length;
+
         return {
           ...disc,
           ...ov,
           professor,
-          alunosCount: alunos.length,
+          alunosCount,
         };
       })
       .sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR"));
-  }, [usuarioCompleto, overrides]);
+  }, [usuarioCompleto, overrides, alunosOverride, turmasDeleted]);
 
   const turmasFiltradas = useMemo(() => {
     const termo = normStr(busca);
@@ -100,48 +153,60 @@ export default function EditarTurmaCoordenador() {
     });
   }, [busca, turmasDaCoordenacao]);
 
-  function handleStartEdit(turma) {
-    setEditingId(turma.id);
-    setEditingNome(String(turma.nome || ""));
-  }
+  async function handleDeleteTurma(turma) {
+    const result = await Swal.fire({
+      title: "Excluir turma?",
+      text: `Tem certeza que deseja excluir "${turma.nome}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sim, excluir",
+      cancelButtonText: "Cancelar",
+      reverseButtons: true,
+      confirmButtonColor: "#d64545",
+      cancelButtonColor: "#94a3b8",
+    });
 
-  function handleCancelEdit() {
-    setEditingId(null);
-    setEditingNome("");
-  }
+    if (!result.isConfirmed) return;
 
-  function handleSaveEdit(turmaId) {
-    const nomeFinal = editingNome.trim();
-    if (!nomeFinal) return;
+    const currentDeleted = getTurmasDeleted();
+    const nextDeleted = Array.from(
+      new Set([...currentDeleted, Number(turma.id)]),
+    );
 
-    const current = getTurmasOverride();
-    const prev = current[String(turmaId)] || {};
+    saveTurmasDeleted(nextDeleted);
 
-    const next = {
-      ...current,
-      [String(turmaId)]: {
-        ...prev,
-        nome: nomeFinal,
-      },
-    };
-
-    saveTurmasOverride(next);
-    setOverrideVersion((v) => v + 1);
-    handleCancelEdit();
-  }
-
-  function handleRemoveOverride(turmaId) {
-    const current = getTurmasOverride();
-    const next = { ...current };
-
-    delete next[String(turmaId)];
-
-    saveTurmasOverride(next);
-    setOverrideVersion((v) => v + 1);
-
-    if (editingId === turmaId) {
-      handleCancelEdit();
+    const currentOverrides = getTurmasOverride();
+    if (currentOverrides[String(turma.id)]) {
+      const nextOverrides = { ...currentOverrides };
+      delete nextOverrides[String(turma.id)];
+      saveTurmasOverride(nextOverrides);
     }
+
+    const currentAlunosOverride = getTurmaAlunosOverride();
+    if (currentAlunosOverride[String(turma.id)]) {
+      const nextAlunosOverride = { ...currentAlunosOverride };
+      delete nextAlunosOverride[String(turma.id)];
+      localStorage.setItem(
+        STORAGE_TURMA_ALUNOS,
+        JSON.stringify(nextAlunosOverride),
+      );
+    }
+
+    const disciplinaAtualId = localStorage.getItem("disciplinaAtualId");
+    if (String(disciplinaAtualId) === String(turma.id)) {
+      localStorage.removeItem("disciplinaAtualId");
+      window.dispatchEvent(new Event("disciplinaAtual:changed"));
+    }
+
+    window.dispatchEvent(new Event("turmas:changed"));
+    setOverrideVersion((v) => v + 1);
+
+    await Swal.fire({
+      title: "Turma excluída",
+      text: "A alteração foi salva no navegador.",
+      icon: "success",
+      confirmButtonColor: "#3b82f6",
+    });
   }
 
   return (
@@ -168,115 +233,57 @@ export default function EditarTurmaCoordenador() {
               Nenhuma turma encontrada.
             </div>
           ) : (
-            turmasFiltradas.map((turma) => {
-              const isEditing = editingId === turma.id;
+            turmasFiltradas.map((turma) => (
+              <article
+                key={turma.id}
+                className="editar-turmas-coord__item"
+                style={{ "--barColor": turma.cor || "#60a5fa" }}
+              >
+                <div className="editar-turmas-coord__bar" />
 
-              return (
-                <article
-                  key={turma.id}
-                  className="editar-turmas-coord__item"
-                  style={{ "--barColor": turma.cor || "#60a5fa" }}
-                >
-                  <div className="editar-turmas-coord__bar" />
+                <div className="editar-turmas-coord__content">
+                  <div className="editar-turmas-coord__main">
+                    <h2 className="editar-turmas-coord__title">{turma.nome}</h2>
 
-                  <div className="editar-turmas-coord__content">
-                    <div className="editar-turmas-coord__main">
-                      {!isEditing ? (
-                        <h2 className="editar-turmas-coord__title">
-                          {turma.nome}
-                        </h2>
-                      ) : (
-                        <div className="editar-turmas-coord__editbox">
-                          <input
-                            type="text"
-                            value={editingNome}
-                            onChange={(e) => setEditingNome(e.target.value)}
-                            maxLength={80}
-                            autoFocus
-                          />
-                          <div className="editar-turmas-coord__edit-actions-mobile">
-                            <button
-                              type="button"
-                              onClick={() => handleSaveEdit(turma.id)}
-                              aria-label="Salvar"
-                            >
-                              <Check size={16} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleCancelEdit}
-                              aria-label="Cancelar"
-                            >
-                              <X size={16} />
-                            </button>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="editar-turmas-coord__meta">
-                        {turma.professor?.nome && (
-                          <span>
-                            <strong>Professor:</strong> {turma.professor.nome}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="editar-turmas-coord__right">
-                      <div className="editar-turmas-coord__students">
-                        <Users size={17} />
-                        <span>{turma.alunosCount} alunos</span>
-                      </div>
-
-                      {!isEditing ? (
-                        <div className="editar-turmas-coord__actions">
-                          <button
-                            type="button"
-                            onClick={() =>
-                              navigate(`/editar-turma/${turma.id}`)
-                            }
-                            aria-label="Editar turma"
-                            title="Editar turma"
-                          >
-                            <Pencil size={16} />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveOverride(turma.id)}
-                            aria-label="Remover alterações"
-                            title="Remover alterações"
-                            className="is-danger"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      ) : (
-                        <div className="editar-turmas-coord__actions editar-turmas-coord__actions--edit">
-                          <button
-                            type="button"
-                            onClick={() => handleSaveEdit(turma.id)}
-                            aria-label="Salvar"
-                            title="Salvar"
-                          >
-                            <Check size={16} />
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={handleCancelEdit}
-                            aria-label="Cancelar"
-                            title="Cancelar"
-                          >
-                            <X size={16} />
-                          </button>
-                        </div>
+                    <div className="editar-turmas-coord__meta">
+                      {turma.professor?.nome && (
+                        <span>
+                          <strong>Professor:</strong> {turma.professor.nome}
+                        </span>
                       )}
                     </div>
                   </div>
-                </article>
-              );
-            })
+
+                  <div className="editar-turmas-coord__right">
+                    <div className="editar-turmas-coord__students">
+                      <Users size={17} />
+                      <span>{turma.alunosCount} alunos</span>
+                    </div>
+
+                    <div className="editar-turmas-coord__actions">
+                      <button
+                        type="button"
+                        onClick={() => navigate(`/editar-turma/${turma.id}`)}
+                        aria-label="Editar turma"
+                        title="Editar turma"
+                      >
+                        <Pencil size={16} />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteTurma(turma)}
+                        aria-label="Excluir turma"
+                        title="Excluir turma"
+                        className="is-danger"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))
           )}
         </div>
       </div>

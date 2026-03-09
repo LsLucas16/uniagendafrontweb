@@ -99,9 +99,9 @@ export default function EditarTurma() {
   };
 
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
-  const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
-  routeTurmaId || getDisciplinaAtualId(),
-);
+  const [disciplinaAtualId, setDisciplinaAtualId] = useState(
+    () => routeTurmaId || getDisciplinaAtualId(),
+  );
 
   useEffect(() => {
     const onDisciplinaChanged = () =>
@@ -126,13 +126,13 @@ export default function EditarTurma() {
   }, []);
 
   useEffect(() => {
-  if (!routeTurmaId) return;
+    if (!routeTurmaId) return;
 
-  const routeId = String(routeTurmaId);
-  setDisciplinaAtualId(routeId);
-  localStorage.setItem("disciplinaAtualId", routeId);
-  window.dispatchEvent(new Event("disciplinaAtual:changed"));
-}, [routeTurmaId]);
+    const routeId = String(routeTurmaId);
+    setDisciplinaAtualId(routeId);
+    localStorage.setItem("disciplinaAtualId", routeId);
+    window.dispatchEvent(new Event("disciplinaAtual:changed"));
+  }, [routeTurmaId]);
 
   useEffect(() => {
     const onDown = (e) => {
@@ -168,6 +168,8 @@ export default function EditarTurma() {
     if (!id) return null;
     return baseUsuarios.find((u) => u.id === id) || null;
   }, [usuarioLogado, baseUsuarios]);
+
+  const isCoordenador = user?.tipo === "coordenador";
 
   const disciplinaBase = useMemo(() => {
     if (!turmaId) return null;
@@ -443,6 +445,16 @@ export default function EditarTurma() {
       <div className="editar-turma-page">
         <div className="editar-turma-card">
           <header className="page-header">
+            {isCoordenador && (
+              <button
+                type="button"
+                className="btn-voltar-coordenador"
+                onClick={() => navigate("/editar-turma-coordenador")}
+              >
+                ← Voltar
+              </button>
+            )}
+
             <h1>Editar Turma</h1>
           </header>
 
