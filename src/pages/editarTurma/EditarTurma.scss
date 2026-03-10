@@ -13,8 +13,19 @@ $et-fundo-input: #f3f5f7;
    ✅ TUDO ESCOPADO: nada aqui vaza pra outras telas
 ========================================================= */
 .editar-turma-page {
-  @include uiPageShell;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  background: transparent;
+  padding: 0;
+}
 
+.editar-turma-card {
+  @include uiPageShell;
+}
+
+.editar-turma-page {
   /* Header */
   .page-header {
     margin-bottom: 24px;
@@ -522,6 +533,27 @@ $et-fundo-input: #f3f5f7;
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  transition: color 0.18s ease;
+
+  &:hover {
+    color: #334e68;
+  }
+}
+
+
+.btn-voltar-coordenador {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0 0 12px;
+  color: #667085;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
   transition: color 0.18s ease;
 
   &:hover {

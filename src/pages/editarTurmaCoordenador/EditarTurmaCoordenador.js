@@ -248,7 +248,7 @@ export default function EditarTurmaCoordenador() {
                     <div className="editar-turmas-coord__meta">
                       {turma.professor?.nome && (
                         <span>
-                          <strong>Professor:</strong> {turma.professor.nome}
+                          {turma.professor.nome}
                         </span>
                       )}
                     </div>

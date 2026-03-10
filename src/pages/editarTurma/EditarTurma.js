@@ -443,18 +443,18 @@ export default function EditarTurma() {
   if (!user) {
     return (
       <div className="editar-turma-page">
+        {isCoordenador && (
+          <button
+            type="button"
+            className="btn-voltar-coordenador"
+            onClick={() => navigate("/editar-turma-coordenador")}
+          >
+            ← Voltar
+          </button>
+        )}
+
         <div className="editar-turma-card">
           <header className="page-header">
-            {isCoordenador && (
-              <button
-                type="button"
-                className="btn-voltar-coordenador"
-                onClick={() => navigate("/editar-turma-coordenador")}
-              >
-                ← Voltar
-              </button>
-            )}
-
             <h1>Editar Turma</h1>
           </header>
 
@@ -472,6 +472,16 @@ export default function EditarTurma() {
   if (!turmaId) {
     return (
       <div className="editar-turma-page">
+        {isCoordenador && (
+          <button
+            type="button"
+            className="btn-voltar-coordenador"
+            onClick={() => navigate("/editar-turma-coordenador")}
+          >
+            ← Voltar
+          </button>
+        )}
+
         <div className="editar-turma-card">
           <header className="page-header">
             <h1>Editar Turma</h1>
@@ -503,6 +513,16 @@ export default function EditarTurma() {
   if (!disciplinaBase) {
     return (
       <div className="editar-turma-page">
+        {isCoordenador && (
+          <button
+            type="button"
+            className="btn-voltar-coordenador"
+            onClick={() => navigate("/editar-turma-coordenador")}
+          >
+            ← Voltar
+          </button>
+        )}
+
         <div className="editar-turma-card">
           <header className="page-header">
             <h1>Editar Turma</h1>
@@ -519,6 +539,16 @@ export default function EditarTurma() {
 
   return (
     <div className="editar-turma-page">
+      {isCoordenador && (
+        <button
+          type="button"
+          className="btn-voltar-coordenador"
+          onClick={() => navigate("/editar-turma-coordenador")}
+        >
+          ← Voltar
+        </button>
+      )}
+
       <div className="editar-turma-card">
         <header className="page-header">
           <h1>Editar Turma</h1>
