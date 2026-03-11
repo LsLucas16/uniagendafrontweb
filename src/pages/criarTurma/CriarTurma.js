@@ -57,7 +57,7 @@ export default function CriarTurma() {
           u.nome?.toLowerCase().includes(q) ||
           String(u.user || "").toLowerCase().includes(q) ||
           String(u.id).includes(q) ||
-          String(u.email || "").toLowerCase().includes(q),
+          String(u.email || "").toLowerCase().includes(q)
       )
       .filter((u) => !alunosSelecionados.some((a) => Number(a.id) === Number(u.id)))
       .slice(0, 8)
@@ -132,7 +132,6 @@ export default function CriarTurma() {
 
   const handleRemoveResponsavelFromModal = () => {
     if (editIndex === null) return;
-
     setResponsaveis((prev) => prev.filter((_, i) => i !== editIndex));
     closeModal();
   };
@@ -190,9 +189,8 @@ export default function CriarTurma() {
 
   return (
     <div className="criar-turma-page">
-      <h1 className="page-title">Criar Nova Turma</h1>
-
-      <section className="criar-turma-card">
+      <section className="criar-turma-card criar-turma-card--top">
+        <h1 className="page-title">Criar Nova Turma</h1>
         <h2 className="section-title">Informações da Turma</h2>
 
         <div className="grid-2">
@@ -256,7 +254,7 @@ export default function CriarTurma() {
                   className="btn-edit"
                   onClick={() => openEditarResponsavel(idx)}
                 >
-                  <Pencil size={14} />
+                  <Pencil size={12} />
                   <span className="btn-edit__text">Editar</span>
                 </button>
               </div>
@@ -289,20 +287,20 @@ export default function CriarTurma() {
 
       <section className="criar-turma-card alunos-card">
         <div className="section-head">
-          <h2 className="section-title">Alunos da Turma</h2>
+          <h2 className="section-title">Lista de alunos</h2>
 
           <button
             type="button"
             className="btn-import"
             onClick={() => Swal.fire("Info", "Função de importação (mock).", "info")}
           >
-            <Upload size={14} />
+            <Upload size={13} />
             <span>Importar lista</span>
           </button>
         </div>
 
         <div className="search-wrap" ref={searchWrapRef}>
-          <Search size={16} className="search-ico" />
+          <Search size={15} className="search-ico" />
 
           <input
             value={buscaAluno}
@@ -382,11 +380,7 @@ export default function CriarTurma() {
         )}
 
         <div className="footer-action">
-          <button
-            type="button"
-            className="btn-create"
-            onClick={handleCriarTurma}
-          >
+          <button type="button" className="btn-create" onClick={handleCriarTurma}>
             Criar turma
           </button>
         </div>
@@ -397,9 +391,7 @@ export default function CriarTurma() {
         onClose={closeModal}
         usuarios={usuariosComUser}
         initialValue={
-          modalMode === "edit" && editIndex !== null
-            ? responsaveis[editIndex]
-            : null
+          modalMode === "edit" && editIndex !== null ? responsaveis[editIndex] : null
         }
         onSave={handleSaveResponsavelFromModal}
         onRemove={modalMode === "edit" ? handleRemoveResponsavelFromModal : null}
