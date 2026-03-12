@@ -8,6 +8,7 @@ import Swal from "sweetalert2";
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_TURMA_ALUNOS = "turma_alunos_override";
 const STORAGE_TURMAS_DELETED = "turmas_deleted";
+const STORAGE_USUARIOS_DISCIPLINAS = "usuarios_disciplinas_override";
 
 function safeJsonParse(value, fallback) {
   try {
@@ -32,6 +33,29 @@ function getTurmaAlunosOverride() {
 
 function getTurmasDeleted() {
   return safeJsonParse(localStorage.getItem(STORAGE_TURMAS_DELETED), []);
+}
+
+function getUsuariosDisciplinasOverride() {
+  return safeJsonParse(localStorage.getItem(STORAGE_USUARIOS_DISCIPLINAS), {});
+}
+
+function getDisciplinasMescladas() {
+  const overrides = getTurmasOverride();
+  const base = Array.isArray(dados.disciplinas) ? dados.disciplinas : [];
+
+  const baseMap = {};
+  base.forEach((d) => {
+    baseMap[String(d.id)] = d;
+  });
+
+  Object.entries(overrides).forEach(([id, ov]) => {
+    baseMap[String(id)] = {
+      ...(baseMap[String(id)] || {}),
+      ...ov,
+    };
+  });
+
+  return Object.values(baseMap);
 }
 
 function saveTurmasDeleted(next) {
@@ -98,48 +122,56 @@ export default function EditarTurmaCoordenador() {
     return dados.usuarios.find((u) => u.id === usuario.id) || null;
   }, [usuario]);
 
-  const turmasDaCoordenacao = useMemo(() => {
-    if (!usuarioCompleto) return [];
+ const turmasDaCoordenacao = useMemo(() => {
+  if (!usuarioCompleto) return [];
 
-    const idsDoUsuario = Array.isArray(usuarioCompleto.disciplinas)
-      ? usuarioCompleto.disciplinas
-      : [];
+  const usuariosDisciplinasOverride = getUsuariosDisciplinasOverride();
+  const idsBase = Array.isArray(usuarioCompleto.disciplinas)
+    ? usuarioCompleto.disciplinas
+    : [];
 
-    return (dados.disciplinas || [])
-      .filter((disc) => disc.instituicaoId === usuarioCompleto.faculdadeId)
-      .filter((disc) => idsDoUsuario.includes(disc.id))
-      .filter((disc) => !turmasDeleted.includes(Number(disc.id)))
-      .map((disc) => {
-        const ov = overrides[String(disc.id)] || {};
-        const professor =
-          dados.usuarios.find((u) => u.id === disc.professorId) || null;
+  const idsOverride = Array.isArray(
+    usuariosDisciplinasOverride[String(usuarioCompleto.id)],
+  )
+    ? usuariosDisciplinasOverride[String(usuarioCompleto.id)].map(Number)
+    : [];
 
-        const alunosBase = (dados.usuarios || []).filter(
-          (u) =>
-            u.tipo === "aluno" &&
-            u.faculdadeId === disc.instituicaoId &&
-            Array.isArray(u.disciplinas) &&
-            u.disciplinas.includes(disc.id),
-        );
+  const idsDoUsuario = [...new Set([...idsBase, ...idsOverride])];
+  const disciplinasMescladas = getDisciplinasMescladas();
 
-        const alunosIdsOverride = Array.isArray(alunosOverride[String(disc.id)])
-          ? alunosOverride[String(disc.id)].map(Number)
-          : null;
+  return disciplinasMescladas
+    .filter(
+      (disc) => Number(disc.instituicaoId) === Number(usuarioCompleto.faculdadeId),
+    )
+    .filter((disc) => idsDoUsuario.includes(Number(disc.id)))
+    .filter((disc) => !turmasDeleted.includes(Number(disc.id)))
+    .map((disc) => {
+      const professor =
+        dados.usuarios.find((u) => Number(u.id) === Number(disc.professorId)) || null;
 
-        const alunosCount =
-          alunosIdsOverride !== null
-            ? alunosIdsOverride.length
-            : alunosBase.length;
+      const alunosBase = (dados.usuarios || []).filter(
+        (u) =>
+          u.tipo === "aluno" &&
+          Number(u.faculdadeId) === Number(disc.instituicaoId) &&
+          Array.isArray(u.disciplinas) &&
+          u.disciplinas.includes(Number(disc.id)),
+      );
 
-        return {
-          ...disc,
-          ...ov,
-          professor,
-          alunosCount,
-        };
-      })
-      .sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR"));
-  }, [usuarioCompleto, overrides, alunosOverride, turmasDeleted]);
+      const alunosIdsOverride = Array.isArray(alunosOverride[String(disc.id)])
+        ? alunosOverride[String(disc.id)].map(Number)
+        : null;
+
+      const alunosCount =
+        alunosIdsOverride !== null ? alunosIdsOverride.length : alunosBase.length;
+
+      return {
+        ...disc,
+        professor,
+        alunosCount,
+      };
+    })
+    .sort((a, b) => String(a.nome).localeCompare(String(a.nome), "pt-BR"));
+}, [usuarioCompleto, overrides, alunosOverride, turmasDeleted]);
 
   const turmasFiltradas = useMemo(() => {
     const termo = normStr(busca);

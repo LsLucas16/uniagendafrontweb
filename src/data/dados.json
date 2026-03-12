@@ -222,7 +222,8 @@
     "cor": "#3B82F6",
     "instituicaoId": 1,
     "professorId": 201,
-    "responsavelId": 401
+    "responsavelId": 401,
+    "criado_por": 1
   },
   {
     "id": 2,
@@ -230,7 +231,8 @@
     "cor": "#22C55E",
     "instituicaoId": 1,
     "professorId": 201,
-    "responsavelId": 401
+    "responsavelId": 401,
+    "criado_por": 1
   },
   {
     "id": 3,
@@ -238,7 +240,8 @@
     "cor": "#A855F7",
     "instituicaoId": 1,
     "professorId": 201,
-    "responsavelId": 401
+    "responsavelId": 401,
+    "criado_por": 1
   },
   {
     "id": 4,
@@ -246,7 +249,8 @@
     "cor": "#F59E0B",
     "instituicaoId": 1,
     "professorId": 201,
-    "responsavelId": 401
+    "responsavelId": 401,
+    "criado_por": 1
   },
 
   {
@@ -255,7 +259,8 @@
     "cor": "#3B82F6",
     "instituicaoId": 3,
     "professorId": 302,
-    "responsavelId": 402
+    "responsavelId": 402,
+    "criado_por": 1
   },
   {
     "id": 6,
@@ -263,7 +268,8 @@
     "cor": "#22C55E",
     "instituicaoId": 3,
     "professorId": 302,
-    "responsavelId": 402
+    "responsavelId": 402,
+    "criado_por": 1
   },
   {
     "id": 7,
@@ -271,7 +277,8 @@
     "cor": "#A855F7",
     "instituicaoId": 3,
     "professorId": 302,
-    "responsavelId": 402
+    "responsavelId": 402,
+    "criado_por": 1
   },
   {
     "id": 8,
@@ -279,7 +286,8 @@
     "cor": "#EF4444",
     "instituicaoId": 3,
     "professorId": 302,
-    "responsavelId": 402
+    "responsavelId": 402,
+    "criado_por": 1
   },
   {
     "id": 9,
@@ -287,7 +295,8 @@
     "cor": "#14B8A6",
     "instituicaoId": 3,
     "professorId": 302,
-    "responsavelId": 402
+    "responsavelId": 402,
+    "criado_por": 1
   },
   {
     "id": 10,
@@ -295,7 +304,8 @@
     "cor": "#8B5CF6",
     "instituicaoId": 3,
     "professorId": 302,
-    "responsavelId": 402
+    "responsavelId": 402,
+    "criado_por": 1
   },
   {
     "id": 11,
@@ -303,7 +313,8 @@
     "cor": "#84CC16",
     "instituicaoId": 3,
     "professorId": 302,
-    "responsavelId": 402
+    "responsavelId": 402,
+    "criado_por": 1
   },
   {
     "id": 12,
@@ -311,7 +322,8 @@
     "cor": "#F59E0B",
     "instituicaoId": 3,
     "professorId": 302,
-    "responsavelId": 402
+    "responsavelId": 402,
+    "criado_por": 1
   }
 ],
 "eventos": [

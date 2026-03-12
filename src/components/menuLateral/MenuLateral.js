@@ -30,9 +30,34 @@ const MenuLateral = () => {
   // Hooks sempre no topo
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [disciplinaAbertaId, setDisciplinaAbertaId] = useState(null);
+  const STORAGE_USUARIOS_DISCIPLINAS = "usuarios_disciplinas_override";
+
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() => {
     return localStorage.getItem("disciplinaAtualId") || "";
   });
+
+  function getUsuariosDisciplinasOverride() {
+  return safeJsonParse(localStorage.getItem(STORAGE_USUARIOS_DISCIPLINAS), {});
+}
+
+function getDisciplinasMescladas() {
+  const overrides = getTurmasOverride();
+  const base = Array.isArray(data.disciplinas) ? data.disciplinas : [];
+
+  const baseMap = {};
+  base.forEach((d) => {
+    baseMap[String(d.id)] = d;
+  });
+
+  Object.entries(overrides).forEach(([id, ov]) => {
+    baseMap[String(id)] = {
+      ...(baseMap[String(id)] || {}),
+      ...ov,
+    };
+  });
+
+  return Object.values(baseMap);
+}
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,19 +124,22 @@ const MenuLateral = () => {
   }, [user]);
 
   const disciplinasDoUsuario = useMemo(() => {
-    if (!user) return [];
+  if (!user) return [];
 
-    const ids = Array.isArray(user.disciplinas) ? user.disciplinas : [];
-    const overrides = getTurmasOverride();
+  const usuariosDisciplinasOverride = getUsuariosDisciplinasOverride();
+  const idsBase = Array.isArray(user.disciplinas) ? user.disciplinas : [];
+  const idsOverride = Array.isArray(usuariosDisciplinasOverride[String(user.id)])
+    ? usuariosDisciplinasOverride[String(user.id)].map(Number)
+    : [];
 
-    return (data.disciplinas || [])
-      .filter((d) => ids.includes(d.id))
-      .filter((d) => d.instituicaoId === user.faculdadeId)
-      .map((d) => {
-        const ov = overrides[String(d.id)] || null;
-        return ov ? { ...d, ...ov } : d;
-      });
-  }, [user, turmasOverrideVer]);
+  const ids = [...new Set([...idsBase, ...idsOverride])];
+  const disciplinasMescladas = getDisciplinasMescladas();
+
+  return disciplinasMescladas
+    .filter((d) => ids.includes(Number(d.id)))
+    .filter((d) => Number(d.instituicaoId) === Number(user.faculdadeId))
+    .sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR"));
+}, [user, turmasOverrideVer]);
 
   // Define disciplinaAtualId quando existir lista
   useEffect(() => {

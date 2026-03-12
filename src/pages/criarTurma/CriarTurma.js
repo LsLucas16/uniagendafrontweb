@@ -8,12 +8,28 @@ import "./CriarTurma.scss";
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_TURMA_ALUNOS = "turma_alunos_override";
 const STORAGE_DISCIPLINA_ATUAL = "disciplinaAtualId";
+const STORAGE_USUARIOS_DISCIPLINAS = "usuarios_disciplinas_override";
 
 const defaultPerms = {
   eventos: true,
   responsaveis: false,
   alunos: true,
 };
+
+const CORES_TURMAS = [
+  "#3B82F6",
+  "#22C55E",
+  "#A855F7",
+  "#F59E0B",
+  "#EF4444",
+  "#14B8A6",
+  "#8B5CF6",
+  "#84CC16",
+  "#06B6D4",
+  "#EC4899",
+  "#6366F1",
+  "#F97316",
+];
 
 function safeJsonParse(v, fallback) {
   try {
@@ -41,9 +57,19 @@ function setTurmaAlunosOverride(map) {
   window.dispatchEvent(new Event("turmas:changed"));
 }
 
+function getUsuariosDisciplinasOverride() {
+  return safeJsonParse(localStorage.getItem(STORAGE_USUARIOS_DISCIPLINAS), {});
+}
+
+function setUsuariosDisciplinasOverride(map) {
+  localStorage.setItem(STORAGE_USUARIOS_DISCIPLINAS, JSON.stringify(map));
+  window.dispatchEvent(new Event("turmas:changed"));
+}
+
 function buildNomeCompleto(nome = "", complemento = "") {
   const n = String(nome || "").trim();
   const c = String(complemento || "").trim();
+
   if (!n && !c) return "";
   if (!c) return n;
   return `${n} - ${c}`;
@@ -59,14 +85,49 @@ function getUsuarioLogado() {
 
 function getNextDisciplinaId(baseDisciplinas, turmasOverride) {
   const idsBase = (baseDisciplinas || []).map((d) => Number(d.id) || 0);
-  const idsOverride = Object.keys(turmasOverride || {}).map((id) => Number(id) || 0);
+  const idsOverride = Object.keys(turmasOverride || {}).map(
+    (id) => Number(id) || 0,
+  );
   const maxId = Math.max(0, ...idsBase, ...idsOverride);
   return maxId + 1;
 }
 
-function getCorPorTipo(tipo) {
-  if (tipo === "secundaria") return "#22C55E";
-  return "#3B82F6";
+function getRandomTurmaColor() {
+  const idx = Math.floor(Math.random() * CORES_TURMAS.length);
+  return CORES_TURMAS[idx];
+}
+
+function addDisciplinaParaUsuario(
+  overrideMap,
+  userId,
+  disciplinaId,
+  baseUsuarios,
+) {
+  if (!userId || !disciplinaId) return overrideMap;
+
+  const key = String(userId);
+  const baseUser = (baseUsuarios || []).find(
+    (u) => Number(u.id) === Number(userId),
+  );
+  const baseDisciplinas = Array.isArray(baseUser?.disciplinas)
+    ? baseUser.disciplinas
+    : [];
+  const overrideDisciplinas = Array.isArray(overrideMap[key])
+    ? overrideMap[key]
+    : [];
+
+  const merged = [
+    ...new Set([
+      ...baseDisciplinas,
+      ...overrideDisciplinas,
+      Number(disciplinaId),
+    ]),
+  ];
+
+  return {
+    ...overrideMap,
+    [key]: merged,
+  };
 }
 
 export default function CriarTurma() {
@@ -74,15 +135,7 @@ export default function CriarTurma() {
   const [complemento, setComplemento] = useState("");
   const [tipo, setTipo] = useState("primaria");
 
-  const [responsaveis, setResponsaveis] = useState([
-    {
-      userId: "",
-      nome: "Márcia Alves",
-      cargo: "",
-      contato: "",
-      permissoes: { ...defaultPerms },
-    },
-  ]);
+  const [responsaveis, setResponsaveis] = useState([]);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("add");
@@ -97,7 +150,9 @@ export default function CriarTurma() {
 
   const usuarioLogado = useMemo(() => getUsuarioLogado(), []);
   const baseUsuarios = Array.isArray(data?.usuarios) ? data.usuarios : [];
-  const baseDisciplinas = Array.isArray(data?.disciplinas) ? data.disciplinas : [];
+  const baseDisciplinas = Array.isArray(data?.disciplinas)
+    ? data.disciplinas
+    : [];
 
   const usuariosComUser = useMemo(() => {
     return baseUsuarios.map((u) => ({
@@ -124,11 +179,17 @@ export default function CriarTurma() {
       .filter(
         (u) =>
           u.nome?.toLowerCase().includes(q) ||
-          String(u.user || "").toLowerCase().includes(q) ||
+          String(u.user || "")
+            .toLowerCase()
+            .includes(q) ||
           String(u.id).includes(q) ||
-          String(u.email || "").toLowerCase().includes(q)
+          String(u.email || "")
+            .toLowerCase()
+            .includes(q),
       )
-      .filter((u) => !alunosSelecionados.some((a) => Number(a.id) === Number(u.id)))
+      .filter(
+        (u) => !alunosSelecionados.some((a) => Number(a.id) === Number(u.id)),
+      )
       .slice(0, 8)
       .map((u) => ({
         id: u.id,
@@ -215,7 +276,9 @@ export default function CriarTurma() {
       return;
     }
 
-    const aluno = baseUsuarios.find((u) => Number(u.id) === Number(alunoSelecionadoId));
+    const aluno = baseUsuarios.find(
+      (u) => Number(u.id) === Number(alunoSelecionadoId),
+    );
     if (!aluno) return;
 
     setAlunosSelecionados((prev) => [
@@ -234,22 +297,16 @@ export default function CriarTurma() {
   };
 
   const handleRemoverAluno = (id) => {
-    setAlunosSelecionados((prev) => prev.filter((a) => Number(a.id) !== Number(id)));
+    setAlunosSelecionados((prev) =>
+      prev.filter((a) => Number(a.id) !== Number(id)),
+    );
   };
 
   const limparFormulario = () => {
     setNome("");
     setComplemento("");
     setTipo("primaria");
-    setResponsaveis([
-      {
-        userId: "",
-        nome: "Márcia Alves",
-        cargo: "",
-        contato: "",
-        permissoes: { ...defaultPerms },
-      },
-    ]);
+    setResponsaveis([]);
     setBuscaAluno("");
     setDropdownOpen(false);
     setAlunoSelecionadoId(null);
@@ -268,15 +325,23 @@ export default function CriarTurma() {
 
     const turmasOverride = getTurmasOverride();
     const turmaAlunosOverride = getTurmaAlunosOverride();
+    let usuariosDisciplinasOverride = getUsuariosDisciplinasOverride();
+
     const novoId = getNextDisciplinaId(baseDisciplinas, turmasOverride);
     const nomeCompleto = buildNomeCompleto(nome, complemento);
+    const corAleatoria = getRandomTurmaColor();
 
     const professorSelecionado =
-      responsaveis.find((r) => String(r.cargo).toLowerCase() === "professor") || null;
+      responsaveis.find((r) => String(r.cargo).toLowerCase() === "professor") ||
+      null;
 
     const responsavelSelecionado =
-      responsaveis.find((r) => String(r.cargo).toLowerCase() === "responsável") ||
-      responsaveis.find((r) => String(r.cargo).toLowerCase() === "responsavel") ||
+      responsaveis.find(
+        (r) => String(r.cargo).toLowerCase() === "responsável",
+      ) ||
+      responsaveis.find(
+        (r) => String(r.cargo).toLowerCase() === "responsavel",
+      ) ||
       null;
 
     turmasOverride[String(novoId)] = {
@@ -285,10 +350,14 @@ export default function CriarTurma() {
       nomeCustom: String(nome || "").trim(),
       complementoCustom: String(complemento || "").trim(),
       tipo,
-      cor: getCorPorTipo(tipo),
+      cor: corAleatoria,
       instituicaoId: instituicaoIdAtual,
-      professorId: professorSelecionado ? Number(professorSelecionado.userId) || null : null,
-      responsavelId: responsavelSelecionado ? Number(responsavelSelecionado.userId) || null : null,
+      professorId: professorSelecionado
+        ? Number(professorSelecionado.userId) || null
+        : null,
+      responsavelId: responsavelSelecionado
+        ? Number(responsavelSelecionado.userId) || null
+        : null,
       responsaveis: responsaveis.map((r) => ({
         userId: r.userId ?? "",
         nome: r.nome ?? "",
@@ -297,12 +366,44 @@ export default function CriarTurma() {
         permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
       })),
       criadaNoCriarTurma: true,
+      criadaEm: new Date().toISOString(),
     };
 
-    turmaAlunosOverride[String(novoId)] = alunosSelecionados.map((a) => Number(a.id));
+    turmaAlunosOverride[String(novoId)] = alunosSelecionados.map((a) =>
+      Number(a.id),
+    );
+
+    if (usuarioLogado?.id) {
+      usuariosDisciplinasOverride = addDisciplinaParaUsuario(
+        usuariosDisciplinasOverride,
+        Number(usuarioLogado.id),
+        novoId,
+        baseUsuarios,
+      );
+    }
+
+    responsaveis.forEach((r) => {
+      if (!r?.userId) return;
+      usuariosDisciplinasOverride = addDisciplinaParaUsuario(
+        usuariosDisciplinasOverride,
+        Number(r.userId),
+        novoId,
+        baseUsuarios,
+      );
+    });
+
+    alunosSelecionados.forEach((a) => {
+      usuariosDisciplinasOverride = addDisciplinaParaUsuario(
+        usuariosDisciplinasOverride,
+        Number(a.id),
+        novoId,
+        baseUsuarios,
+      );
+    });
 
     setTurmasOverride(turmasOverride);
     setTurmaAlunosOverride(turmaAlunosOverride);
+    setUsuariosDisciplinasOverride(usuariosDisciplinasOverride);
 
     localStorage.setItem(STORAGE_DISCIPLINA_ATUAL, String(novoId));
     window.dispatchEvent(new Event("disciplinaAtual:changed"));
@@ -317,6 +418,9 @@ export default function CriarTurma() {
 
     limparFormulario();
   };
+
+  const podeCriarTurma =
+    nome.trim() && responsaveis.length > 0 && alunosSelecionados.length > 0;
 
   return (
     <div className="criar-turma-page">
@@ -375,36 +479,55 @@ export default function CriarTurma() {
         <h2 className="section-title">Responsáveis da turma</h2>
 
         <div className="responsaveis">
-          {responsaveis.map((r, idx) => (
-            <div className="responsavel-card" key={`${r.userId}-${idx}-${r.nome}`}>
-              <div className="responsavel-top">
-                <span className="chip">{r.nome || "Responsável"}</span>
+          {responsaveis.length > 0 ? (
+            responsaveis.map((r, idx) => (
+              <div
+                className="responsavel-card"
+                key={`${r.userId}-${idx}-${r.nome}`}
+              >
+                <div className="responsavel-top">
+                  <span className="chip">{r.nome || "Responsável"}</span>
 
-                <button
-                  type="button"
-                  className="btn-edit"
-                  onClick={() => openEditarResponsavel(idx)}
-                >
-                  <Pencil size={12} />
-                  <span className="btn-edit__text">Editar</span>
-                </button>
-              </div>
-
-              {idx === 0 && (
-                <div className="grid-2 inner">
-                  <div className="field">
-                    <label>Cargo</label>
-                    <input value={responsavelPrincipal.cargo || ""} readOnly />
-                  </div>
-
-                  <div className="field">
-                    <label>Contato</label>
-                    <input value={responsavelPrincipal.contato || ""} readOnly />
-                  </div>
+                  <button
+                    type="button"
+                    className="btn-edit"
+                    onClick={() => openEditarResponsavel(idx)}
+                  >
+                    <Pencil size={12} />
+                    <span className="btn-edit__text">Editar</span>
+                  </button>
                 </div>
-              )}
+
+                {idx === 0 && (
+                  <div className="grid-2 inner">
+                    <div className="field">
+                      <label>Cargo</label>
+                      <input
+                        value={responsavelPrincipal.cargo || ""}
+                        readOnly
+                      />
+                    </div>
+
+                    <div className="field">
+                      <label>Contato</label>
+                      <input
+                        value={responsavelPrincipal.contato || ""}
+                        readOnly
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="empty-state">
+              <p>Nenhum responsável adicionado ainda.</p>
+              <p>
+                Use o botão abaixo para buscar e adicionar o primeiro
+                responsável.
+              </p>
             </div>
-          ))}
+          )}
 
           <button
             type="button"
@@ -423,7 +546,9 @@ export default function CriarTurma() {
           <button
             type="button"
             className="btn-import"
-            onClick={() => Swal.fire("Info", "Função de importação (mock).", "info")}
+            onClick={() =>
+              Swal.fire("Info", "Função de importação (mock).", "info")
+            }
           >
             <Upload size={13} />
             <span>Importar lista</span>
@@ -488,7 +613,9 @@ export default function CriarTurma() {
               <div className="aluno-row" key={a.id}>
                 <div className="aluno-info">
                   <div className="aluno-nome">{a.nome}</div>
-                  <div className="aluno-matricula">{a.matricula || a.email || ""}</div>
+                  <div className="aluno-matricula">
+                    {a.matricula || a.email || ""}
+                  </div>
                 </div>
 
                 <button
@@ -511,7 +638,11 @@ export default function CriarTurma() {
         )}
 
         <div className="footer-action">
-          <button type="button" className="btn-create" onClick={handleCriarTurma}>
+          <button
+            type="button"
+            className={`btn-create ${podeCriarTurma ? "is-ready" : ""}`}
+            onClick={handleCriarTurma}
+          >
             Criar turma
           </button>
         </div>
@@ -522,10 +653,14 @@ export default function CriarTurma() {
         onClose={closeModal}
         usuarios={usuariosComUser}
         initialValue={
-          modalMode === "edit" && editIndex !== null ? responsaveis[editIndex] : null
+          modalMode === "edit" && editIndex !== null
+            ? responsaveis[editIndex]
+            : null
         }
         onSave={handleSaveResponsavelFromModal}
-        onRemove={modalMode === "edit" ? handleRemoveResponsavelFromModal : null}
+        onRemove={
+          modalMode === "edit" ? handleRemoveResponsavelFromModal : null
+        }
       />
     </div>
   );
