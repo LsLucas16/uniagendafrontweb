@@ -493,11 +493,11 @@ export default function CriarTurma() {
                       type="button"
                       className="btn-edit"
                       onClick={() => openEditarResponsavel(idx)}
-                    >
+                      >
                       <Pencil size={12} />
                       <span className="btn-edit__text">Editar</span>
                     </button>
-                  </div>
+                      </div>
 
                   {idx === 0 && (
                     <div className="grid-2 inner">
