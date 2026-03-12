@@ -16,29 +16,36 @@ $ct-input-bg: #fbfcfd;
 $ct-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
 $imput: rgba(250, 250, 250, 1);
 
-.criar-turma-page {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 8px;
+* {
   box-sizing: border-box;
+}
+
+.painel-evento.criar-turma-page {
+  @include uiPageShell;
   font-family: "Inter", sans-serif;
-  background: transparent;
+}
+
+.criar-turma-page {
+  .eventos-wrap {
+    width: 100%;
+  }
 }
 
 .criar-turma-card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
   width: 100%;
-  background: $ct-card-bg;
-  border: 1px solid $ct-border;
-  border-radius: 14px;
-  box-shadow: $ct-shadow;
-  padding: 14px 14px 15px;
-  box-sizing: border-box;
+
+  & + & {
+    margin-top: 22px;
+  }
 }
 
 .criar-turma-card--top {
-  padding-top: 12px;
+  padding-top: 0;
 }
 
 .page-title {
@@ -47,7 +54,7 @@ $imput: rgba(250, 250, 250, 1);
   line-height: 1.15;
   font-weight: 700;
   color: $ct-title;
-  margin: 0 0 14px;
+  margin: 0 0 16px;
 }
 
 .section-title {
