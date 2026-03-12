@@ -5,11 +5,69 @@ import data from "../../data/dados.json";
 import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
 import "./CriarTurma.scss";
 
+const STORAGE_TURMAS = "turmas_override";
+const STORAGE_TURMA_ALUNOS = "turma_alunos_override";
+const STORAGE_DISCIPLINA_ATUAL = "disciplinaAtualId";
+
 const defaultPerms = {
   eventos: true,
   responsaveis: false,
   alunos: true,
 };
+
+function safeJsonParse(v, fallback) {
+  try {
+    return JSON.parse(v) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function getTurmasOverride() {
+  return safeJsonParse(localStorage.getItem(STORAGE_TURMAS), {});
+}
+
+function setTurmasOverride(map) {
+  localStorage.setItem(STORAGE_TURMAS, JSON.stringify(map));
+  window.dispatchEvent(new Event("turmas:changed"));
+}
+
+function getTurmaAlunosOverride() {
+  return safeJsonParse(localStorage.getItem(STORAGE_TURMA_ALUNOS), {});
+}
+
+function setTurmaAlunosOverride(map) {
+  localStorage.setItem(STORAGE_TURMA_ALUNOS, JSON.stringify(map));
+  window.dispatchEvent(new Event("turmas:changed"));
+}
+
+function buildNomeCompleto(nome = "", complemento = "") {
+  const n = String(nome || "").trim();
+  const c = String(complemento || "").trim();
+  if (!n && !c) return "";
+  if (!c) return n;
+  return `${n} - ${c}`;
+}
+
+function getUsuarioLogado() {
+  try {
+    return JSON.parse(localStorage.getItem("usuario")) || null;
+  } catch {
+    return null;
+  }
+}
+
+function getNextDisciplinaId(baseDisciplinas, turmasOverride) {
+  const idsBase = (baseDisciplinas || []).map((d) => Number(d.id) || 0);
+  const idsOverride = Object.keys(turmasOverride || {}).map((id) => Number(id) || 0);
+  const maxId = Math.max(0, ...idsBase, ...idsOverride);
+  return maxId + 1;
+}
+
+function getCorPorTipo(tipo) {
+  if (tipo === "secundaria") return "#22C55E";
+  return "#3B82F6";
+}
 
 export default function CriarTurma() {
   const [nome, setNome] = useState("");
@@ -37,7 +95,9 @@ export default function CriarTurma() {
 
   const searchWrapRef = useRef(null);
 
+  const usuarioLogado = useMemo(() => getUsuarioLogado(), []);
   const baseUsuarios = Array.isArray(data?.usuarios) ? data.usuarios : [];
+  const baseDisciplinas = Array.isArray(data?.disciplinas) ? data.disciplinas : [];
 
   const usuariosComUser = useMemo(() => {
     return baseUsuarios.map((u) => ({
@@ -46,12 +106,21 @@ export default function CriarTurma() {
     }));
   }, [baseUsuarios]);
 
+  const user = useMemo(() => {
+    const id = usuarioLogado?.id;
+    if (!id) return null;
+    return baseUsuarios.find((u) => Number(u.id) === Number(id)) || null;
+  }, [usuarioLogado, baseUsuarios]);
+
+  const instituicaoIdAtual = user?.faculdadeId || 1;
+
   const candidatosBusca = useMemo(() => {
     const q = buscaAluno.trim().toLowerCase();
     if (!q) return [];
 
     return baseUsuarios
       .filter((u) => u.tipo === "aluno")
+      .filter((u) => Number(u.faculdadeId) === Number(instituicaoIdAtual))
       .filter(
         (u) =>
           u.nome?.toLowerCase().includes(q) ||
@@ -67,7 +136,7 @@ export default function CriarTurma() {
         matricula: u.user,
         email: u.email || "",
       }));
-  }, [buscaAluno, baseUsuarios, alunosSelecionados]);
+  }, [buscaAluno, baseUsuarios, alunosSelecionados, instituicaoIdAtual]);
 
   useEffect(() => {
     const onDown = (e) => {
@@ -168,6 +237,25 @@ export default function CriarTurma() {
     setAlunosSelecionados((prev) => prev.filter((a) => Number(a.id) !== Number(id)));
   };
 
+  const limparFormulario = () => {
+    setNome("");
+    setComplemento("");
+    setTipo("primaria");
+    setResponsaveis([
+      {
+        userId: "",
+        nome: "Márcia Alves",
+        cargo: "",
+        contato: "",
+        permissoes: { ...defaultPerms },
+      },
+    ]);
+    setBuscaAluno("");
+    setDropdownOpen(false);
+    setAlunoSelecionadoId(null);
+    setAlunosSelecionados([]);
+  };
+
   const handleCriarTurma = () => {
     if (!nome.trim()) {
       Swal.fire({
@@ -178,6 +266,47 @@ export default function CriarTurma() {
       return;
     }
 
+    const turmasOverride = getTurmasOverride();
+    const turmaAlunosOverride = getTurmaAlunosOverride();
+    const novoId = getNextDisciplinaId(baseDisciplinas, turmasOverride);
+    const nomeCompleto = buildNomeCompleto(nome, complemento);
+
+    const professorSelecionado =
+      responsaveis.find((r) => String(r.cargo).toLowerCase() === "professor") || null;
+
+    const responsavelSelecionado =
+      responsaveis.find((r) => String(r.cargo).toLowerCase() === "responsável") ||
+      responsaveis.find((r) => String(r.cargo).toLowerCase() === "responsavel") ||
+      null;
+
+    turmasOverride[String(novoId)] = {
+      id: novoId,
+      nome: nomeCompleto,
+      nomeCustom: String(nome || "").trim(),
+      complementoCustom: String(complemento || "").trim(),
+      tipo,
+      cor: getCorPorTipo(tipo),
+      instituicaoId: instituicaoIdAtual,
+      professorId: professorSelecionado ? Number(professorSelecionado.userId) || null : null,
+      responsavelId: responsavelSelecionado ? Number(responsavelSelecionado.userId) || null : null,
+      responsaveis: responsaveis.map((r) => ({
+        userId: r.userId ?? "",
+        nome: r.nome ?? "",
+        cargo: r.cargo ?? "",
+        contato: r.contato ?? "",
+        permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+      })),
+      criadaNoCriarTurma: true,
+    };
+
+    turmaAlunosOverride[String(novoId)] = alunosSelecionados.map((a) => Number(a.id));
+
+    setTurmasOverride(turmasOverride);
+    setTurmaAlunosOverride(turmaAlunosOverride);
+
+    localStorage.setItem(STORAGE_DISCIPLINA_ATUAL, String(novoId));
+    window.dispatchEvent(new Event("disciplinaAtual:changed"));
+
     Swal.fire({
       icon: "success",
       title: "Turma criada",
@@ -185,6 +314,8 @@ export default function CriarTurma() {
       timer: 1400,
       showConfirmButton: false,
     });
+
+    limparFormulario();
   };
 
   return (

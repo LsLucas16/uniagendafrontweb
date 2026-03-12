@@ -14,6 +14,7 @@ $ct-blue: #7fb3d5;
 $ct-blue-soft: #cfe0f1;
 $ct-input-bg: #fbfcfd;
 $ct-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
+$imput: rgba(250, 250, 250, 1);
 
 .criar-turma-page {
   width: 100%;
@@ -92,7 +93,7 @@ $ct-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
     height: 37px;
     border-radius: 3px;
     border: 1px solid $ct-border-soft;
-    background: $ct-input-bg;
+    background: $imput;
     padding: 0 11px;
     box-sizing: border-box;
     font-size: 12px;
@@ -111,7 +112,7 @@ $ct-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
     }
 
     &[readonly] {
-      background: $ct-input-bg;
+      background: $imput;
       color: $ct-title;
     }
   }
@@ -138,16 +139,38 @@ $ct-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
 .radio-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   font-size: 11px;
   color: $ct-text;
   cursor: pointer;
   width: fit-content;
 
   input {
+    appearance: none;
+    -webkit-appearance: none;
     margin: 0;
-    transform: scale(0.82);
-    accent-color: #8db8dd;
+    padding: 0;
+    width: 16px;
+    min-width: 16px;
+    max-width: 16px;
+    height: 16px;
+    min-height: 16px;
+    max-height: 16px;
+    flex: 0 0 16px;
+    box-sizing: border-box;
+    border: 1.8px solid #7fb3d5;
+    border-radius: 50%;
+    background: #fff;
+    display: inline-block;
+    vertical-align: middle;
+    cursor: pointer;
+    box-shadow: none;
+    outline: none;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  input:checked {
+    background: #7fb3d5;
   }
 
   span {
@@ -298,11 +321,11 @@ $ct-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
   height: 32px;
   border-radius: 3px;
   border: 1px solid $ct-border-soft;
-  background: $ct-input-bg;
+  background: $imput;
   padding: 0 12px 0 32px;
   box-sizing: border-box;
   font-size: 11px;
-  color: $ct-title;
+  color: $imput;
   outline: none;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
 
