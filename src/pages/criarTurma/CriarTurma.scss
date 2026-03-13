@@ -1,68 +1,68 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "../../styles/index";
 
-$ct-page-bg: #f4f5f7;
-$ct-card-bg: #ffffff;
-$ct-border: #e4e7ec;
-$ct-border-soft: #eaecf0;
 $ct-title: #334e68;
-$ct-text: #516b88;
-$ct-muted: #98a2b3;
-$ct-placeholder: #c2cad5;
-$ct-chip-bg: #dfe7f0;
-$ct-blue: #7fb3d5;
+$ct-text: #486581;
+$ct-muted: #9aa5b1;
+$ct-placeholder: #c5ccd6;
+$ct-border: #d9e2ec;
+$ct-border-soft: #d9e2ec;
+$ct-chip-bg: #d9dee5;
+$ct-blue: #76a9da;
 $ct-blue-soft: #cfe0f1;
-$ct-input-bg: #fbfcfd;
-$ct-shadow: 0 2px 6px rgba(16, 24, 40, 0.04);
-$imput: rgba(250, 250, 250, 1);
+$ct-input-bg: #fafbfc;
+$ct-page-bg: #f5f7fa;
+$ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 * {
   box-sizing: border-box;
 }
 
 .painel-evento.criar-turma-page {
-  @include uiPageShell;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
   font-family: "Inter", sans-serif;
 }
 
 .criar-turma-page {
-  .eventos-wrap {
-    width: 100%;
-  }
+  width: 100%;
+}
+
+.criar-turma-page .eventos-wrap {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
 }
 
 .criar-turma-card {
-  background: transparent;
-  border: 0;
-  border-radius: 0;
-  box-shadow: none;
-  padding: 0;
   width: 100%;
-
-  & + & {
-    margin-top: 22px;
-  }
-}
-
-.criar-turma-card--top {
-  padding-top: 0;
+  background: #fff;
+  border: 1px solid $ct-border;
+  border-radius: 24px;
+  box-shadow: $ct-shadow;
+  padding: 24px 30px 26px;
 }
 
 .page-title {
   @include titulo;
-  font-size: 28px;
+  margin: 0 0 28px;
+  font-size: 26px;
   line-height: 1.15;
   font-weight: 700;
   color: $ct-title;
-  margin: 0 0 16px;
 }
 
 .section-title {
-  font-size: 16px;
+  margin: 0 0 16px;
+  font-size: 18px;
   line-height: 1.2;
   font-weight: 700;
   color: $ct-title;
-  margin: 0 0 14px;
 }
 
 .section-head {
@@ -70,7 +70,7 @@ $imput: rgba(250, 250, 250, 1);
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 
   .section-title {
     margin-bottom: 0;
@@ -80,31 +80,30 @@ $imput: rgba(250, 250, 250, 1);
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: 28px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 
   label {
-    font-size: 12px;
+    margin: 0;
+    font-size: 14px;
     line-height: 1.2;
-    font-weight: 600;
+    font-weight: 700;
     color: $ct-title;
   }
 
   input {
     width: 100%;
-    height: 37px;
-    border-radius: 3px;
+    height: 50px;
     border: 1px solid $ct-border-soft;
-    background: $imput;
-    padding: 0 11px;
-    box-sizing: border-box;
-    font-size: 12px;
-    font-weight: 400;
+    border-radius: 6px;
+    background: $ct-input-bg;
+    padding: 0 14px;
+    font-size: 14px;
     color: $ct-title;
     outline: none;
     transition: border-color 0.18s ease, box-shadow 0.18s ease;
@@ -114,27 +113,26 @@ $imput: rgba(250, 250, 250, 1);
     }
 
     &:focus {
-      border-color: rgba(127, 179, 213, 0.95);
+      border-color: #7fb3d5;
       box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.12);
     }
 
     &[readonly] {
-      background: $imput;
+      background: $ct-input-bg;
       color: $ct-title;
     }
   }
 }
-
 .tipo-area {
-  margin-top: 14px;
+  margin-top: 18px;
 }
 
 .tipo-label {
-  font-size: 12px;
+  margin-bottom: 10px;
+  font-size: 14px;
   line-height: 1.2;
-  font-weight: 600;
+  font-weight: 700;
   color: $ct-title;
-  margin-bottom: 8px;
 }
 
 .radio-group {
@@ -184,115 +182,127 @@ $imput: rgba(250, 250, 250, 1);
     line-height: 1.2;
   }
 }
+
 .responsaveis {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 14px;
 }
 
 .responsavel-card {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 10px;
 }
 
 .responsavel-top {
-  display: grid;
-  grid-template-columns: max-content max-content;
+  display: flex;
   align-items: center;
   justify-content: space-between;
-  column-gap: 10px;
-  min-height: 20px;
+  gap: 14px;
 }
 
 .chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-
-  height: 22px;
-  padding: 0 14px;
-
-  border-radius: 0 999px 999px 0;
-
-  background: #cfd6de;
-  color: #334e68;
-
-  font-size: 12px;
-  font-weight: 500;
-
+  min-width: 135px;
+  height: 34px;
+  padding: 0 16px;
+  border-radius: 0 14px 14px 0;
+  background: #d3d9e1;
+  color: $ct-title;
+  font-size: 11px;
+  font-weight: 700;
   white-space: nowrap;
 }
 
 .btn-edit {
-  height: 20px;
-  min-width: 58px;
-  padding: 0 8px;
-  border-radius: 4px;
-  border: 1px solid #e6ebf1;
+  height: 30px;
+  min-width: 86px;
+  padding: 0 14px;
+  border-radius: 6px;
+  border: 1px solid $ct-border;
   background: #fff;
-  color: #9aa7b5;
+  color: #8d99a8;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 6px;
   cursor: pointer;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 500;
-  line-height: 1;
-  box-shadow: none;
-  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+  transition: all 0.18s ease;
 
   &:hover {
     background: #fafbfd;
-    color: #7f8fa1;
-    border-color: #dfe6ee;
+    border-color: #cfd7e1;
+    color: #6b7c93;
   }
 
   svg {
-    width: 10px;
-    height: 10px;
-  }
-
-  .btn-edit__text {
-    line-height: 1;
+    width: 12px;
+    height: 12px;
   }
 }
 
 .inner {
-  margin-top: 1px;
-  gap: 10px;
+  margin-top: 2px;
+  gap: 16px;
+}
+
+.responsavel-card .field {
+  gap: 8px;
+}
+
+.responsavel-card .field label {
+  font-size: 14px;
+  font-weight: 700;
+  color: $ct-title;
+}
+
+.responsavel-card .field input {
+  height: 52px;
+  border-radius: 6px;
+  border: 1px solid $ct-border-soft;
+  background: $ct-input-bg;
+  padding: 0 14px;
+  font-size: 14px;
 }
 
 .btn-primary {
-  height: 27px;
+  height: 48px;
   border: 0;
-  border-radius: 3px;
+  border-radius: 6px;
   background: $ct-blue;
   color: #fff;
-  font-size: 11px;
-  font-weight: 500;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 0 12px;
+  padding: 0 18px;
   transition: filter 0.18s ease, box-shadow 0.18s ease;
 
   &:hover {
     filter: brightness(0.98);
-    box-shadow: 0 8px 18px rgba(127, 179, 213, 0.16);
+    box-shadow: 0 8px 18px rgba(127, 179, 213, 0.18);
   }
 
   &.wide {
-    width: 92%;
-    align-self: center;
+    width: 100%;
   }
 }
 
 .add-responsavel-btn {
-  margin-top: 6px;
+  width: 100%;
+  height: 56px;
+  margin-top: 10px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .alunos-card {
@@ -302,21 +312,20 @@ $imput: rgba(250, 250, 250, 1);
 }
 
 .btn-import {
-  height: 22px;
+  height: 36px;
   border: 0;
   border-radius: 999px;
   background: $ct-blue;
   color: #fff;
-  padding: 0 12px;
+  padding: 0 16px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  font-size: 10px;
-  font-weight: 500;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
   white-space: nowrap;
-  transition: filter 0.18s ease;
 
   &:hover {
     filter: brightness(0.98);
@@ -325,11 +334,11 @@ $imput: rgba(250, 250, 250, 1);
 
 .search-wrap {
   position: relative;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
 
   .search-ico {
     position: absolute;
-    left: 10px;
+    left: 12px;
     top: 50%;
     transform: translateY(-50%);
     color: #9aa4b2;
@@ -339,59 +348,57 @@ $imput: rgba(250, 250, 250, 1);
 
 .search-input {
   width: 100%;
-  height: 32px;
-  border-radius: 3px;
+  height: 46px;
+  border-radius: 6px;
   border: 1px solid $ct-border-soft;
-  background: $imput;
-  padding: 0 12px 0 32px;
-  box-sizing: border-box;
-  font-size: 11px;
+  background: $ct-input-bg;
+  padding: 0 14px 0 38px;
+  font-size: 14px;
   color: $ct-title;
   outline: none;
-  transition: border-color 0.18s ease, box-shadow 0.18s ease;
 
   &::placeholder {
     color: $ct-placeholder;
   }
 
   &:focus {
-    border-color: rgba(127, 179, 213, 0.95);
+    border-color: #7fb3d5;
     box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.12);
   }
 }
 
 .search-dropdown {
   position: absolute;
+  top: calc(100% + 6px);
   left: 0;
   right: 0;
-  top: calc(100% + 6px);
+  z-index: 20;
+  overflow: hidden;
   background: #fff;
   border: 1px solid $ct-border;
   border-radius: 10px;
   box-shadow: 0 12px 24px rgba(16, 24, 40, 0.12);
-  overflow: hidden;
-  z-index: 20;
 }
 
 .dropdown-item {
   width: 100%;
-  text-align: left;
   border: 0;
   background: #fff;
-  padding: 10px 12px;
-  cursor: pointer;
+  text-align: left;
+  padding: 12px 14px;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  cursor: pointer;
 
   .d-name {
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     color: #1f2937;
   }
 
   .d-sub {
-    font-size: 10px;
+    font-size: 11px;
     color: #8a96a8;
   }
 
@@ -405,23 +412,25 @@ $imput: rgba(250, 250, 250, 1);
 }
 
 .add-aluno-row {
-  margin-top: 2px;
-  margin-bottom: 8px;
   display: flex;
   justify-content: flex-start;
+  margin-top: 4px;
+  margin-bottom: 10px;
 }
 
 .add-aluno-btn {
-  min-width: 132px;
-  height: 28px;
+  min-width: 150px;
+  height: 42px;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 .alunos-list {
-  margin-top: 6px;
-  border: 1px solid #eef2f7;
-  border-radius: 10px;
-  background: #fff;
+  margin-top: 8px;
   overflow: hidden;
+  border: 1px solid #eef2f7;
+  border-radius: 12px;
+  background: #fff;
 }
 
 .aluno-row {
@@ -429,7 +438,7 @@ $imput: rgba(250, 250, 250, 1);
   align-items: center;
   justify-content: space-between;
   gap: 10px;
-  padding: 10px 12px;
+  padding: 12px 14px;
   border-bottom: 1px solid #eef2f7;
 
   &:last-child {
@@ -440,31 +449,31 @@ $imput: rgba(250, 250, 250, 1);
 .aluno-info {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .aluno-nome {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 600;
   color: #1f2937;
 }
 
 .aluno-matricula {
-  font-size: 10px;
-  color: #98a2b3;
+  font-size: 12px;
+  color: $ct-muted;
 }
 
 .btn-x {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 32px;
+  height: 32px;
   border: 1px solid transparent;
+  border-radius: 8px;
   background: transparent;
   color: #94a3b8;
-  cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer;
 
   &:hover {
     background: #f7f9fc;
@@ -474,16 +483,17 @@ $imput: rgba(250, 250, 250, 1);
 }
 
 .empty-state {
-  flex: 1;
   min-height: 132px;
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 2px;
   text-align: center;
   color: #a0a8b5;
-  font-size: 12px;
-  line-height: 1.25;
+  font-size: 13px;
+  line-height: 1.35;
   padding: 18px 12px 12px;
 
   p {
@@ -494,29 +504,29 @@ $imput: rgba(250, 250, 250, 1);
 .footer-action {
   display: flex;
   justify-content: center;
-  margin-top: 12px;
-  padding-top: 2px;
+  margin-top: 16px;
+  padding-top: 4px;
 }
 
 .btn-create {
-  width: 260px;
+  width: 280px;
   max-width: 100%;
-  height: 26px;
+  height: 46px;
   border: 0;
-  border-radius: 3px;
+  border-radius: 6px;
   background: $ct-blue-soft;
-  color: #ffffff;
-  font-size: 11px;
-  font-weight: 500;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
   cursor: not-allowed;
-  opacity: 0.9;
-  transition: filter 0.18s ease, box-shadow 0.18s ease, background 0.18s ease, opacity 0.18s ease;
+  opacity: 0.92;
+  transition: all 0.18s ease;
 
   &:disabled {
     background: $ct-blue-soft;
-    color: #ffffff;
+    color: #fff;
     cursor: not-allowed;
-    opacity: 0.9;
+    opacity: 0.92;
   }
 
   &.is-ready {
@@ -526,63 +536,59 @@ $imput: rgba(250, 250, 250, 1);
 
     &:hover {
       filter: brightness(0.98);
-      box-shadow: 0 8px 18px rgba(127, 179, 213, 0.16);
+      box-shadow: 0 8px 18px rgba(127, 179, 213, 0.18);
     }
   }
 }
 
-@media (max-width: 720px) {
-  .criar-turma-page {
-    padding: 8px;
-    gap: 10px;
-  }
-
-  .criar-turma-card {
-    padding: 14px;
-    border-radius: 12px;
-  }
-
-  .page-title {
-    font-size: 24px;
-    margin-bottom: 12px;
-  }
-
+@media (max-width: 920px) {
   .grid-2 {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: 18px;
   }
 
-  .section-head {
+  .section-head,
+  .responsavel-top {
     flex-direction: column;
     align-items: stretch;
   }
 
+  .btn-edit,
   .btn-import {
     align-self: flex-end;
   }
+}
 
-  .btn-primary.wide,
-  .btn-create {
+@media (max-width: 720px) {
+  .criar-turma-card {
+    padding: 18px 16px 20px;
+    border-radius: 18px;
+  }
+
+  .page-title {
+    font-size: 22px;
+    margin-bottom: 20px;
+  }
+
+  .section-title {
+    font-size: 17px;
+  }
+
+  .field input,
+  .responsavel-card .field input,
+  .search-input {
+    height: 44px;
+  }
+
+  .add-responsavel-btn,
+  .btn-create,
+  .btn-primary.wide {
     width: 100%;
   }
-}
 
-
-.responsavel-card .field {
-  gap: 4px;
-}
-
-.responsavel-card .field label {
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.2;
-  color: #334e68;
-}
-
-.responsavel-card .field input {
-  height: 33px;
-  border-radius: 3px;
-  border: 1px solid #dfe5ec;
-  background: rgba(250, 250, 250, 1);
-  padding: 0 10px;
+  .chip {
+    min-width: 140px;
+    height: 34px;
+    padding: 0 16px;
+  }
 }
