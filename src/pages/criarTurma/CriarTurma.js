@@ -135,7 +135,16 @@ export default function CriarTurma() {
   const [complemento, setComplemento] = useState("");
   const [tipo, setTipo] = useState("primaria");
 
-  const [responsaveis, setResponsaveis] = useState([]);
+  const [responsaveis, setResponsaveis] = useState(() => {
+    const usuario = getUsuarioLogado();
+    const baseUsuarios = Array.isArray(data?.usuarios) ? data.usuarios : [];
+
+    const user =
+      baseUsuarios.find((u) => Number(u.id) === Number(usuario?.id)) || null;
+
+    const responsavelPadrao = buildResponsavelPadrao(user);
+    return responsavelPadrao ? [responsavelPadrao] : [];
+  });
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("add");
@@ -200,6 +209,21 @@ export default function CriarTurma() {
   }, [buscaAluno, baseUsuarios, alunosSelecionados, instituicaoIdAtual]);
 
   useEffect(() => {
+    if (!user) return;
+
+    setResponsaveis((prev) => {
+      const jaExiste = prev.some(
+        (r) => Number(r.userId) === Number(user.id) && r.coordenadorPadrao,
+      );
+
+      if (jaExiste) return prev;
+
+      const responsavelPadrao = buildResponsavelPadrao(user);
+      return responsavelPadrao ? [responsavelPadrao, ...prev] : prev;
+    });
+  }, [user]);
+
+  useEffect(() => {
     const onDown = (e) => {
       if (!searchWrapRef.current) return;
       if (!searchWrapRef.current.contains(e.target)) {
@@ -235,12 +259,19 @@ export default function CriarTurma() {
   };
 
   const handleSaveResponsavelFromModal = (payload) => {
+    const currentItem =
+      modalMode === "edit" && editIndex !== null
+        ? responsaveis[editIndex]
+        : null;
+
     const normalized = {
-      userId: payload.userId ?? "",
+      userId: payload.userId ?? currentItem?.userId ?? "",
       nome: payload.nome ?? "",
       cargo: payload.cargo ?? "",
       contato: payload.contato ?? "",
       permissoes: { ...defaultPerms, ...(payload.permissoes || {}) },
+      fixo: currentItem?.fixo ?? false,
+      coordenadorPadrao: currentItem?.coordenadorPadrao ?? false,
     };
 
     if (modalMode === "add") {
@@ -262,6 +293,17 @@ export default function CriarTurma() {
 
   const handleRemoveResponsavelFromModal = () => {
     if (editIndex === null) return;
+
+    const responsavelAtual = responsaveis[editIndex];
+    if (responsavelAtual?.coordenadorPadrao || responsavelAtual?.fixo) {
+      Swal.fire({
+        icon: "warning",
+        title: "Remoção não permitida",
+        text: "O coordenador padrão da turma pode ser editado, mas não pode ser removido.",
+      });
+      return;
+    }
+
     setResponsaveis((prev) => prev.filter((_, i) => i !== editIndex));
     closeModal();
   };
@@ -306,7 +348,10 @@ export default function CriarTurma() {
     setNome("");
     setComplemento("");
     setTipo("primaria");
-    setResponsaveis([]);
+
+    const responsavelPadrao = buildResponsavelPadrao(user);
+    setResponsaveis(responsavelPadrao ? [responsavelPadrao] : []);
+
     setBuscaAluno("");
     setDropdownOpen(false);
     setAlunoSelecionadoId(null);
@@ -364,6 +409,8 @@ export default function CriarTurma() {
         cargo: r.cargo ?? "",
         contato: r.contato ?? "",
         permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+        fixo: !!r.fixo,
+        coordenadorPadrao: !!r.coordenadorPadrao,
       })),
       criadaNoCriarTurma: true,
       criadaEm: new Date().toISOString(),
@@ -421,6 +468,20 @@ export default function CriarTurma() {
 
   const podeCriarTurma =
     nome.trim() && responsaveis.length > 0 && alunosSelecionados.length > 0;
+
+  function buildResponsavelPadrao(user) {
+    if (!user) return null;
+
+    return {
+      userId: user.id ?? "",
+      nome: user.nome ?? "",
+      cargo: "Coordenador",
+      contato: user.email || user.telefone || "",
+      permissoes: { ...defaultPerms },
+      fixo: true,
+      coordenadorPadrao: true,
+    };
+  }
 
   return (
     <div className="painel-evento criar-turma-page">
@@ -493,11 +554,11 @@ export default function CriarTurma() {
                       type="button"
                       className="btn-edit"
                       onClick={() => openEditarResponsavel(idx)}
-                      >
+                    >
                       <Pencil size={12} />
                       <span className="btn-edit__text">Editar</span>
                     </button>
-                      </div>
+                  </div>
 
                   {idx === 0 && (
                     <div className="grid-2 inner">
@@ -662,7 +723,22 @@ export default function CriarTurma() {
           }
           onSave={handleSaveResponsavelFromModal}
           onRemove={
-            modalMode === "edit" ? handleRemoveResponsavelFromModal : null
+            modalMode === "edit" &&
+            editIndex !== null &&
+            !responsaveis[editIndex]?.coordenadorPadrao &&
+            !responsaveis[editIndex]?.fixo
+              ? handleRemoveResponsavelFromModal
+              : null
+          }
+          bloquearResponsavel={
+            modalMode === "edit" &&
+            editIndex !== null &&
+            !!responsaveis[editIndex]?.coordenadorPadrao
+          }
+          bloquearRemocao={
+            modalMode === "edit" &&
+            editIndex !== null &&
+            !!responsaveis[editIndex]?.coordenadorPadrao
           }
         />
       </div>

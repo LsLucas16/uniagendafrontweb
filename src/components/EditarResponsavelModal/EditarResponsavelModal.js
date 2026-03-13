@@ -18,6 +18,8 @@ export default function EditarResponsavelModal({
   initialValue = null,
   onSave,
   onRemove,
+  bloquearResponsavel = false,
+  bloquearRemocao = false,
 }) {
   const [draft, setDraft] = useState(null);
   const [errors, setErrors] = useState({});
@@ -27,6 +29,9 @@ export default function EditarResponsavelModal({
   const searchRef = useRef(null);
 
   const isAdd = !initialValue;
+
+  const responsavelTravado =
+    !!bloquearResponsavel && !!initialValue?.coordenadorPadrao;
 
   useEffect(() => {
     if (!open) return;
@@ -106,20 +111,24 @@ export default function EditarResponsavelModal({
 
   // ✅ ao selecionar, só preenche userId e nome (NÃO sugere cargo nem contato)
   const pickUser = (o) => {
-    setDraft((prev) => ({
-      ...prev,
-      userId: o.user,
-      nome: o.nome,
-    }));
-    setQueryUser(o.nome);
-    setDropdownOpen(false);
-  };
+  if (responsavelTravado) return;
 
-  const clearUser = () => {
-    setDraft((prev) => ({ ...prev, userId: "", nome: "" }));
-    setQueryUser("");
-    setDropdownOpen(false);
-  };
+  setDraft((prev) => ({
+    ...prev,
+    userId: o.user,
+    nome: o.nome,
+  }));
+  setQueryUser(o.nome);
+  setDropdownOpen(false);
+};
+
+ const clearUser = () => {
+  if (responsavelTravado) return;
+
+  setDraft((prev) => ({ ...prev, userId: "", nome: "" }));
+  setQueryUser("");
+  setDropdownOpen(false);
+};
 
   const togglePerm = (key) => {
     setDraft((prev) => ({
@@ -226,21 +235,25 @@ export default function EditarResponsavelModal({
               <input
                 value={queryUser}
                 onChange={(e) => {
+                  if (responsavelTravado) return;
+
                   const v = e.target.value;
                   setQueryUser(v);
                   setDropdownOpen(true);
 
-                  // ✅ deixa o nome ser digitado pelo usuário
-                  // mas NÃO define userId até selecionar alguém
                   setDraft((prev) => ({
                     ...prev,
                     userId: "",
                     nome: v,
                   }));
                 }}
-                onFocus={() => setDropdownOpen(true)}
+                onFocus={() => {
+                  if (responsavelTravado) return;
+                  setDropdownOpen(true);
+                }}
                 placeholder="Digite para buscar..."
                 autoComplete="off"
+                disabled={responsavelTravado}
               />
 
               <button
@@ -249,11 +262,12 @@ export default function EditarResponsavelModal({
                 onClick={clearUser}
                 aria-label="Limpar"
                 title="Limpar"
+                disabled={responsavelTravado}
               >
                 <X size={14} />
               </button>
 
-              {dropdownOpen && candidatos.length > 0 && (
+              {!responsavelTravado && dropdownOpen && candidatos.length > 0 && (
                 <div className="erm__dropdown">
                   {candidatos.map((o) => (
                     <button
@@ -359,7 +373,7 @@ export default function EditarResponsavelModal({
         </div>
 
         <div className="erm__footer">
-          {!!draft.userId && !!onRemove && (
+         {!!draft.userId && !!onRemove && !bloquearRemocao && (
             <button
               type="button"
               className="erm__btn erm__btn--dangerGhost"
