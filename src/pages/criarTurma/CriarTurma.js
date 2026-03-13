@@ -542,54 +542,52 @@ export default function CriarTurma() {
 
           <div className="responsaveis">
             {responsaveis.length > 0 ? (
-              responsaveis.map((r, idx) => (
-                <div
-                  className="responsavel-card"
-                  key={`${r.userId}-${idx}-${r.nome}`}
-                >
-                  <div className="responsavel-top">
-                    <span className="chip">{r.nome || "Responsável"}</span>
+  responsaveis.map((r, idx) => (
+    <div
+      className="responsavel-card"
+      key={`${r.userId}-${idx}-${r.nome}`}
+    >
+      <div className="responsavel-top">
+        <span className="chip">{r.nome || "Responsável"}</span>
 
-                    <button
-                      type="button"
-                      className="btn-edit"
-                      onClick={() => openEditarResponsavel(idx)}
-                    >
-                      <Pencil size={12} />
-                      <span className="btn-edit__text">Editar</span>
-                    </button>
-                  </div>
+        <button
+          type="button"
+          className="btn-edit"
+          onClick={() => openEditarResponsavel(idx)}
+        >
+          <Pencil size={12} />
+          <span className="btn-edit__text">Editar</span>
+        </button>
+      </div>
 
-                  {idx === 0 && (
-                    <div className="grid-2 inner">
-                      <div className="field">
-                        <label>Cargo</label>
-                        <input
-                          value={responsavelPrincipal.cargo || ""}
-                          readOnly
-                        />
-                      </div>
+      <div className="grid-2 inner">
+        <div className="field">
+          <label>Cargo</label>
+          <input
+            value={r.cargo || ""}
+            readOnly
+          />
+        </div>
 
-                      <div className="field">
-                        <label>Contato</label>
-                        <input
-                          value={responsavelPrincipal.contato || ""}
-                          readOnly
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="empty-state">
-                <p>Nenhum responsável adicionado ainda.</p>
-                <p>
-                  Use o botão abaixo para buscar e adicionar o primeiro
-                  responsável.
-                </p>
-              </div>
-            )}
+        <div className="field">
+          <label>Contato</label>
+          <input
+            value={r.contato || ""}
+            readOnly
+          />
+        </div>
+      </div>
+    </div>
+  ))
+) : (
+  <div className="empty-state">
+    <p>Nenhum responsável adicionado ainda.</p>
+    <p>
+      Use o botão abaixo para buscar e adicionar o primeiro
+      responsável.
+    </p>
+  </div>
+)}
 
             <button
               type="button"

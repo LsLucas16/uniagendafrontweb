@@ -149,6 +149,10 @@ export default function EditarTurmaCoordenador() {
       const professor =
         dados.usuarios.find((u) => Number(u.id) === Number(disc.professorId)) || null;
 
+         const responsaveis = Array.isArray(disc.responsaveis)
+    ? disc.responsaveis
+    : [];
+
       const alunosBase = (dados.usuarios || []).filter(
         (u) =>
           u.tipo === "aluno" &&
@@ -164,11 +168,12 @@ export default function EditarTurmaCoordenador() {
       const alunosCount =
         alunosIdsOverride !== null ? alunosIdsOverride.length : alunosBase.length;
 
-      return {
-        ...disc,
-        professor,
-        alunosCount,
-      };
+     return {
+  ...disc,
+  professor,
+  responsaveis,
+  alunosCount,
+};
     })
     .sort((a, b) => String(a.nome).localeCompare(String(a.nome), "pt-BR"));
 }, [usuarioCompleto, overrides, alunosOverride, turmasDeleted]);
@@ -278,12 +283,17 @@ export default function EditarTurmaCoordenador() {
                     <h2 className="editar-turmas-coord__title">{turma.nome}</h2>
 
                     <div className="editar-turmas-coord__meta">
-                      {turma.professor?.nome && (
-                        <span>
-                          {turma.professor.nome}
-                        </span>
-                      )}
-                    </div>
+  {turma.professor?.nome && (
+    <span> {turma.professor.nome}</span>
+  )}
+
+  {Array.isArray(turma.responsaveis) &&
+    turma.responsaveis.map((r, index) => (
+      <span key={`${r.userId || r.nome}-${index}`}>
+         {r.nome} {r.cargo ? `- ${r.cargo}` : ""}
+      </span>
+    ))}
+</div>
                   </div>
 
                   <div className="editar-turmas-coord__right">
