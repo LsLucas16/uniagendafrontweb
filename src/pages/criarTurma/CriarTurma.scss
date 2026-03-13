@@ -129,9 +129,9 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .tipo-label {
   margin-bottom: 10px;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.2;
-  font-weight: 700;
+  font-weight: 600;
   color: $ct-title;
 }
 
@@ -145,7 +145,8 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 11px;
+  font-size: 10px;
+  font-weight: 500;
   color: $ct-text;
   cursor: pointer;
   width: fit-content;
