@@ -2,371 +2,297 @@
 
 @import "../../styles/index";
 
-$azul-principal: #2e4a67;
+$azul-principal: #2E4A67;
 $azul-secundario: #667085;
 
 /* Fundo geral (Figma parece um cinza MUITO leve) */
 .eventos-publicados-page {
-@include uiPageShell;
-}
+  @include uiPageShell;
 
-/* Header */
-.eventos-publicados-header {
-  margin-bottom: 14px;
+  .eventos-publicados-header {
+    margin-bottom: 14px;
 
-  h1 {
-    margin: 0;
-    font-size: 28px;
-    line-height: 1.15;
-    font-weight: 800;
-    color: $azul-principal;
-    letter-spacing: -0.2px;
-  }
+    h1 {
+      margin: 0;
+      font-size: 28px;
+      line-height: 1.15;
+      font-weight: 800;
+      color: $azul-principal;
+      letter-spacing: -0.2px;
+    }
 
-  p {
-    margin: 6px 0 0;
-    font-size: 14px;
-    color: $azul-principal;
-  }
-}
-
-/* =========================
-   FILTROS (IGUAL FIGMA)
-========================= */
-.filtros-card {
-  background: #ffffff;
-  border: 1px solid #e9eef6;
-  border-radius: 16px;
-  padding: 16px;
-  margin-bottom: 16px; 
-  border: 0;                 
-  box-shadow: none;  
-}
-
-.filtros-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.filtros-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 16px;
-  font-weight: 800;
-  color: $azul-principal;
-}
-
-.filtros-icon {
-  color: $azul-principal;
-  opacity: 0.85;
-}
-
-/* Botão pill */
-.filtros-pill {
-  height: 34px;
-  padding: 0 12px 0 14px;
-  border-radius: 10px;
-  border: 1px solid #cfe2f6;
-  background: #6ea8d9;
-  color: #ffffff;
-  font-size: 13px;
-  font-weight: 400;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-  user-select: none;
-  white-space: nowrap;
-  box-shadow: 0 6px 14px rgba(110, 168, 217, 0.18);
-
-  &:hover {
-    filter: brightness(0.98);
-  }
-
-  &:active {
-    transform: translateY(0.5px);
-  }
-}
-
-.filtros-pill.is-on {
-  background: #5f9ed5;
-  border-color: #bcd7f3;
-}
-
-.filtros-pill-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 999px;
-  border: 2px solid #ffffff;
-  background: transparent;
-  flex: 0 0 auto;
-}
-
-.filtros-pill-dot.is-filled {
-  background: #ffffff;
-}
-
-.filtros-pill-dot.is-empty {
-  background: transparent;
-}
-
-.filtros-row {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-
-/* ✅ Campo de busca no Figma NÃO é branco puro */
-.filtro-search {
-  flex: 1;
-  height: 44px;
-  border-radius: 10px;
-  border: 1px solid #e5edf7;
-  background: #f2f5fa;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 14px;
-   box-shadow: none;  
-
-  input {
-    border: 0;
-    outline: none;
-    width: 100%;
-    background: transparent;
-    font-size: 14px;
-    color: #344054;
-    box-shadow: none;  
-
-    &::placeholder {
-      color: #98a2b3;
+    p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      color: $azul-principal;
     }
   }
 
-  &:focus-within {
-    border-color: #bcd7f3;
-    background: #eef3fb;
-     box-shadow: none;  
-  }
-}
-
-.filtro-search__icon {
-  color: #98a2b3;
-}
-
-/* =========================
-   LISTA / CARD
-========================= */
-.eventos-publicados-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  width: 100%;
-}
-
-/* Base card */
-.evento-card {
-  background-color: #fafafa;
-  border: 1px solid #e6edf7;
-  border-radius: 12px;
-  padding: 18px 18px 14px;
-  box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
-}
-
-/* =========================
-   VARIANTE: COORDENADOR (seu layout)
-========================= */
-
-.evento-card-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.evento-card-titleblock {
-  min-width: 0;
-  width: 100%;
-}
-
-.evento-card-createdbyline {
-  font-size: 12px;
-  color: $azul-secundario;
-  margin-bottom: 6px;
-  font-weight: 500;
-}
-
-.evento-card-title {
-  font-size: 24px;
-  line-height: 1.12;
-  font-weight: 600;
-  color: $azul-principal;
-  margin: 0 0 10px 0;
-  letter-spacing: -0.2px;
-}
-
-.evento-card-desc {
-  font-size: 20px;
-  line-height: 1.25;
-  font-weight: 600;
-  color: $azul-secundario;
-  margin: 0;
-  max-width: 920px;
-}
-
-/* Chips turmas */
-.evento-card-turmaschips {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-/* Meta (datas + chips perto) */
-.evento-card-meta {
-  margin-top: 14px;
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  gap: 10px;
-}
-
-.evento-card-dates {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  font-size: 12px;
-  color: $azul-secundario;
-  line-height: 1.2;
-}
-
-.evento-card-lastline {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.evento-card-chips {
-  display: inline-flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* Chips base */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding: 0 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  line-height: 1;
-  white-space: nowrap;
-  border: 0;
-}
-
-.chip--calendario,
-.chip--destaque {
-  background: #6ea8d9;
-  color: #ffffff;
-}
-
-.chip--turma {
-  background: rgba(110, 168, 217, 0.22);
-  color: $azul-principal;
-  border: 1px solid rgba(46, 74, 103, 0.14);
-}
-
-/* Botão editar ícone (coord) */
-.btn-editar-icononly {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
-  border: 1px solid #e6edf7;
-  background: #ffffff;
-  color: #98a2b3;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-
-  &:hover {
-    background: #f8fafc;
-    border-color: #cfe0f2;
-    color: $azul-secundario;
+  .filtros-card {
+    background: #ffffff;
+    border: 1px solid #e9eef6;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 0;
+    box-shadow: none;
   }
 
-  &:active {
-    transform: translateY(0.5px);
+  .filtros-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
   }
-}
 
-.btn-editar-icononly.is-disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-/* =========================
-   VARIANTE: DEFAULT (professor/responsável) — 1º print
-========================= */
-.evento-card--default {
-  background: #ffffff; /* no print parece mais branco/limpo */
-  border: 1px solid #e6edf7;
-  box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
-}
-
-.evento-default-top {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.evento-default-left {
-  min-width: 0;
-}
-
-.evento-default-chips {
-  display: inline-flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.btn-editar-text {
-  height: 30px;
-  padding: 0 12px;
-  border-radius: 10px;
-  border: 1px solid #e6edf7;
-  background: #ffffff;
-  color: $azul-secundario;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-
-  &:hover {
-    background: #f8fafc;
-    border-color: #cfe0f2;
+  .filtros-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 800;
     color: $azul-principal;
   }
 
-  &:active {
-    transform: translateY(0.5px);
+  .filtros-icon {
+    color: $azul-principal;
+    opacity: 0.85;
   }
 
-  &.is-disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-    pointer-events: none;
+  .filtros-pill {
+    height: 34px;
+    padding: 0 12px 0 14px;
+    border-radius: 10px;
+    border: 1px solid #cfe2f6;
+    background: #6ea8d9;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 400;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+    box-shadow: 0 6px 14px rgba(110, 168, 217, 0.18);
+
+    &:hover {
+      filter: brightness(0.98);
+    }
+
+    &:active {
+      transform: translateY(0.5px);
+    }
+
+    &.is-on {
+      background: #5f9ed5;
+      border-color: #bcd7f3;
+    }
+  }
+
+  .filtros-pill-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    border: 2px solid #ffffff;
+    background: transparent;
+    flex: 0 0 auto;
+
+    &.is-filled {
+      background: #ffffff;
+    }
+
+    &.is-empty {
+      background: transparent;
+    }
+  }
+
+  .filtros-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .filtro-search {
+    flex: 1;
+    height: 44px;
+    border-radius: 10px;
+    border: 1px solid #e5edf7;
+    background: #f2f5fa;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 14px;
+    box-shadow: none;
+
+    input {
+      border: 0;
+      outline: none;
+      width: 100%;
+      background: transparent;
+      font-size: 14px;
+      color: #344054;
+      box-shadow: none;
+
+      &::placeholder {
+        color: #98a2b3;
+      }
+    }
+
+    &:focus-within {
+      border-color: #bcd7f3;
+      background: #eef3fb;
+      box-shadow: none;
+    }
+  }
+
+  .filtro-search__icon {
+    color: #98a2b3;
+  }
+
+  .eventos-publicados-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    width: 100%;
+  }
+
+  .evento-card {
+    background-color: #fafafa;
+    border: 1px solid #e6edf7;
+    border-radius: 12px;
+    padding: 18px 18px 14px;
+    box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
+  }
+
+  .evento-card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .evento-card-titleblock {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .evento-card-createdbyline {
+    font-size: 12px;
+    color: $azul-secundario;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .evento-card-title {
+    font-size: 18px;
+    line-height: 1.2;
+    font-weight: 600;
+    color: $azul-principal;
+    margin: 0 0 12px 0;
+    letter-spacing: -0.2px;
+  }
+
+  .evento-card-desc {
+    font-size: 16px;
+    line-height: 1.3;
+    font-weight: 500;
+    color: #7b8794;
+    margin: 0;
+    max-width: 920px;
+  }
+
+  .evento-card-turmaschips {
+    margin-top: 12px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .evento-card-meta {
+    margin-top: 14px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+    gap: 10px;
+  }
+
+  .evento-card-dates {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 12px;
+    color: $azul-secundario;
+    line-height: 1.2;
+  }
+
+  .evento-card-lastline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .evento-card-chips {
+    display: inline-flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: 24px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    line-height: 1;
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .chip--calendario,
+  .chip--destaque {
+    background: #6ea8d9;
+    color: #ffffff;
+    font-weight: 400;
+  }
+
+  .chip--turma {
+    background: #9BC8E3;
+    color: $azul-principal;
+    border: 1px solid rgba(46, 74, 103, 0.14);
+    font-weight: 400;
+  }
+
+  .btn-editar-icononly {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid #e6edf7;
+    background: #ffffff;
+    color: #98a2b3;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    &:hover {
+      background: #f8fafc;
+      border-color: #cfe0f2;
+      color: $azul-secundario;
+    }
+
+    &:active {
+      transform: translateY(0.5px);
+    }
+
+    &.is-disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
   }
 }
 
