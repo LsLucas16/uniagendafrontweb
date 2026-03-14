@@ -1,4 +1,3 @@
-// EventosPublicados.jsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Pencil, Search, Filter } from "lucide-react";
@@ -33,12 +32,6 @@ function normStr(s) {
     .trim();
 }
 
-/**
- * Pega as turmas/disciplinas associadas ao evento:
- * - turmasIds (novo)
- * - disciplinaId (pode ser number ou array)
- * - disciplinaCoordenadorId / etc (chaves inconsistentes do JSON)
- */
 function getTurmasDoEvento(ev) {
   const fromTurmasIds =
     Array.isArray(ev?.turmasIds) && ev.turmasIds.length > 0
@@ -80,10 +73,6 @@ function getTipoUsuario(u) {
   return String(raw).toLowerCase().trim();
 }
 
-/* =========================
-   Cards (2 variantes Figma)
-========================= */
-
 function CardCoordenador({
   ev,
   criadoPor,
@@ -99,14 +88,15 @@ function CardCoordenador({
   mostrarTodasTurmas,
 }) {
   return (
-    <article key={ev.id} className="evento-card evento-card--coord">
+    <article className="evento-card evento-card--coord">
       <div className="evento-card-top">
         <div className="evento-card-titleblock">
           <div className="evento-card-createdbyline">
             Criado por: {criadoPor}
-          </div>  
+          </div>
 
           <div className="evento-card-title">{ev.titulo}</div>
+
           <div className="evento-card-desc">{ev.descricao}</div>
 
           {turmasOrdenadas.length > 0 && (
@@ -114,8 +104,8 @@ function CardCoordenador({
               {(mostrarTodasTurmas
                 ? turmasOrdenadas
                 : turmasOrdenadas.slice(0, 1)
-              ).map((t) => (
-                <span key={t.id} className="chip chip--turma">
+              ).map((t, idx) => (
+                <span key={`${t.id}-${idx}`} className="chip chip--turma">
                   {t.nome}
                 </span>
               ))}
@@ -169,15 +159,6 @@ function CardCoordenador({
   );
 }
 
-/**
- * ✅ DEFAULT (Professor/Responsável) — igual ao Figma:
- * Título (grosso/azul escuro)
- * Última atualização abaixo do título (sempre)
- * Chips abaixo
- * Descrição
- * Data do evento (se existir) embaixo
- * Criado por embaixo
- */
 function CardDefault({
   ev,
   criadoPor,
@@ -190,11 +171,10 @@ function CardDefault({
   temCalendario,
   temDestaque,
 }) {
-  const isBoth = temCalendario && temDestaque; // ✅ variante 1
+  const isBoth = temCalendario && temDestaque;
 
   return (
     <article
-      key={ev.id}
       className={`evento-card evento-card--default ${
         isBoth ? "evento-card--both" : "evento-card--single"
       }`}
@@ -203,14 +183,12 @@ function CardDefault({
         <div className="evento-default-left">
           <div className="evento-default-title">{ev.titulo}</div>
 
-          {/* ✅ quando for SÓ 1 chip (cal OU dest), a "Última atualização" aparece aqui em cima */}
           {!isBoth && (
             <div className="evento-default-updatedTop">
               Última atualização: {dataAtual}
             </div>
           )}
 
-          {/* ✅ Criado por muda de lugar conforme a combinação */}
           {isBoth && (
             <div className="evento-default-createdTop">
               Criado por: {criadoPor}
@@ -229,7 +207,6 @@ function CardDefault({
           )}
         </div>
 
-        {/* ✅ só aparece editar quando tem calendário (você já garante em podeEditar) */}
         {podeEditar && (
           <button
             type="button"
@@ -257,7 +234,6 @@ function CardDefault({
           {temDataEvento ? `Data do evento: ${dataEventoFmt}` : ""}
         </div>
 
-        {/* ✅ quando for BOTH, a última atualização vai para o rodapé (direita) */}
         {isBoth ? (
           <div className="evento-default-updatedBottom">
             Última atualização: {dataAtual}
@@ -272,16 +248,13 @@ function CardDefault({
   );
 }
 
-
 export default function EventosPublicados() {
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const navigate = useNavigate();
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
     getDisciplinaAtualId()
   );
-
   const [refreshKey, setRefreshKey] = useState(0);
-
   const [busca, setBusca] = useState("");
   const [apenasCoordenadores, setApenasCoordenadores] = useState(false);
 
@@ -291,8 +264,9 @@ export default function EventosPublicados() {
 
     const onStorage = (e) => {
       if (e.key === "usuario") setUsuarioLogado(getUsuarioLogado());
-      if (e.key === "disciplinaAtualId")
+      if (e.key === "disciplinaAtualId") {
         setDisciplinaAtualId(getDisciplinaAtualId());
+      }
     };
 
     const onEventosChanged = () => setRefreshKey((k) => k + 1);
@@ -323,6 +297,7 @@ export default function EventosPublicados() {
   const user = useMemo(() => {
     const id = usuarioLogado?.id;
     if (!id) return null;
+
     return (
       (data.usuarios || []).find((u) => Number(u.id) === Number(id)) || null
     );
@@ -342,6 +317,7 @@ export default function EventosPublicados() {
       (Array.isArray(user?.disciplinas) && user.disciplinas) ||
       (Array.isArray(usuarioLogado?.disciplinas) && usuarioLogado.disciplinas) ||
       [];
+
     return new Set(ids.map(Number).filter(Number.isFinite));
   }, [user, usuarioLogado]);
 
@@ -422,12 +398,13 @@ export default function EventosPublicados() {
         const hay = normStr(
           `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`
         );
+
         return hay.includes(q);
       })
       .sort((a, b) => {
-        const ta = new Date(b.ultimaAtualizacao || 0).getTime();
-        const tb = new Date(a.ultimaAtualizacao || 0).getTime();
-        return ta - tb;
+        const ta = new Date(a.ultimaAtualizacao || 0).getTime();
+        const tb = new Date(b.ultimaAtualizacao || 0).getTime();
+        return tb - ta;
       });
   }, [
     user,
@@ -458,6 +435,7 @@ export default function EventosPublicados() {
             <h1>Eventos Publicados</h1>
             <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
           </header>
+
           <div className="eventos-publicados-empty">
             Usuário não identificado. Faça login novamente.
           </div>
@@ -520,24 +498,28 @@ export default function EventosPublicados() {
           {eventosFiltrados.map((ev) => {
             const criadoPor =
               usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
-            const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
 
+            const dataAtual = formatarDataPtBR(ev.ultimaAtualizacao);
             const temDataEvento = !!ev.dataEvento;
             const dataEventoFmt = temDataEvento
               ? formatarDataPtBR(ev.dataEvento)
               : "";
-            const eventoPassado = isDataEventoPassada(ev.dataEvento);
 
+            const eventoPassado = isDataEventoPassada(ev.dataEvento);
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
 
-            const podeEditar = !!ev.calendario && !eventoPassado;
+            // IMPORTANTE:
+            // botão aparece sempre que calendário = true
+            // se evento passou, fica visível porém desabilitado
+            const podeEditar = !!ev.calendario;
 
             const turmasEv = getTurmasDoEvento(ev);
             const turmasNomes = (turmasEv || []).map((id) => ({
               id: Number(id),
               nome: disciplinasById.get(Number(id))?.nome || `Turma ${id}`,
             }));
+
             const turmasOrdenadas = [...turmasNomes].sort((a, b) => a.id - b.id);
             const mostrarTodasTurmas = isCoordenador;
 

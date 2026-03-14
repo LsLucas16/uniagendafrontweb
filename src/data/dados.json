@@ -86,7 +86,7 @@
   },
   {
     "id": 302,
-    "user": "202620302",
+    "user": "professor2",
     "senha": "123",
     "nome": "Renata Oliveira Costa",
     "contato": "professor@faculdade.br",
@@ -221,8 +221,8 @@
     "nome": "Calculo I - Turma 8",
     "cor": "#3B82F6",
     "instituicaoId": 1,
-    "professorId": 201,
-    "responsavelId": 401,
+    "professorId": 18791,
+    "responsavelId": 18791,
     "criado_por": 1
   },
   {
@@ -230,8 +230,8 @@
     "nome": "Matemática Básica - Turma 1",
     "cor": "#22C55E",
     "instituicaoId": 1,
-    "professorId": 201,
-    "responsavelId": 401,
+    "professorId": 18791,
+    "responsavelId": 18791,
     "criado_por": 1
   },
   {
@@ -239,8 +239,8 @@
     "nome": "Introdução aos Modelos Matemáticos",
     "cor": "#A855F7",
     "instituicaoId": 1,
-    "professorId": 201,
-    "responsavelId": 401,
+    "professorId": 18791,
+    "responsavelId": 18791,
     "criado_por": 1
   },
   {
@@ -248,14 +248,14 @@
     "nome": "Monitoria do Curso de Matemática e Exatas",
     "cor": "#F59E0B",
     "instituicaoId": 1,
-    "professorId": 201,
-    "responsavelId": 401,
+    "professorId": 18791,
+    "responsavelId": 18791,
     "criado_por": 1
   },
 
   {
     "id": 5,
-    "nome": 1,
+    "nome": "Monitoria do Curso de Matemática II",
     "cor": "#3B82F6",
     "instituicaoId": 3,
     "professorId": 302,
@@ -333,7 +333,7 @@
     "descricao": "Não se esqueçam da avaliação sobre derivadas e integrais. Finaliza hoje, a entrega deve ser feita pela plataforma.",
     "ultimaAtualizacao": "2025-11-15T10:30:00.000Z",
     "dataEvento": "2025-11-15T00:00:00.000Z",
-    "criadoPorId": 201,
+    "criadoPorId": 18791,
     "instituicaoId": 1,
     "disciplinaId": 1,
     "disciplinCoordenadoraId": [],
@@ -346,7 +346,7 @@
     "titulo": "Avaliativa hoje",
     "descricao": "Não se esqueçam da avaliação. Entrega pela plataforma até 23:59.",
     "ultimaAtualizacao": "2025-11-15T09:10:00.000Z",
-    "criadoPorId": 201,
+    "criadoPorId": 18791,
     "instituicaoId": 1,
     "disciplinaId": 3,
     "disciplinCoordenadoraId": [],
@@ -401,7 +401,7 @@
     "descricao": "Plantão hoje às 16:00 na sala virtual. Participação recomendada.",
     "ultimaAtualizacao": "2025-11-15T12:05:00.000Z",
     "dataEvento": "2025-11-15T00:00:00.000Z",
-    "criadoPorId": 201,
+    "criadoPorId": 18791,
     "instituicaoId": 1,
     "disciplinaId": 4,
     "disciplinCoordenadoraId": [],

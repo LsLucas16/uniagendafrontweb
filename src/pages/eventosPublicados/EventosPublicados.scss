@@ -1,11 +1,9 @@
-/* EventosPublicados.scss */
-
 @import "../../styles/index";
 
-$azul-principal: #2E4A67;
+$azul-principal: #2e4a67;
 $azul-secundario: #667085;
+$azul-caneta: #8E8E93;
 
-/* Fundo geral (Figma parece um cinza MUITO leve) */
 .eventos-publicados-page {
   @include uiPageShell;
 
@@ -136,7 +134,7 @@ $azul-secundario: #667085;
       box-shadow: none;
 
       &::placeholder {
-        color: #98a2b3;
+        color: $azul-caneta;
       }
     }
 
@@ -148,7 +146,7 @@ $azul-secundario: #667085;
   }
 
   .filtro-search__icon {
-    color: #98a2b3;
+    color: $azul-caneta;
   }
 
   .eventos-publicados-list {
@@ -188,7 +186,7 @@ $azul-secundario: #667085;
   .evento-card-title {
     font-size: 18px;
     line-height: 1.2;
-    font-weight: 600;
+    font-weight: 700;
     color: $azul-principal;
     margin: 0 0 12px 0;
     letter-spacing: -0.2px;
@@ -260,23 +258,61 @@ $azul-secundario: #667085;
   }
 
   .chip--turma {
-    background: #9BC8E3;
+    background: #9bc8e3;
     color: $azul-principal;
     border: 1px solid rgba(46, 74, 103, 0.14);
     font-weight: 400;
   }
 
   .btn-editar-icononly {
-    width: 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+
+  border: none; /* remove borda */
+
+  background: transparent;
+
+  color: #8E8E93;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  flex: 0 0 auto;
+
+  &:hover {
+    background: rgba(0,0,0,0.04);
+  }
+
+  &:active {
+    transform: translateY(0.5px);
+  }
+
+  &.is-disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+  .btn-editar-text {
     height: 34px;
-    border-radius: 10px;
-    border: 1px solid #e6edf7;
+    min-width: 96px;
+    padding: 0 14px;
+    border-radius: 8px;
+    border: 1px solid #d8e2ef;
     background: #ffffff;
-    color: #98a2b3;
+    color: $azul-caneta;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
     cursor: pointer;
+    flex: 0 0 auto;
 
     &:hover {
       background: #f8fafc;
@@ -296,24 +332,100 @@ $azul-secundario: #667085;
   }
 }
 
+.evento-default-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.evento-default-left {
+  min-width: 0;
+  flex: 1;
+}
+
+.evento-default-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: $azul-principal;
+  margin-bottom: 4px;
+}
+
+.evento-default-updatedTop {
+  font-size: 12px;
+  font-weight: 400;
+  color: $azul-caneta;
+  margin-bottom: 8px;
+}
+
+.evento-default-createdTop {
+  font-size: 12px;
+  color: $azul-caneta;
+  margin-bottom: 8px;
+}
+
+.evento-default-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .evento-default-desc {
-  margin-top: 10px;
+  margin-top: 12px;
   font-size: 16px;
   font-weight: 600;
   color: $azul-secundario;
   line-height: 1.35;
 }
 
-/* Empty */
+.evento-default-footer {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.evento-card--single .evento-default-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.evento-card--both .evento-default-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.evento-default-eventdate {
+  font-size: 12px;
+  font-weight: 400;
+  color: $azul-caneta;
+}
+
+.evento-default-updatedBottom {
+  font-size: 12px;
+  font-weight: 400;
+  color: $azul-caneta;
+}
+
+.evento-default-createdBottom {
+  font-size: 12px;
+  color: $azul-caneta;
+}
+
 .eventos-publicados-empty {
   padding: 10px 4px;
   font-size: 14px;
   color: #9aa6b2;
 }
 
-/* =========================
-   RESPONSIVO
-========================= */
 @media (max-width: 900px) {
   .eventos-publicados-container {
     padding: 20px 16px 18px;
@@ -349,93 +461,12 @@ $azul-secundario: #667085;
     gap: 10px;
   }
 
-  .evento-default-bottom {
+  .evento-default-top {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 6px;
+    align-items: stretch;
+  }
+
+  .btn-editar-text {
+    width: 100%;
   }
 }
-
-/* Criado por logo abaixo do título (igual print) */
-.evento-default-createdTop {
-  font-size: 12px;
-  color: rgba(114, 122, 142, 1);
-  margin-bottom: 8px;
-}
-
-/* Rodapé com as duas infos embaixo */
-.evento-default-footer {
-  margin-top: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap; /* quebra bonito no mobile */
-}
-
-/* Ajustes Professor conforme Figma */
-
-.evento-default-title {
-  font-size: 18px;
-  font-weight: 600; 
-  color: rgba(114, 122, 142, 1);
-  margin-bottom: 4px;
-}
-
-.evento-default-updatedTop {
-  font-size: 12px;
-  font-weight: 400;
-  color: #98a2b3;
-  margin-bottom: 8px;
-}
-
-.evento-default-createdBottom {
-  font-size: 12px;
-  color: #98a2b3;
-
-  strong {
-    font-weight: 700;
-    color: $azul-secundario;
-  }
-}
-
-/* ✅ BOTH (cal + destaque): rodapé em linha (Data esq / Última atualização dir) */
-.evento-card--both .evento-default-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-/* ✅ SINGLE (só cal OU só destaque): rodapé vira coluna e "Criado por" fica embaixo */
-.evento-card--single .evento-default-footer {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-}
-
-/* Top updated (quando não é both) */
-.evento-default-updatedTop {
-  font-size: 12px;
-  font-weight: 400;
-  color: #98a2b3;
-  margin-bottom: 8px;
-}
-
-/* Bottom updated (quando é both) */
-.evento-default-updatedBottom {
-  font-size: 12px;
-  font-weight: 400;
-  color: #98a2b3;
-}
-
-/* Data do evento */
-.evento-default-eventdate {
-  font-size: 12px;
-  font-weight: 400;
-  color: #98a2b3;
-}
-
-

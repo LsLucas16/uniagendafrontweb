@@ -290,7 +290,7 @@ export default function EditarTurmaCoordenador() {
   {Array.isArray(turma.responsaveis) &&
     turma.responsaveis.map((r, index) => (
       <span key={`${r.userId || r.nome}-${index}`}>
-         {r.nome} {r.cargo ? `- ${r.cargo}` : ""}
+         {r.nome}  
       </span>
     ))}
 </div>

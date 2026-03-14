@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./MenuLateral.scss";
-import data from "../../data/dados.json";
 import {
   SquarePen,
   ClipboardList,
@@ -12,158 +11,117 @@ import {
   ChevronRight,
 } from "lucide-react";
 
-const STORAGE_TURMAS = "turmas_override";
-
-function safeJsonParse(v, fallback) {
-  try {
-    return JSON.parse(v) ?? fallback;
-  } catch {
-    return fallback;
-  }
-}
-
-function getTurmasOverride() {
-  return safeJsonParse(localStorage.getItem(STORAGE_TURMAS), {});
-}
+import {
+  getUsuarioLogado,
+  getInstituicaoById,
+  getDisciplinasPermitidas,
+  getUsuariosMesclados,
+  setDisciplinaAtual,
+} from "../../utils/storageData";
 
 const MenuLateral = () => {
-  // Hooks sempre no topo
-  const [perfilAberto, setPerfilAberto] = useState(false);
-  const [disciplinaAbertaId, setDisciplinaAbertaId] = useState(null);
-  const STORAGE_USUARIOS_DISCIPLINAS = "usuarios_disciplinas_override";
-
-  const [disciplinaAtualId, setDisciplinaAtualId] = useState(() => {
-    return localStorage.getItem("disciplinaAtualId") || "";
-  });
-
-  function getUsuariosDisciplinasOverride() {
-  return safeJsonParse(localStorage.getItem(STORAGE_USUARIOS_DISCIPLINAS), {});
-}
-
-function getDisciplinasMescladas() {
-  const overrides = getTurmasOverride();
-  const base = Array.isArray(data.disciplinas) ? data.disciplinas : [];
-
-  const baseMap = {};
-  base.forEach((d) => {
-    baseMap[String(d.id)] = d;
-  });
-
-  Object.entries(overrides).forEach(([id, ov]) => {
-    baseMap[String(id)] = {
-      ...(baseMap[String(id)] || {}),
-      ...ov,
-    };
-  });
-
-  return Object.values(baseMap);
-}
-
   const navigate = useNavigate();
   const location = useLocation();
+
+  const [perfilAberto, setPerfilAberto] = useState(false);
+  const [disciplinaAbertaId, setDisciplinaAbertaId] = useState(null);
+  const [dataVersion, setDataVersion] = useState(0);
+  const [disciplinaAtualId, setDisciplinaAtualId] = useState(
+    () => localStorage.getItem("disciplinaAtualId") || ""
+  );
+
   const isActive = (path) => location.pathname === path;
 
-  const [turmasOverrideVer, setTurmasOverrideVer] = useState(0);
-
   useEffect(() => {
-  const syncDisciplinaAtual = () => {
-    setDisciplinaAtualId(localStorage.getItem("disciplinaAtualId") || "");
-  };
+    const bump = () => setDataVersion((v) => v + 1);
 
-  const onStorage = (e) => {
-    if (e.key === "disciplinaAtualId") {
-      syncDisciplinaAtual();
-    }
-  };
+    const syncDisciplinaAtual = () => {
+      setDisciplinaAtualId(localStorage.getItem("disciplinaAtualId") || "");
+    };
 
-  window.addEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
-  window.addEventListener("storage", onStorage);
+    const onStorage = (e) => {
+      if (!e.key) {
+        bump();
+        syncDisciplinaAtual();
+        return;
+      }
 
-  return () => {
-    window.removeEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
-    window.removeEventListener("storage", onStorage);
-  };
-}, []);
+      if (
+        e.key === "usuarios_override" ||
+        e.key === "turmas_override" ||
+        e.key === "usuarios_disciplinas_override" ||
+        e.key === "eventos_override" ||
+        e.key === "usuario"
+      ) {
+        bump();
+      }
 
-  useEffect(() => {
-    const bump = () => setTurmasOverrideVer((v) => v + 1);
+      if (e.key === "disciplinaAtualId") {
+        syncDisciplinaAtual();
+      }
+    };
 
-    // evento interno que vamos disparar ao salvar na tela de editar
-    window.addEventListener("turmas:changed", bump);
-
-    // se mudar em outra aba/janela
-    window.addEventListener("storage", (e) => {
-      if (e.key === STORAGE_TURMAS) bump();
-    });
+    window.addEventListener("app:data-changed", bump);
+    window.addEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
+    window.addEventListener("storage", onStorage);
 
     return () => {
-      window.removeEventListener("turmas:changed", bump);
-      window.removeEventListener("storage", bump);
+      window.removeEventListener("app:data-changed", bump);
+      window.removeEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
+      window.removeEventListener("storage", onStorage);
     };
   }, []);
 
-  // pega do localStorage
-  const usuarioStorage = useMemo(() => {
-    try {
-      return JSON.parse(localStorage.getItem("usuario")) || null;
-    } catch {
-      return null;
-    }
-  }, []);
-
-  const currentUserId = usuarioStorage?.id;
-
-  const user = useMemo(() => {
-    if (!currentUserId) return null;
-    return data.usuarios.find((u) => u.id === currentUserId) || null;
-  }, [currentUserId]);
+  const user = useMemo(() => getUsuarioLogado(), [dataVersion]);
 
   const instituicao = useMemo(() => {
     if (!user) return null;
-    return data.instituicoes.find((i) => i.id === user.faculdadeId) || null;
+    return getInstituicaoById(user.faculdadeId);
   }, [user]);
 
   const disciplinasDoUsuario = useMemo(() => {
-  if (!user) return [];
+    if (!user) return [];
 
-  const usuariosDisciplinasOverride = getUsuariosDisciplinasOverride();
-  const idsBase = Array.isArray(user.disciplinas) ? user.disciplinas : [];
-  const idsOverride = Array.isArray(usuariosDisciplinasOverride[String(user.id)])
-    ? usuariosDisciplinasOverride[String(user.id)].map(Number)
-    : [];
+    return getDisciplinasPermitidas(user).sort((a, b) =>
+      String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR")
+    );
+  }, [user, dataVersion]);
 
-  const ids = [...new Set([...idsBase, ...idsOverride])];
-  const disciplinasMescladas = getDisciplinasMescladas();
+  const usuariosMesclados = useMemo(() => getUsuariosMesclados(), [dataVersion]);
 
-  return disciplinasMescladas
-    .filter((d) => ids.includes(Number(d.id)))
-    .filter((d) => Number(d.instituicaoId) === Number(user.faculdadeId))
-    .sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR"));
-}, [user, turmasOverrideVer]);
+  const getUsuarioById = (id) =>
+    usuariosMesclados.find((u) => Number(u.id) === Number(id)) || null;
 
-  // Define disciplinaAtualId quando existir lista
   useEffect(() => {
-    if (!disciplinaAtualId && disciplinasDoUsuario.length > 0) {
-      const first = String(disciplinasDoUsuario[0].id);
-      setDisciplinaAtualId(first);
+    if (!disciplinasDoUsuario.length) {
+      setDisciplinaAtualId("");
+      localStorage.removeItem("disciplinaAtualId");
+      window.dispatchEvent(new Event("disciplinaAtual:changed"));
+      return;
+    }
 
-      localStorage.setItem("disciplinaAtualId", first);
+    const existeNaLista = disciplinasDoUsuario.some(
+      (d) => String(d.id) === String(disciplinaAtualId)
+    );
+
+    if (!disciplinaAtualId || !existeNaLista) {
+      const firstId = String(disciplinasDoUsuario[0].id);
+      setDisciplinaAtualId(firstId);
+      localStorage.setItem("disciplinaAtualId", firstId);
       window.dispatchEvent(new Event("disciplinaAtual:changed"));
     }
   }, [disciplinaAtualId, disciplinasDoUsuario]);
 
-  const getUsuarioById = (id) => data.usuarios.find((u) => u.id === id);
-
-  // Depois de TODOS os hooks, aí sim podemos "retornar null"
   if (!user) return null;
 
-  const primeiraLetra = user.nome.trim().charAt(0).toUpperCase();
+  const primeiraLetra = String(user.nome || "").trim().charAt(0).toUpperCase();
   const isAluno = user.tipo === "aluno";
   const isCoordenador = user.tipo === "coordenador";
 
   const handleLogout = (e) => {
     e.stopPropagation();
     localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
     navigate("/");
   };
 
@@ -176,7 +134,7 @@ function getDisciplinasMescladas() {
     <aside className="menuLateral">
       <header
         className={`menuLateral__header ${perfilAberto ? "active" : ""}`}
-        onClick={() => setPerfilAberto(!perfilAberto)}
+        onClick={() => setPerfilAberto((prev) => !prev)}
       >
         <div className="menuLateral__avatar">{primeiraLetra}</div>
 
@@ -189,16 +147,15 @@ function getDisciplinasMescladas() {
             <div className="menuLateral__user-details">
               <strong className="menuLateral__user-title">{user.nome}</strong>
 
-              {/* use só o que fizer sentido no seu JSON */}
               {user?.user && (
                 <span className="menuLateral__user-sub">{user.user}</span>
               )}
+
               {user?.login && (
                 <span className="menuLateral__user-sub">{user.login}</span>
               )}
             </div>
 
-            {/* ✅ botão não interfere no layout do conteúdo */}
             <button
               type="button"
               className="menuLateral__btn-sair"
@@ -216,6 +173,7 @@ function getDisciplinasMescladas() {
           <div className="menuLateral__uni-logo">
             <img src={instituicao?.logo} alt="Logo" />
           </div>
+
           <div className="menuLateral__uni-info">
             <span className="menuLateral__uni-label">{instituicao?.nome}</span>
             <strong className="menuLateral__uni-name">
@@ -229,7 +187,6 @@ function getDisciplinasMescladas() {
 
       <nav className="menuLateral__menu">
         <div className="menuLateral__actions">
-          {/* ✅ TURMA ATUAL (coordenador / professor / responsável) */}
           {!perfilAberto && !isAluno && (
             <div className="menuLateral__turmaBox">
               {!isCoordenador && (
@@ -242,29 +199,25 @@ function getDisciplinasMescladas() {
                 onChange={(e) => {
                   const next = e.target.value;
                   setDisciplinaAtualId(next);
-
-                  // Persistência e broadcast para o restante do app
-                  localStorage.setItem("disciplinaAtualId", next);
-                  window.dispatchEvent(new Event("disciplinaAtual:changed"));
+                  setDisciplinaAtual(next);
                 }}
               >
                 {disciplinasDoUsuario.map((d) => (
                   <option key={d.id} value={String(d.id)}>
-                    {d.nome}
+                    {String(d.nome || "")}
                   </option>
                 ))}
               </select>
             </div>
           )}
 
-          {/* ===================== ALUNO ===================== */}
           {isAluno ? (
             <div className="menuLateral__materias">
               {disciplinasDoUsuario.map((disc) => {
                 const open = disciplinaAbertaId === disc.id;
                 const professor = getUsuarioById(disc.professorId);
                 const responsavel = getUsuarioById(disc.responsavelId);
-                const tituloCurto = disc.nome.split(" - ")[0];
+                const tituloCurto = String(disc.nome || "").split(" - ")[0];
 
                 return (
                   <div key={disc.id} className="menuLateral__materiaWrap">
@@ -289,7 +242,7 @@ function getDisciplinasMescladas() {
                         style={{ "--discColor": disc.cor }}
                       >
                         <div className="menuLateral__detailsTitle">
-                          {disc.nome}
+                          {String(disc.nome || "")}
                         </div>
 
                         <div className="menuLateral__detailsLine">
@@ -317,8 +270,7 @@ function getDisciplinasMescladas() {
                 );
               })}
             </div>
-          ) : /* ===================== COORDENADOR ===================== */
-          isCoordenador ? (
+          ) : isCoordenador ? (
             <>
               <button
                 className={`menuLateral__btn ${isActive("/nova-turma") ? "active" : ""}`}
@@ -346,13 +298,7 @@ function getDisciplinasMescladas() {
 
               <button
                 className={`menuLateral__btn ${isEditarTurmaAtivo ? "active" : ""}`}
-                onClick={() =>
-                  navigate(
-                    isCoordenador
-                      ? "/editar-turma-coordenador"
-                      : "/editar-turma",
-                  )
-                }
+                onClick={() => navigate("/editar-turma-coordenador")}
               >
                 <Settings size={20} />
                 <span>Editar Turma</span>
@@ -367,7 +313,6 @@ function getDisciplinasMescladas() {
               </button>
             </>
           ) : (
-            /* ===================== PROFESSOR / RESPONSÁVEL ===================== */
             <>
               <button
                 className={`menuLateral__btn ${isActive("/criar-evento") ? "active" : ""}`}
@@ -387,13 +332,7 @@ function getDisciplinasMescladas() {
 
               <button
                 className={`menuLateral__btn ${isEditarTurmaAtivo ? "active" : ""}`}
-                onClick={() =>
-                  navigate(
-                    isCoordenador
-                      ? "/editar-turma-coordenador"
-                      : "/editar-turma",
-                  )
-                }
+                onClick={() => navigate("/editar-turma")}
               >
                 <Settings size={20} />
                 <span>Editar Turma</span>
