@@ -79,18 +79,32 @@ const MenuLateral = () => {
     return getInstituicaoById(user.faculdadeId);
   }, [user]);
 
-  const disciplinasDoUsuario = useMemo(() => {
-    if (!user) return [];
-
-    return getDisciplinasPermitidas(user).sort((a, b) =>
-      String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR")
-    );
-  }, [user, dataVersion]);
-
   const usuariosMesclados = useMemo(() => getUsuariosMesclados(), [dataVersion]);
 
   const getUsuarioById = (id) =>
     usuariosMesclados.find((u) => Number(u.id) === Number(id)) || null;
+
+  const normalizarIds = (ids, idAntigo) => {
+    if (Array.isArray(ids)) {
+      return ids.map(Number).filter(Boolean);
+    }
+
+    if (idAntigo !== undefined && idAntigo !== null && idAntigo !== "") {
+      return [Number(idAntigo)].filter(Boolean);
+    }
+
+    return [];
+  };
+
+  const disciplinasDoUsuario = useMemo(() => {
+    if (!user) return [];
+
+    const disciplinas = getDisciplinasPermitidas(user) || [];
+
+    return disciplinas.sort((a, b) =>
+      String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR")
+    );
+  }, [user, dataVersion]);
 
   useEffect(() => {
     if (!disciplinasDoUsuario.length) {
@@ -215,8 +229,34 @@ const MenuLateral = () => {
             <div className="menuLateral__materias">
               {disciplinasDoUsuario.map((disc) => {
                 const open = disciplinaAbertaId === disc.id;
-                const professor = getUsuarioById(disc.professorId);
-                const responsavel = getUsuarioById(disc.responsavelId);
+
+                const professorIds = normalizarIds(
+                  disc.professorIds,
+                  disc.professorId
+                );
+
+                const responsavelIds = normalizarIds(
+                  disc.responsavelIds,
+                  disc.responsavelId
+                );
+
+                const alunoIds = normalizarIds(
+                  disc.alunoIds,
+                  disc.alunoId
+                );
+
+                const professores = professorIds
+                  .map((id) => getUsuarioById(id))
+                  .filter(Boolean);
+
+                const responsaveis = responsavelIds
+                  .map((id) => getUsuarioById(id))
+                  .filter(Boolean);
+
+                const alunos = alunoIds
+                  .map((id) => getUsuarioById(id))
+                  .filter(Boolean);
+
                 const tituloCurto = String(disc.nome || "").split(" - ")[0];
 
                 return (
@@ -246,22 +286,37 @@ const MenuLateral = () => {
                         </div>
 
                         <div className="menuLateral__detailsLine">
-                          <strong>Professor:</strong>{" "}
+                          <strong>Professores:</strong>{" "}
                           <span>
-                            {professor?.nome || "—"}
-                            {professor?.contato
-                              ? ` | ${professor.contato}`
-                              : ""}
+                            {professores.length
+                              ? professores
+                                  .map(
+                                    (p) =>
+                                      `${p.nome}${p.contato ? ` | ${p.contato}` : ""}`
+                                  )
+                                  .join(" • ")
+                              : "—"}
                           </span>
                         </div>
 
                         <div className="menuLateral__detailsLine">
-                          <strong>Responsável:</strong>{" "}
+                          <strong>Responsáveis:</strong>{" "}
                           <span>
-                            {responsavel?.nome || "—"}
-                            {responsavel?.contato
-                              ? ` | ${responsavel.contato}`
-                              : ""}
+                            {responsaveis.length
+                              ? responsaveis
+                                  .map(
+                                    (r) =>
+                                      `${r.nome}${r.contato ? ` | ${r.contato}` : ""}`
+                                  )
+                                  .join(" • ")
+                              : "—"}
+                          </span>
+                        </div>
+
+                        <div className="menuLateral__detailsLine">
+                          <strong>Alunos:</strong>{" "}
+                          <span>
+                            {alunos.length ? alunos.length : "—"}
                           </span>
                         </div>
                       </div>

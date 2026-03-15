@@ -85,50 +85,80 @@ export function getUsuarioLogado() {
   );
 }
 
+function normalizarIds(ids, idAntigo) {
+  if (Array.isArray(ids)) {
+    return ids.map(Number).filter(Boolean);
+  }
+
+  if (idAntigo !== undefined && idAntigo !== null && idAntigo !== "") {
+    return [Number(idAntigo)].filter(Boolean);
+  }
+
+  return [];
+}
+
 export function getDisciplinasPermitidas(user) {
   if (!user) return [];
 
   const disciplinasMescladas = getDisciplinasMescladas();
+  const usuariosDisciplinasOverride = getUsuariosDisciplinasOverride();
+
+  const userId = Number(user.id);
+  const faculdadeId = Number(user.faculdadeId);
+
+  const idsBaseUsuario = Array.isArray(user.disciplinas)
+    ? user.disciplinas.map(Number)
+    : [];
+
+  const idsOverrideUsuario = Array.isArray(
+    usuariosDisciplinasOverride[String(user.id)]
+  )
+    ? usuariosDisciplinasOverride[String(user.id)].map(Number)
+    : [];
+
+  const idsUsuario = [...new Set([...idsBaseUsuario, ...idsOverrideUsuario])];
 
   const disciplinasDaFaculdade = disciplinasMescladas.filter(
-    (d) => Number(d.instituicaoId) === Number(user.faculdadeId)
+    (d) => Number(d.instituicaoId) === faculdadeId
   );
 
-  if (user.tipo === "coordenador") {
-    return disciplinasDaFaculdade;
-  }
+  return disciplinasDaFaculdade.filter((d) => {
+    const professorIds = normalizarIds(d.professorIds, d.professorId);
+    const responsavelIds = normalizarIds(d.responsavelIds, d.responsavelId);
+    const coordenadorIds = normalizarIds(d.coordenadorIds, d.coordenadorId);
+    const alunoIds = normalizarIds(d.alunoIds, d.alunoId);
 
-  if (user.tipo === "professor") {
-    return disciplinasDaFaculdade.filter(
-      (d) => Number(d.professorId) === Number(user.id)
-    );
-  }
+    const pertenceNovoModelo =
+      professorIds.includes(userId) ||
+      responsavelIds.includes(userId) ||
+      coordenadorIds.includes(userId) ||
+      alunoIds.includes(userId);
 
-  if (user.tipo === "responsavel") {
-    return disciplinasDaFaculdade.filter(
-      (d) => Number(d.responsavelId) === Number(user.id)
-    );
-  }
+    const pertenceModeloAntigo = idsUsuario.includes(Number(d.id));
 
-  if (user.tipo === "aluno") {
-    const usuariosDisciplinasOverride = getUsuariosDisciplinasOverride();
+    if (user.tipo === "coordenador") {
+  return (
+    coordenadorIds.includes(userId) ||
+    Number(d.criado_por) === userId ||
+    pertenceModeloAntigo ||
+    Number(d.instituicaoId) === faculdadeId
+  );
+}
 
-    const idsBase = Array.isArray(user.disciplinas)
-      ? user.disciplinas.map(Number)
-      : [];
+    if (user.tipo === "professor") {
+      return professorIds.includes(userId) || pertenceModeloAntigo;
+    }
 
-    const idsOverride = Array.isArray(
-      usuariosDisciplinasOverride[String(user.id)]
-    )
-      ? usuariosDisciplinasOverride[String(user.id)].map(Number)
-      : [];
+    if (user.tipo === "responsavel") {
+      return responsavelIds.includes(userId) || alunoIds.includes(userId) || pertenceModeloAntigo;
+    }
 
-    const ids = [...new Set([...idsBase, ...idsOverride])];
+    if (user.tipo === "aluno") {
+      return alunoIds.includes(userId) || pertenceModeloAntigo;
+    }
 
-    return disciplinasDaFaculdade.filter((d) => ids.includes(Number(d.id)));
-  }
-
-  return [];
+    return pertenceNovoModelo || pertenceModeloAntigo;
+  });
 }
 
 export function saveOverrideById(storageKey, id, patch) {

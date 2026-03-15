@@ -70,8 +70,19 @@ function getDisciplinaAtualId() {
   return localStorage.getItem("disciplinaAtualId") || "";
 }
 
+function normalizarIds(ids, idAntigo) {
+  if (Array.isArray(ids)) {
+    return ids.map(Number).filter(Boolean);
+  }
+
+  if (idAntigo !== undefined && idAntigo !== null && idAntigo !== "") {
+    return [Number(idAntigo)].filter(Boolean);
+  }
+
+  return [];
+}
+
 export default function EditarTurma() {
-  // modal
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("edit");
   const [editIndex, setEditIndex] = useState(null);
@@ -155,7 +166,6 @@ export default function EditarTurma() {
     : [];
   const baseUsuarios = Array.isArray(data.usuarios) ? data.usuarios : [];
 
-  // ✅ user = matrícula (string 9 dígitos)
   const usuariosComUser = useMemo(() => {
     return baseUsuarios.map((u) => ({
       ...u,
@@ -180,14 +190,11 @@ export default function EditarTurma() {
 
   const [loading, setLoading] = useState(true);
 
-  // topo
   const [nome, setNome] = useState("");
   const [complemento, setComplemento] = useState("");
 
-  // responsáveis: [{ userId, nome, cargo, contato, permissoes }]
   const [responsaveis, setResponsaveis] = useState([]);
 
-  // alunos
   const [buscaAluno, setBuscaAluno] = useState("");
   const [alunosIds, setAlunosIds] = useState([]);
   const [alunoSelecionadoId, setAlunoSelecionadoId] = useState(null);
@@ -204,7 +211,6 @@ export default function EditarTurma() {
     const turmasOverride = getTurmasOverride();
     const turmaOverride = turmasOverride[String(turmaId)];
 
-    // 🔁 migra storage antigo (nomeCustom/complementoCustom) para "nome"
     if (
       turmaOverride &&
       !turmaOverride.nome &&
@@ -232,12 +238,64 @@ export default function EditarTurma() {
     setNome(n);
     setComplemento(c);
 
-    // responsaveis base (professor + responsavel)
-    const professor = baseUsuarios.find(
-      (u) => Number(u.id) === Number(disciplinaMerged.professorId),
+    const professorIds = normalizarIds(
+      disciplinaMerged.professorIds,
+      disciplinaMerged.professorId,
     );
-    const responsavel = baseUsuarios.find(
-      (u) => Number(u.id) === Number(disciplinaMerged.responsavelId),
+    const responsavelIds = normalizarIds(
+      disciplinaMerged.responsavelIds,
+      disciplinaMerged.responsavelId,
+    );
+    const coordenadorIds = normalizarIds(
+      disciplinaMerged.coordenadorIds,
+      disciplinaMerged.coordenadorId,
+    );
+
+    const criarRegistroResponsavel = (u, cargo, extras = {}) => ({
+      userId: u.user ?? String(u.id).padStart(9, "0"),
+      usuarioId: u.id,
+      nome: u.nome ?? "",
+      cargo,
+      contato: u.contato || "",
+      permissoes: {
+        ...defaultPerms,
+        ...(u.permissoes || {}),
+      },
+      fixo: false,
+      removivel: true,
+      ...extras,
+    });
+
+    const professoresBase = professorIds
+      .map((id) => baseUsuarios.find((u) => Number(u.id) === Number(id)))
+      .filter(Boolean)
+      .map((u) => criarRegistroResponsavel(u, "Professor"));
+
+    const responsaveisBase = responsavelIds
+      .map((id) => baseUsuarios.find((u) => Number(u.id) === Number(id)))
+      .filter(Boolean)
+      .map((u) => criarRegistroResponsavel(u, "Responsável"));
+
+    const coordenadoresBase = coordenadorIds
+      .map((id) => baseUsuarios.find((u) => Number(u.id) === Number(id)))
+      .filter(Boolean)
+      .map((u) =>
+        criarRegistroResponsavel(u, "Coordenador", {
+          fixo: true,
+          removivel: false,
+        }),
+      );
+
+    const listaBase = [
+      ...coordenadoresBase,
+      ...professoresBase,
+      ...responsaveisBase,
+    ];
+
+    const listaBaseUnica = listaBase.filter(
+      (item, index, arr) =>
+        arr.findIndex((x) => Number(x.usuarioId) === Number(item.usuarioId)) ===
+        index,
     );
 
     const respOverride =
@@ -245,40 +303,54 @@ export default function EditarTurma() {
         ? turmaOverride.responsaveis
         : null;
 
-    const initialResponsaveis =
-      respOverride ||
-      [professor, responsavel].filter(Boolean).map((u) => ({
-        userId: u.user,
-        nome: u.nome,
-        cargo:
-          u.tipo === "professor"
-            ? "Professor"
-            : u.tipo === "responsavel"
-              ? "Responsável"
-              : "Coordenador",
-        contato: u.contato || "",
-        permissoes: {
-          ...defaultPerms,
-          ...(u.permissoes || {}),
-        },
-      }));
+    const initialResponsaveis = respOverride
+      ? respOverride.map((r) => ({
+          userId: r.userId ?? "",
+          usuarioId: r.usuarioId ?? null,
+          nome: r.nome ?? "",
+          cargo: r.cargo ?? "",
+          contato: r.contato ?? "",
+          permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+          fixo: Boolean(r.fixo) || r.cargo === "Coordenador",
+          removivel:
+            r.removivel === false ? false : r.cargo === "Coordenador" ? false : true,
+        }))
+      : listaBaseUnica;
 
-    // garante shape
-    const normalized = initialResponsaveis.map((r) => ({
-      userId: r.userId ?? "",
-      nome: r.nome ?? "",
-      cargo: r.cargo ?? "",
-      contato: r.contato ?? "",
-      permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
-    }));
+    const coordenadoresObrigatorios = coordenadoresBase.filter(
+      (coord) =>
+        !initialResponsaveis.some(
+          (r) => Number(r.usuarioId) === Number(coord.usuarioId),
+        ),
+    );
+
+    const normalized = [...initialResponsaveis, ...coordenadoresObrigatorios]
+      .map((r) => ({
+        userId: r.userId ?? "",
+        usuarioId: r.usuarioId ?? null,
+        nome: r.nome ?? "",
+        cargo: r.cargo ?? "",
+        contato: r.contato ?? "",
+        permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+        fixo: Boolean(r.fixo) || r.cargo === "Coordenador",
+        removivel:
+          r.removivel === false ? false : r.cargo === "Coordenador" ? false : true,
+      }))
+      .filter(
+        (item, index, arr) =>
+          arr.findIndex(
+            (x) =>
+              Number(x.usuarioId || 0) === Number(item.usuarioId || 0) &&
+              String(x.cargo || "") === String(item.cargo || ""),
+          ) === index,
+      );
 
     setResponsaveis(normalized);
 
-    // alunos base
-    const alunosBase = baseUsuarios
-      .filter((u) => u.tipo === "aluno" && Array.isArray(u.disciplinas))
-      .filter((u) => u.disciplinas.map(Number).includes(turmaId))
-      .map((u) => u.id);
+    const alunosBase = normalizarIds(
+      disciplinaMerged.alunoIds,
+      disciplinaMerged.alunoId,
+    );
 
     const alunosOverrideMap = getTurmaAlunosOverride();
     const overrideIds = Array.isArray(alunosOverrideMap[String(turmaId)])
@@ -351,10 +423,7 @@ export default function EditarTurma() {
     const nomeCompleto = buildNomeCompleto(nome, complemento);
 
     persistTurma({
-      // ✅ isso faz a alteração valer “em geral” quando você faz merge em outras telas
       nome: nomeCompleto,
-
-      // ✅ mantém compatibilidade com o que você já tinha salvo antes
       nomeCustom: String(nome || "").trim(),
       complementoCustom: String(complemento || "").trim(),
     });
@@ -403,37 +472,78 @@ export default function EditarTurma() {
     persistAlunos(next);
   };
 
-  // modal payload -> sempre salva no storage
-  const handleSaveResponsavelFromModal = (payload) => {
-    // payload esperado do modal:
-    // { userId, nome, cargo, contato, permissoes }
-    const normalized = {
-      userId: payload.userId ?? "",
-      nome: payload.nome ?? "",
-      cargo: payload.cargo ?? "",
-      contato: payload.contato ?? "",
-      permissoes: { ...defaultPerms, ...(payload.permissoes || {}) },
-    };
+const handleSaveResponsavelFromModal = (payload) => {
+  const normalized = {
+    userId: payload.userId ?? "",
+    usuarioId: payload.usuarioId ?? null,
+    nome: payload.nome ?? "",
+    cargo: payload.cargo ?? "",
+    contato: payload.contato ?? "",
+    permissoes: { ...defaultPerms, ...(payload.permissoes || {}) },
+    fixo: Boolean(payload.fixo) || payload.cargo === "Coordenador",
+    removivel:
+      payload.removivel === false
+        ? false
+        : payload.cargo === "Coordenador"
+          ? false
+          : true,
+  };
 
-    if (modalMode === "add") {
-      const next = [...responsaveis, normalized];
-      setResponsaveis(next);
-      persistTurma({ responsaveis: next });
-      closeModal();
-      return;
-    }
-
-    // edit
-    if (editIndex === null) return;
-    const next = [...responsaveis];
-    next[editIndex] = { ...next[editIndex], ...normalized };
+  if (modalMode === "add") {
+    const next = [...responsaveis, normalized];
     setResponsaveis(next);
     persistTurma({ responsaveis: next });
     closeModal();
-  };
+    return;
+  }
+
+  if (editIndex === null) return;
+
+  const atual = responsaveis[editIndex];
+  const isCoordenadorFixo =
+    atual?.cargo === "Coordenador" || atual?.removivel === false || atual?.fixo === true;
+
+  const next = [...responsaveis];
+
+  next[editIndex] = isCoordenadorFixo
+    ? {
+        ...atual,
+        // mantém SEMPRE o mesmo coordenador
+        userId: atual.userId,
+        usuarioId: atual.usuarioId,
+        nome: atual.nome,
+        cargo: "Coordenador",
+        fixo: true,
+        removivel: false,
+
+        // se quiser, pode manter contato e permissoes editáveis:
+        contato: payload.contato ?? atual.contato,
+        permissoes: { ...defaultPerms, ...(payload.permissoes || atual.permissoes || {}) },
+      }
+    : {
+        ...next[editIndex],
+        ...normalized,
+      };
+
+  setResponsaveis(next);
+  persistTurma({ responsaveis: next });
+  closeModal();
+};
 
   const handleRemoveResponsavelFromModal = () => {
     if (editIndex === null) return;
+
+    const atual = responsaveis[editIndex];
+
+    if (atual?.cargo === "Coordenador" || atual?.removivel === false) {
+      Swal.fire({
+        icon: "warning",
+        title: "Coordenador obrigatório",
+        text: "O coordenador da turma sempre deve aparecer e não pode ser removido.",
+      });
+      return;
+    }
+
     const next = responsaveis.filter((_, i) => i !== editIndex);
     setResponsaveis(next);
     persistTurma({ responsaveis: next });
@@ -584,7 +694,9 @@ export default function EditarTurma() {
             {responsaveis.map((r, idx) => (
               <div className="responsavel-card" key={`${r.userId}-${idx}`}>
                 <div className="responsavel-top">
-                  <span className="chip">{r.nome}</span>
+                  <span className={`chip ${r.cargo === "Coordenador" ? "chip--coordenador" : ""}`}>
+                    {r.nome}
+                  </span>
 
                   <button
                     type="button"
@@ -670,9 +782,9 @@ export default function EditarTurma() {
                           : ""
                       }`}
                       onClick={() => {
-                        setAlunoSelecionadoId(c.id); // seleciona
-                        setBuscaAluno(`${c.nome} (${c.matricula})`); // mostra no input (feedback visual)
-                        setDropdownOpen(false); // fecha dropdown (não tampa o botão)
+                        setAlunoSelecionadoId(c.id);
+                        setBuscaAluno(`${c.nome} (${c.matricula})`);
+                        setDropdownOpen(false);
                       }}
                     >
                       <div className="d-name">{c.nome}</div>
@@ -734,19 +846,34 @@ export default function EditarTurma() {
       </div>
 
       <EditarResponsavelModal
-        open={modalOpen}
-        onClose={closeModal}
-        usuarios={usuariosComUser}
-        initialValue={
-          modalMode === "edit" && editIndex !== null
-            ? responsaveis[editIndex]
-            : null
-        }
-        onSave={handleSaveResponsavelFromModal}
-        onRemove={
-          modalMode === "edit" ? handleRemoveResponsavelFromModal : null
-        }
-      />
+  open={modalOpen}
+  onClose={closeModal}
+  usuarios={usuariosComUser}
+  initialValue={
+    modalMode === "edit" && editIndex !== null
+      ? responsaveis[editIndex]
+      : null
+  }
+  onSave={handleSaveResponsavelFromModal}
+  onRemove={
+    modalMode === "edit" &&
+    responsaveis[editIndex]?.removivel !== false
+      ? handleRemoveResponsavelFromModal
+      : null
+  }
+  bloquearResponsavel={
+    modalMode === "edit" &&
+    (responsaveis[editIndex]?.cargo === "Coordenador" ||
+      responsaveis[editIndex]?.fixo === true ||
+      responsaveis[editIndex]?.removivel === false)
+  }
+  bloquearRemocao={
+    modalMode === "edit" &&
+    (responsaveis[editIndex]?.cargo === "Coordenador" ||
+      responsaveis[editIndex]?.fixo === true ||
+      responsaveis[editIndex]?.removivel === false)
+  }
+/>
     </div>
   );
 }

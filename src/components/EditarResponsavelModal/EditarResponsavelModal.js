@@ -31,7 +31,12 @@ export default function EditarResponsavelModal({
   const isAdd = !initialValue;
 
   const responsavelTravado =
-    !!bloquearResponsavel && !!initialValue?.coordenadorPadrao;
+  !!bloquearResponsavel &&
+  (
+    initialValue?.cargo === "Coordenador" ||
+    initialValue?.fixo === true ||
+    initialValue?.removivel === false
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -138,11 +143,12 @@ export default function EditarResponsavelModal({
   };
 
   const handleChangeCargo = (e) => {
-    const value = e.target.value;
-    setDraft((prev) => ({ ...prev, cargo: value }));
-    // ✅ se o usuário ajustou cargo, remove erro de cargo
-    setErrors((prev) => ({ ...prev, cargo: undefined }));
-  };
+  if (responsavelTravado) return;
+
+  const value = e.target.value;
+  setDraft((prev) => ({ ...prev, cargo: value }));
+  setErrors((prev) => ({ ...prev, cargo: undefined }));
+};
 
   const validate = () => {
     const next = {};
@@ -290,23 +296,25 @@ export default function EditarResponsavelModal({
           </div>
 
           {/* CARGO (DIGITÁVEL) */}
-          <div className="erm__field">
-            <label>Cargo</label>
+         <div className="erm__field">
+  <label>Cargo</label>
 
-            <div className="erm__inputWrap">
-              <input
-                type="text"
-                value={draft.cargo}
-                onChange={handleChangeCargo}
-                placeholder="Digite o cargo"
-                aria-invalid={!!errors.cargo}
-              />
-            </div>
+  <div className="erm__inputWrap">
+    <input
+      type="text"
+      value={draft.cargo}
+      onChange={handleChangeCargo}
+      placeholder="Digite o cargo"
+      aria-invalid={!!errors.cargo}
+      disabled={responsavelTravado}
+      readOnly={responsavelTravado}
+    />
+  </div>
 
-            {errors.cargo ? (
-              <div className="erm__fieldError">{errors.cargo}</div>
-            ) : null}
-          </div>
+  {errors.cargo ? (
+    <div className="erm__fieldError">{errors.cargo}</div>
+  ) : null}
+</div>
 
           {/* CONTATO */}
           <div className="erm__field">
