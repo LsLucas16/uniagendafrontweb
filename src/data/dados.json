@@ -11,8 +11,8 @@
     "senha": "123",
     "nome": "Julia Maria Neto",
     "tipo": "responsavel",
-    "faculdadeId": 1,
-    "disciplinas": [1, 2, 3, 4]
+    "faculdadeId": 1
+    
   },
   {
     "id": 101,
@@ -21,8 +21,8 @@
     "nome": "Carlos Augusto de Silva Pinho",
     "contato": "(99)99999-9999",
     "tipo": "aluno",
-    "faculdadeId": 2,
-    "disciplinas": [1, 6, 3, 4]
+    "faculdadeId": 2
+    
   },
    {
     "id": 18791,
@@ -31,8 +31,8 @@
     "nome": "Carlos Augusto de Silva Pinho",
     "contato": "(99)99999-9999",
     "tipo": "professor",
-    "faculdadeId": 1,
-    "disciplinas": [1, 6, 3, 4]
+    "faculdadeId": 1
+    
   },
   {
     "id": 201,
@@ -41,8 +41,8 @@
     "nome": "Roberto Almeida Costa Junior",
     "contato": "professor@faculdade.br",
     "tipo": "professor",
-    "faculdadeId": 1,
-    "disciplinas": [1, 6, 3, 4]
+    "faculdadeId": 1
+    
   },
   {
     "id": 301,
@@ -51,8 +51,8 @@
     "nome": "Ana Claudia Oliveira",
     "contato": "coordenador@faculdade.br",
     "tipo": "coordenador",
-    "faculdadeId": 1,
-    "disciplinas": [1, 6, 3, 4]
+    "faculdadeId": 1
+    
   },
   {
     "id": 401,
@@ -61,8 +61,8 @@
     "nome": "Junior Carlos Costa de Matos",
     "contato": "(99)99999-9999",
     "tipo": "responsavel",
-    "faculdadeId": 1,
-    "disciplinas": [1, 6, 3, 4]
+    "faculdadeId": 1
+    
   },
   {
     "id": 102,
@@ -71,8 +71,8 @@
     "nome": "Lucas Ribeiro Silva",
     "contato": "(99)99999-9999",
     "tipo": "aluno",
-    "faculdadeId": 3,
-    "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
+    "faculdadeId": 3
+    
   },
   {
     "id": 202,
@@ -81,8 +81,8 @@
     "nome": "Marcos Antônio Ferreira",
     "contato": "coordenador@faculdade.br",
     "tipo": "coordenador",
-    "faculdadeId": 3,
-    "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
+    "faculdadeId": 3
+    
   },
   {
     "id": 302,
@@ -91,8 +91,8 @@
     "nome": "Renata Oliveira Costa",
     "contato": "professor@faculdade.br",
     "tipo": "professor",
-    "faculdadeId": 3,
-    "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
+    "faculdadeId": 3
+    
   },
   {
     "id": 402,
@@ -101,8 +101,8 @@
     "nome": "Fernanda Ribeiro Silva",
     "contato": "(99)99999-9999",
     "tipo": "responsavel",
-    "faculdadeId": 3,
-    "disciplinas": [1, 2, 3, 8, 9, 10, 11, 4]
+    "faculdadeId": 3
+    
   },
   {
     "id": 103,
@@ -111,8 +111,8 @@
     "nome": "Beatriz Fernandes Lima",
     "contato": "(61) 98888-0103",
     "tipo": "aluno",
-    "faculdadeId": 1,
-    "disciplinas": [1, 2, 3, 4]
+    "faculdadeId": 1
+    
   },
   {
     "id": 104,
@@ -121,8 +121,8 @@
     "nome": "Pedro Henrique Souza",
     "contato": "(61) 98888-0104",
     "tipo": "aluno",
-    "faculdadeId": 1,
-    "disciplinas": [2, 3, 4]
+    "faculdadeId": 1
+    
   },
   {
     "id": 105,
@@ -131,8 +131,8 @@
     "nome": "Mariana Costa Ribeiro",
     "contato": "(61) 98888-0105",
     "tipo": "aluno",
-    "faculdadeId": 1,
-    "disciplinas": [1, 4]
+    "faculdadeId": 1
+    
   },
   {
     "id": 106,
@@ -141,8 +141,8 @@
     "nome": "Gustavo Almeida Santos",
     "contato": "(61) 98888-0106",
     "tipo": "aluno",
-    "faculdadeId": 1,
-    "disciplinas": [1, 3]
+    "faculdadeId": 1
+    
   },
   {
     "id": 107,
@@ -151,8 +151,8 @@
     "nome": "Larissa Martins Pereira",
     "contato": "(62) 97777-0107",
     "tipo": "aluno",
-    "faculdadeId": 2,
-    "disciplinas": [6, 1, 3]
+    "faculdadeId": 2
+    
   },
   {
     "id": 108,
@@ -161,8 +161,8 @@
     "nome": "João Vitor Nascimento",
     "contato": "(62) 97777-0108",
     "tipo": "aluno",
-    "faculdadeId": 2,
-    "disciplinas": [6, 3, 4]
+    "faculdadeId": 2
+    
   },
   {
     "id": 109,
@@ -171,8 +171,8 @@
     "nome": "Camila Rocha Freitas",
     "contato": "(62) 97777-0109",
     "tipo": "aluno",
-    "faculdadeId": 2,
-    "disciplinas": [1, 4]
+    "faculdadeId": 2
+    
   },
   {
     "id": 110,
@@ -181,8 +181,8 @@
     "nome": "Rafael Teixeira Cardoso",
     "contato": "(63) 96666-0110",
     "tipo": "aluno",
-    "faculdadeId": 3,
-    "disciplinas": [8, 9, 10]
+    "faculdadeId": 3
+    
   },
   {
     "id": 111,
@@ -191,8 +191,8 @@
     "nome": "Isabela Mendes Araujo",
     "contato": "(63) 96666-0111",
     "tipo": "aluno",
-    "faculdadeId": 3,
-    "disciplinas": [8, 11, 12]
+    "faculdadeId": 3
+    
   },
   {
     "id": 112,
@@ -201,8 +201,8 @@
     "nome": "Bruno Vieira Monteiro",
     "contato": "(63) 96666-0112",
     "tipo": "aluno",
-    "faculdadeId": 3,
-    "disciplinas": [7, 9, 11]
+    "faculdadeId": 3
+    
   },
   {
     "id": 113,
@@ -211,8 +211,8 @@
     "nome": "Sofia Carvalho Batista",
     "contato": "(63) 96666-0113",
     "tipo": "aluno",
-    "faculdadeId": 3,
-    "disciplinas": [10, 11]
+    "faculdadeId": 3
+    
   },
   {
   "id": 502,
@@ -221,8 +221,8 @@
   "nome": "Patricia Almeida Rocha",
   "contato": "(61) 98888-0502",
   "tipo": "responsavel",
-  "faculdadeId": 1,
-  "disciplinas": [1, 2, 3, 4]
+  "faculdadeId": 1
+  
 },
 {
   "id": 503,
@@ -231,8 +231,8 @@
   "nome": "Marcia Fernandes Lima",
   "contato": "(61) 98888-0503",
   "tipo": "responsavel",
-  "faculdadeId": 1,
-  "disciplinas": [1, 2]
+  "faculdadeId": 1
+  
 },
 {
   "id": 504,
@@ -241,14 +241,15 @@
   "nome": "Paulo Ricardo Mendes",
   "contato": "(63) 96666-0504",
   "tipo": "responsavel",
-  "faculdadeId": 3,
-  "disciplinas": [5, 6, 7, 8]
+  "faculdadeId": 3
+  
 }
 ],
-"disciplinas": [
+"disciplinas":[
   {
     "id": 1,
     "nome": "Calculo I - Turma 8",
+    "tipo": "primaria",
     "cor": "#3B82F6",
     "instituicaoId": 1,
     "professorIds": [18791, 201],
@@ -260,6 +261,7 @@
   {
     "id": 2,
     "nome": "Matemática Básica - Turma 1",
+    "tipo": "primaria",
     "cor": "#22C55E",
     "instituicaoId": 1,
     "professorIds": [18791],
@@ -271,6 +273,7 @@
   {
     "id": 3,
     "nome": "Introdução aos Modelos Matemáticos",
+    "tipo": "secundaria",
     "cor": "#A855F7",
     "instituicaoId": 1,
     "professorIds": [18791, 201],
@@ -282,6 +285,7 @@
   {
     "id": 4,
     "nome": "Monitoria do Curso de Matemática e Exatas",
+    "tipo": "secundaria",
     "cor": "#F59E0B",
     "instituicaoId": 1,
     "professorIds": [18791],
@@ -293,6 +297,7 @@
   {
     "id": 5,
     "nome": "Álgebra Linear I - Turma 2",
+    "tipo": "primaria",
     "cor": "#EF4444",
     "instituicaoId": 1,
     "professorIds": [201],
@@ -304,6 +309,7 @@
   {
     "id": 6,
     "nome": "Geometria Analítica - Turma 3",
+    "tipo": "primaria",
     "cor": "#14B8A6",
     "instituicaoId": 1,
     "professorIds": [18791, 201],
@@ -315,6 +321,7 @@
   {
     "id": 7,
     "nome": "Estatística Aplicada - Turma 1",
+    "tipo": "primaria",
     "cor": "#8B5CF6",
     "instituicaoId": 1,
     "professorIds": [18791],
@@ -326,6 +333,7 @@
   {
     "id": 8,
     "nome": "Lógica Matemática - Turma 4",
+    "tipo": "primaria",
     "cor": "#84CC16",
     "instituicaoId": 1,
     "professorIds": [201],

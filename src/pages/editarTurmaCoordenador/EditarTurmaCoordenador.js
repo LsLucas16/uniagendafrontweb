@@ -122,61 +122,69 @@ export default function EditarTurmaCoordenador() {
     return dados.usuarios.find((u) => u.id === usuario.id) || null;
   }, [usuario]);
 
- const turmasDaCoordenacao = useMemo(() => {
+const turmasDaCoordenacao = useMemo(() => {
   if (!usuarioCompleto) return [];
 
-  const usuariosDisciplinasOverride = getUsuariosDisciplinasOverride();
-  const idsBase = Array.isArray(usuarioCompleto.disciplinas)
-    ? usuarioCompleto.disciplinas
-    : [];
-
-  const idsOverride = Array.isArray(
-    usuariosDisciplinasOverride[String(usuarioCompleto.id)],
-  )
-    ? usuariosDisciplinasOverride[String(usuarioCompleto.id)].map(Number)
-    : [];
-
-  const idsDoUsuario = [...new Set([...idsBase, ...idsOverride])];
   const disciplinasMescladas = getDisciplinasMescladas();
 
   return disciplinasMescladas
     .filter(
-      (disc) => Number(disc.instituicaoId) === Number(usuarioCompleto.faculdadeId),
+      (disc) =>
+        Number(disc.instituicaoId) === Number(usuarioCompleto.faculdadeId),
     )
-    .filter((disc) => idsDoUsuario.includes(Number(disc.id)))
     .filter((disc) => !turmasDeleted.includes(Number(disc.id)))
-    .map((disc) => {
-      const professor =
-        dados.usuarios.find((u) => Number(u.id) === Number(disc.professorId)) || null;
+    .filter((disc) => {
+      const coordIds = Array.isArray(disc.coordenadorIds)
+        ? disc.coordenadorIds.map(Number)
+        : [];
 
-         const responsaveis = Array.isArray(disc.responsaveis)
-    ? disc.responsaveis
-    : [];
+      const criadoPor = Number(disc.criado_por || 0);
 
-      const alunosBase = (dados.usuarios || []).filter(
-        (u) =>
-          u.tipo === "aluno" &&
-          Number(u.faculdadeId) === Number(disc.instituicaoId) &&
-          Array.isArray(u.disciplinas) &&
-          u.disciplinas.includes(Number(disc.id)),
+      return (
+        coordIds.includes(Number(usuarioCompleto.id)) ||
+        criadoPor === Number(usuarioCompleto.id)
       );
+    })
+    .map((disc) => {
+      const professorIds = Array.isArray(disc.professorIds)
+        ? disc.professorIds.map(Number)
+        : [];
+
+      const professor =
+        (dados.usuarios || []).find((u) =>
+          professorIds.includes(Number(u.id)),
+        ) || null;
+
+      const responsaveis = Array.isArray(disc.responsaveis)
+        ? disc.responsaveis
+        : [];
 
       const alunosIdsOverride = Array.isArray(alunosOverride[String(disc.id)])
         ? alunosOverride[String(disc.id)].map(Number)
         : null;
 
-      const alunosCount =
-        alunosIdsOverride !== null ? alunosIdsOverride.length : alunosBase.length;
+      const alunosIdsBase = Array.isArray(disc.alunoIds)
+        ? disc.alunoIds.map(Number)
+        : [];
 
-     return {
-  ...disc,
-  professor,
-  responsaveis,
-  alunosCount,
-};
+      const alunosIdsValidos = (alunosIdsOverride ?? alunosIdsBase).filter(
+        (id) =>
+          (dados.usuarios || []).some(
+            (u) => Number(u.id) === Number(id) && u.tipo === "aluno",
+          ),
+      );
+
+      const alunosCount = alunosIdsValidos.length;
+
+      return {
+        ...disc,
+        professor,
+        responsaveis,
+        alunosCount,
+      };
     })
-    .sort((a, b) => String(a.nome).localeCompare(String(a.nome), "pt-BR"));
-}, [usuarioCompleto, overrides, alunosOverride, turmasDeleted]);
+    .sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR"));
+}, [usuarioCompleto, alunosOverride, turmasDeleted]);
 
   const turmasFiltradas = useMemo(() => {
     const termo = normStr(busca);

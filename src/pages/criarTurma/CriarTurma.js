@@ -389,32 +389,64 @@ export default function CriarTurma() {
       ) ||
       null;
 
-    turmasOverride[String(novoId)] = {
-      id: novoId,
-      nome: nomeCompleto,
-      nomeCustom: String(nome || "").trim(),
-      complementoCustom: String(complemento || "").trim(),
-      tipo,
-      cor: corAleatoria,
-      instituicaoId: instituicaoIdAtual,
-      professorId: professorSelecionado
-        ? Number(professorSelecionado.userId) || null
-        : null,
-      responsavelId: responsavelSelecionado
-        ? Number(responsavelSelecionado.userId) || null
-        : null,
-      responsaveis: responsaveis.map((r) => ({
-        userId: r.userId ?? "",
-        nome: r.nome ?? "",
-        cargo: r.cargo ?? "",
-        contato: r.contato ?? "",
-        permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
-        fixo: !!r.fixo,
-        coordenadorPadrao: !!r.coordenadorPadrao,
-      })),
-      criadaNoCriarTurma: true,
-      criadaEm: new Date().toISOString(),
-    };
+    const coordenadores = responsaveis.filter(
+  (r) => String(r.cargo).toLowerCase() === "coordenador",
+);
+
+const professores = responsaveis.filter(
+  (r) => String(r.cargo).toLowerCase() === "professor",
+);
+
+const responsaveisLegais = responsaveis.filter((r) => {
+  const cargo = String(r.cargo).toLowerCase();
+  return cargo === "responsável" || cargo === "responsavel";
+});
+
+turmasOverride[String(novoId)] = {
+  id: novoId,
+  nome: nomeCompleto,
+  nomeCustom: String(nome || "").trim(),
+  complementoCustom: String(complemento || "").trim(),
+  tipo,
+  cor: corAleatoria,
+  instituicaoId: instituicaoIdAtual,
+
+  professorId: professorSelecionado
+    ? Number(professorSelecionado.userId) || null
+    : null,
+  responsavelId: responsavelSelecionado
+    ? Number(responsavelSelecionado.userId) || null
+    : null,
+
+  professorIds: professores.map((r) => Number(r.userId)).filter(Boolean),
+  responsavelIds: responsaveisLegais
+    .map((r) => Number(r.userId))
+    .filter(Boolean),
+  coordenadorIds: coordenadores.map((r) => Number(r.userId)).filter(Boolean),
+  alunoIds: alunosSelecionados.map((a) => Number(a.id)).filter(Boolean),
+
+  criado_por: coordenadores.length
+    ? Number(coordenadores[0].userId) || null
+    : usuarioLogado?.id
+      ? Number(usuarioLogado.id)
+      : null,
+
+  responsaveis: responsaveis.map((r) => ({
+    userId: r.userId ?? "",
+    usuarioId: Number(r.userId) || null,
+    nome: r.nome ?? "",
+    cargo: r.cargo ?? "",
+    contato: r.contato ?? "",
+    permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+    fixo: !!r.fixo,
+    removivel: r.fixo ? false : true,
+    coordenadorPadrao: !!r.coordenadorPadrao,
+    criadoPorTurma: !!r.coordenadorPadrao,
+  })),
+
+  criadaNoCriarTurma: true,
+  criadaEm: new Date().toISOString(),
+};
 
     turmaAlunosOverride[String(novoId)] = alunosSelecionados.map((a) =>
       Number(a.id),
