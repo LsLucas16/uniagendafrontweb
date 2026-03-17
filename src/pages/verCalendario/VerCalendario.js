@@ -1,0 +1,231 @@
+import React, { useMemo, useState } from "react";
+import { Search, Filter } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import data from "../../data/dados.json";
+import chevronIcon from "../../assets/ic_chevron.svg";
+import "./VerCalendario.scss";
+
+const MESES_PT = [
+  "Janeiro",
+  "Fevereiro",
+  "Março",
+  "Abril",
+  "Maio",
+  "Junho",
+  "Julho",
+  "Agosto",
+  "Setembro",
+  "Outubro",
+  "Novembro",
+  "Dezembro",
+];
+
+const DIAS_SEMANA = [
+  "Segunda",
+  "Terça",
+  "Quarta",
+  "Quinta",
+  "Sexta",
+  "Sábado",
+  "Domingo",
+];
+
+function toDateKey(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return "";
+
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+
+  return `${y}-${m}-${day}`;
+}
+
+function getMondayFirstDay(jsDay) {
+  return jsDay === 0 ? 6 : jsDay - 1;
+}
+
+function buildCalendarDays(year, month) {
+  const firstDay = new Date(year, month, 1);
+  const startOffset = getMondayFirstDay(firstDay.getDay());
+
+  const startDate = new Date(year, month, 1 - startOffset);
+  const cells = [];
+
+  for (let i = 0; i < 35; i += 1) {
+    const d = new Date(startDate);
+    d.setDate(startDate.getDate() + i);
+
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+
+    cells.push({
+      key: `${yyyy}-${mm}-${dd}`,
+      date: d,
+      day: d.getDate(),
+      isCurrentMonth: d.getMonth() === month,
+    });
+  }
+
+  return cells;
+}
+
+export default function VerCalendario() {
+  const navigate = useNavigate();
+  const [busca, setBusca] = useState("");
+
+  const [mesAtual, setMesAtual] = useState(() => {
+    const hoje = new Date();
+    return new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+  });
+
+  const eventos = Array.isArray(data?.eventos) ? data.eventos : [];
+
+  const eventosFiltrados = useMemo(() => {
+    const termo = String(busca || "").trim().toLowerCase();
+    const eventosCalendario = eventos.filter((evento) => evento.calendario);
+
+    if (!termo) return eventosCalendario;
+
+    return eventosCalendario.filter((evento) => {
+      const titulo = String(evento.titulo || "").toLowerCase();
+      const descricao = String(evento.descricao || "").toLowerCase();
+      const disciplinaId = String(evento.disciplinaId || "");
+      return (
+        titulo.includes(termo) ||
+        descricao.includes(termo) ||
+        disciplinaId.includes(termo)
+      );
+    });
+  }, [busca, eventos]);
+
+  const eventosPorDia = useMemo(() => {
+    const mapa = {};
+
+    eventosFiltrados.forEach((evento) => {
+      const key = toDateKey(evento.dataEvento);
+      if (!key) return;
+
+      if (!mapa[key]) {
+        mapa[key] = [];
+      }
+
+      mapa[key].push(evento);
+    });
+
+    return mapa;
+  }, [eventosFiltrados]);
+
+  const year = mesAtual.getFullYear();
+  const month = mesAtual.getMonth();
+
+  const days = useMemo(() => buildCalendarDays(year, month), [year, month]);
+
+  function handlePrevMonth() {
+    setMesAtual((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+  }
+
+  function handleNextMonth() {
+    setMesAtual((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+  }
+
+ function handleOpenDay(dateKey) {
+  const eventosDoDia = eventosPorDia[dateKey] || [];
+  if (!eventosDoDia.length) return;
+
+  navigate(`/detalhe-calendario/${dateKey}`, {
+    state: {
+      dataSelecionada: dateKey,
+      eventos: eventosDoDia,
+    },
+  });
+}
+  return (
+    <div className="ver-calendario-page">
+      <section className="ver-calendario-card ver-calendario-card--filters">
+        <h1 className="page-title">Calendário</h1>
+
+        <button type="button" className="filters-link">
+          <Filter size={13} />
+          <span>Filtros</span>
+        </button>
+
+        <div className="search-wrap">
+          <Search size={15} className="search-icon" />
+          <input
+            type="text"
+            value={busca}
+            onChange={(e) => setBusca(e.target.value)}
+            placeholder="Buscar por nome, disciplina ou professor..."
+          />
+        </div>
+      </section>
+
+      <section className="ver-calendario-card ver-calendario-card--calendar">
+        <div className="calendar-header">
+  <div className="calendar-header__nav">
+    <button
+      type="button"
+      className="month-nav month-nav--prev"
+      aria-label="Mês anterior"
+      onClick={handlePrevMonth}
+    >
+      <img src={chevronIcon} alt="" />
+    </button>
+
+    <h2>
+      {MESES_PT[month]} {year}
+    </h2>
+
+    <button
+      type="button"
+      className="month-nav month-nav--next"
+      aria-label="Próximo mês"
+      onClick={handleNextMonth}
+    >
+      <img src={chevronIcon} alt="" />
+    </button>
+  </div>
+</div>
+
+        <div className="calendar-weekdays">
+          {DIAS_SEMANA.map((dia) => (
+            <div key={dia} className="weekday">
+              {dia}
+            </div>
+          ))}
+        </div>
+
+        <div className="calendar-grid">
+          {days.map((item) => {
+            const eventosDoDia = eventosPorDia[item.key] || [];
+            const eventosCount = eventosDoDia.length;
+            const isClickable = eventosCount > 0 && item.isCurrentMonth;
+
+            return (
+              <button
+                key={item.key}
+                type="button"
+                className={`calendar-cell ${item.isCurrentMonth ? "" : "is-outside"} ${
+                  isClickable ? "is-clickable" : ""
+                }`}
+                onClick={() => handleOpenDay(item.key)}
+                disabled={!isClickable}
+              >
+                <div className="calendar-cell__top">
+                  <span className="day-number">{item.day}</span>
+
+                  {eventosCount > 0 && (
+                    <span className="events-badge">+{eventosCount}</span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+    </div>
+  );
+}

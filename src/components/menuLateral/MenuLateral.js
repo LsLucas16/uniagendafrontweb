@@ -360,8 +360,8 @@ const MenuLateral = () => {
               </button>
 
               <button
-                className={`menuLateral__btn ${isActive("/calendario") ? "active" : ""}`}
-                onClick={() => navigate("/calendario")}
+                className={`menuLateral__btn ${isActive("/ver-calendario") ? "active" : ""}`}
+                onClick={() => navigate("/ver-calendario")}
               >
                 <Calendar size={20} />
                 <span>Ver Calendário</span>

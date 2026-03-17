@@ -15,6 +15,8 @@ import EditarTurma from "./pages/editarTurma/EditarTurma";
 import EditarTurmaCoordenador from "./pages/editarTurmaCoordenador/EditarTurmaCoordenador";
 import ListaAlunos from "./pages/listaAlunos/ListaAlunos";
 import CriarTurma from "./pages/criarTurma/CriarTurma";
+import VerCalendario from "./pages/verCalendario/VerCalendario";
+import DetalheCalendario from "./pages/detalheCalendario/DetalheCalendario";
 
 function App() {
   return (
@@ -122,13 +124,21 @@ function App() {
             />
 
             <Route
-              path="/calendario"
+              path="/ver-calendario"
               element={
                 <Layout>
-                  <PaginaTemporaria titulo="Calendário (Em desenvolvimento)" />
+                  <VerCalendario />
                 </Layout>
               }
             />
+            <Route
+  path="/detalhe-calendario/:date"
+  element={
+    <Layout>
+      <DetalheCalendario />
+    </Layout>
+  }
+/>
           </Route>
         </Route>
       </Routes>
