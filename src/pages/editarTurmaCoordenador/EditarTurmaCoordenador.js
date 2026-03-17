@@ -146,43 +146,91 @@ const turmasDaCoordenacao = useMemo(() => {
       );
     })
     .map((disc) => {
-      const professorIds = Array.isArray(disc.professorIds)
-        ? disc.professorIds.map(Number)
-        : [];
+  const professorIds = Array.isArray(disc.professorIds)
+    ? disc.professorIds.map(Number)
+    : [];
 
-      const professor =
-        (dados.usuarios || []).find((u) =>
-          professorIds.includes(Number(u.id)),
-        ) || null;
+  const responsavelIds = Array.isArray(disc.responsavelIds)
+    ? disc.responsavelIds.map(Number)
+    : [];
 
-      const responsaveis = Array.isArray(disc.responsaveis)
-        ? disc.responsaveis
-        : [];
+  const coordenadorIds = Array.isArray(disc.coordenadorIds)
+    ? disc.coordenadorIds.map(Number)
+    : [];
 
-      const alunosIdsOverride = Array.isArray(alunosOverride[String(disc.id)])
-        ? alunosOverride[String(disc.id)].map(Number)
-        : null;
+  const professores = (dados.usuarios || [])
+    .filter((u) => professorIds.includes(Number(u.id)))
+    .map((u) => ({
+      id: u.id,
+      nome: u.nome,
+      cargo: "Professor",
+    }));
 
-      const alunosIdsBase = Array.isArray(disc.alunoIds)
-        ? disc.alunoIds.map(Number)
-        : [];
+  const coordenadores = (dados.usuarios || [])
+    .filter((u) => coordenadorIds.includes(Number(u.id)))
+    .map((u) => ({
+      id: u.id,
+      nome: u.nome,
+      cargo: "Coordenador",
+    }));
 
-      const alunosIdsValidos = (alunosIdsOverride ?? alunosIdsBase).filter(
-        (id) =>
-          (dados.usuarios || []).some(
-            (u) => Number(u.id) === Number(id) && u.tipo === "aluno",
-          ),
-      );
+  const responsaveisBase = (dados.usuarios || [])
+    .filter((u) => responsavelIds.includes(Number(u.id)))
+    .map((u) => ({
+      id: u.id,
+      nome: u.nome,
+      cargo: "Responsável",
+    }));
 
-      const alunosCount = alunosIdsValidos.length;
+  const responsaveisOverride = Array.isArray(disc.responsaveis)
+    ? disc.responsaveis.map((r) => ({
+        id: Number(r.usuarioId || r.userId) || 0,
+        nome: r.nome || "",
+        cargo: r.cargo || "",
+      }))
+    : [];
 
-      return {
-        ...disc,
-        professor,
-        responsaveis,
-        alunosCount,
-      };
-    })
+  const pessoasDaTurma =
+    responsaveisOverride.length > 0
+      ? responsaveisOverride
+      : [...coordenadores, ...professores, ...responsaveisBase];
+
+  const pessoasUnicas = pessoasDaTurma.filter(
+    (item, index, arr) =>
+      arr.findIndex(
+        (x) =>
+          Number(x.id) === Number(item.id) &&
+          String(x.cargo) === String(item.cargo),
+      ) === index,
+  );
+
+  const professor =
+    professores.length > 0
+      ? { nome: professores.map((p) => p.nome).join(", ") }
+      : null;
+
+  const alunosIdsOverride = Array.isArray(alunosOverride[String(disc.id)])
+    ? alunosOverride[String(disc.id)].map(Number)
+    : null;
+
+  const alunosIdsBase = Array.isArray(disc.alunoIds)
+    ? disc.alunoIds.map(Number)
+    : [];
+
+  const alunosIdsValidos = (alunosIdsOverride ?? alunosIdsBase).filter(
+    (id) =>
+      (dados.usuarios || []).some(
+        (u) => Number(u.id) === Number(id) && u.tipo === "aluno",
+      ),
+  );
+
+  return {
+    ...disc,
+    professor,
+    responsaveis: pessoasUnicas,
+    alunosCount: alunosIdsValidos.length,
+  };
+})
     .sort((a, b) => String(a.nome).localeCompare(String(b.nome), "pt-BR"));
 }, [usuarioCompleto, alunosOverride, turmasDeleted]);
 
@@ -290,15 +338,11 @@ const turmasDaCoordenacao = useMemo(() => {
                   <div className="editar-turmas-coord__main">
                     <h2 className="editar-turmas-coord__title">{turma.nome}</h2>
 
-                    <div className="editar-turmas-coord__meta">
-  {turma.professor?.nome && (
-    <span> {turma.professor.nome}</span>
-  )}
-
+         <div className="editar-turmas-coord__meta">
   {Array.isArray(turma.responsaveis) &&
     turma.responsaveis.map((r, index) => (
-      <span key={`${r.userId || r.nome}-${index}`}>
-         {r.nome}  
+      <span key={`${r.id || r.nome}-${index}`}>
+        {r.nome} 
       </span>
     ))}
 </div>
