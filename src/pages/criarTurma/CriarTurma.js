@@ -390,65 +390,67 @@ export default function CriarTurma() {
       null;
 
     const coordenadores = responsaveis.filter(
-  (r) => String(r.cargo).toLowerCase() === "coordenador",
-);
+      (r) => String(r.cargo).toLowerCase() === "coordenador",
+    );
 
-const professores = responsaveis.filter(
-  (r) => String(r.cargo).toLowerCase() === "professor",
-);
+    const professores = responsaveis.filter(
+      (r) => String(r.cargo).toLowerCase() === "professor",
+    );
 
-const responsaveisLegais = responsaveis.filter((r) => {
-  const cargo = String(r.cargo).toLowerCase();
-  return cargo === "responsável" || cargo === "responsavel";
-});
+    const responsaveisLegais = responsaveis.filter((r) => {
+      const cargo = String(r.cargo).toLowerCase();
+      return cargo === "responsável" || cargo === "responsavel";
+    });
 
-turmasOverride[String(novoId)] = {
-  id: novoId,
-  nome: nomeCompleto,
-  nomeCustom: String(nome || "").trim(),
-  complementoCustom: String(complemento || "").trim(),
-  tipo,
-  cor: corAleatoria,
-  instituicaoId: instituicaoIdAtual,
+    turmasOverride[String(novoId)] = {
+      id: novoId,
+      nome: nomeCompleto,
+      nomeCustom: String(nome || "").trim(),
+      complementoCustom: String(complemento || "").trim(),
+      tipo,
+      cor: corAleatoria,
+      instituicaoId: instituicaoIdAtual,
 
-  professorId: professorSelecionado
-    ? Number(professorSelecionado.userId) || null
-    : null,
-  responsavelId: responsavelSelecionado
-    ? Number(responsavelSelecionado.userId) || null
-    : null,
+      professorId: professorSelecionado
+        ? Number(professorSelecionado.userId) || null
+        : null,
+      responsavelId: responsavelSelecionado
+        ? Number(responsavelSelecionado.userId) || null
+        : null,
 
-  professorIds: professores.map((r) => Number(r.userId)).filter(Boolean),
-  responsavelIds: responsaveisLegais
-    .map((r) => Number(r.userId))
-    .filter(Boolean),
-  coordenadorIds: coordenadores.map((r) => Number(r.userId)).filter(Boolean),
-  alunoIds: alunosSelecionados.map((a) => Number(a.id)).filter(Boolean),
+      professorIds: professores.map((r) => Number(r.userId)).filter(Boolean),
+      responsavelIds: responsaveisLegais
+        .map((r) => Number(r.userId))
+        .filter(Boolean),
+      coordenadorIds: coordenadores
+        .map((r) => Number(r.userId))
+        .filter(Boolean),
+      alunoIds: alunosSelecionados.map((a) => Number(a.id)).filter(Boolean),
 
-  criado_por: coordenadores.length
-    ? Number(coordenadores[0].userId) || null
-    : usuarioLogado?.id
-      ? Number(usuarioLogado.id)
-      : null,
+      criado_por: coordenadores.length
+        ? Number(coordenadores[0].userId) || null
+        : usuarioLogado?.id
+          ? Number(usuarioLogado.id)
+          : null,
 
-  responsaveis: responsaveis.map((r) => ({
-    userId: r.userId ?? "",
-    usuarioId: Number(r.userId) || null,
-    nome: r.nome ?? "",
-    cargo: r.cargo ?? "",
-    contato: r.contato ?? "",
-    permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
-    fixo: !!r.fixo,
-    removivel: r.fixo ? false : true,
-    coordenadorPadrao: !!r.coordenadorPadrao,
-    criadoPorTurma: !!r.coordenadorPadrao,
-  })),
+      responsaveis: responsaveis.map((r) => ({
+        userId: r.userId ?? "",
+        usuarioId: Number(r.userId) || null,
+        nome: r.nome ?? "",
+        cargo: r.cargo ?? "",
+        contato: r.contato ?? "",
+        permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+        fixo: !!r.fixo,
+        removivel: r.fixo ? false : true,
+        coordenadorPadrao: !!r.coordenadorPadrao,
+        criadoPorTurma: !!r.coordenadorPadrao,
+      })),
 
-  criadaNoCriarTurma: true,
-  criadaEm: new Date().toISOString(),
-};
+      criadaNoCriarTurma: true,
+      criadaEm: new Date().toISOString(),
+    };
 
-    turmaAlunosOverride[String(novoId)] = alunosSelecionados.map((a) =>
+      turmaAlunosOverride[String(novoId)] = alunosSelecionados.map((a) =>
       Number(a.id),
     );
 
@@ -574,52 +576,46 @@ turmasOverride[String(novoId)] = {
 
           <div className="responsaveis">
             {responsaveis.length > 0 ? (
-  responsaveis.map((r, idx) => (
-    <div
-      className="responsavel-card"
-      key={`${r.userId}-${idx}-${r.nome}`}
-    >
-      <div className="responsavel-top">
-        <span className="chip">{r.nome || "Responsável"}</span>
+              responsaveis.map((r, idx) => (
+                <div
+                  className="responsavel-card"
+                  key={`${r.userId}-${idx}-${r.nome}`}
+                >
+                  <div className="responsavel-top">
+                    <span className="chip">{r.nome || "Responsável"}</span>
 
-        <button
-          type="button"
-          className="btn-edit"
-          onClick={() => openEditarResponsavel(idx)}
-        >
-          <Pencil size={12} />
-          <span className="btn-edit__text">Editar</span>
-        </button>
-      </div>
+                    <button
+                      type="button"
+                      className="btn-edit"
+                      onClick={() => openEditarResponsavel(idx)}
+                    >
+                      <Pencil size={12} />
+                      <span className="btn-edit__text">Editar</span>
+                    </button>
+                  </div>
 
-      <div className="grid-2 inner">
-        <div className="field">
-          <label>Cargo</label>
-          <input
-            value={r.cargo || ""}
-            readOnly
-          />
-        </div>
+                  <div className="grid-2 inner">
+                    <div className="field">
+                      <label>Cargo</label>
+                      <input value={r.cargo || ""} readOnly />
+                    </div>
 
-        <div className="field">
-          <label>Contato</label>
-          <input
-            value={r.contato || ""}
-            readOnly
-          />
-        </div>
-      </div>
-    </div>
-  ))
-) : (
-  <div className="empty-state">
-    <p>Nenhum responsável adicionado ainda.</p>
-    <p>
-      Use o botão abaixo para buscar e adicionar o primeiro
-      responsável.
-    </p>
-  </div>
-)}
+                    <div className="field">
+                      <label>Contato</label>
+                      <input value={r.contato || ""} readOnly />
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state">
+                <p>Nenhum responsável adicionado ainda.</p>
+                <p>
+                  Use o botão abaixo para buscar e adicionar o primeiro
+                  responsável.
+                </p>
+              </div>
+            )}
 
             <button
               type="button"

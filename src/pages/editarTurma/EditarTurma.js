@@ -173,8 +173,8 @@ export default function EditarTurma() {
   }, [disciplinaAtualId]);
 
   const baseDisciplinas = Array.isArray(data.disciplinas || data.diciplinas)
-  ? data.disciplinas || data.diciplinas
-  : [];
+    ? data.disciplinas || data.diciplinas
+    : [];
   const baseUsuarios = Array.isArray(data.usuarios) ? data.usuarios : [];
 
   const usuariosComUser = useMemo(() => {
@@ -192,17 +192,17 @@ export default function EditarTurma() {
 
   const isCoordenador = user?.tipo === "coordenador";
 
- const disciplinaBase = useMemo(() => {
-  if (!turmaId) return null;
+  const disciplinaBase = useMemo(() => {
+    if (!turmaId) return null;
 
-  const base =
-    baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null;
+    const base =
+      baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null;
 
-  if (base) return base;
+    if (base) return base;
 
-  const overrideMap = getTurmasOverride();
-  return overrideMap[String(turmaId)] || null;
-}, [baseDisciplinas, turmaId]);
+    const overrideMap = getTurmasOverride();
+    return overrideMap[String(turmaId)] || null;
+  }, [baseDisciplinas, turmaId]);
 
   useEffect(() => {
     setLoading(true);
@@ -246,40 +246,40 @@ export default function EditarTurma() {
     setComplemento(c);
     setTipoTurma(disciplinaMerged.tipo || "primaria");
 
-  const professorIds = normalizarIds(
-  disciplinaMerged.professorIds,
-  disciplinaMerged.professorId,
-);
+    const professorIds = normalizarIds(
+      disciplinaMerged.professorIds,
+      disciplinaMerged.professorId,
+    );
 
-const responsavelIds = normalizarIds(
-  disciplinaMerged.responsavelIds,
-  disciplinaMerged.responsavelId,
-);
+    const responsavelIds = normalizarIds(
+      disciplinaMerged.responsavelIds,
+      disciplinaMerged.responsavelId,
+    );
 
-const coordenadorIds = [
-  ...new Set([
-    ...normalizarIds(
-      disciplinaMerged.coordenadorIds,
-      disciplinaMerged.coordenadorId,
-    ),
-    ...normalizarIds([], disciplinaMerged.criado_por),
-  ]),
-];
+    const coordenadorIds = [
+      ...new Set([
+        ...normalizarIds(
+          disciplinaMerged.coordenadorIds,
+          disciplinaMerged.coordenadorId,
+        ),
+        ...normalizarIds([], disciplinaMerged.criado_por),
+      ]),
+    ];
 
-   const criarRegistroResponsavel = (u, cargo, extras = {}) => ({
-  userId: u.user ?? String(u.id).padStart(9, "0"),
-  usuarioId: u.id,
-  nome: u.nome ?? "",
-  cargo,
-  contato: u.contato || "",
-  permissoes: {
-    ...defaultPerms,
-    ...(u.permissoes || {}),
-  },
-  fixo: false,
-  removivel: true,
-  ...extras,
-});
+    const criarRegistroResponsavel = (u, cargo, extras = {}) => ({
+      userId: u.user ?? String(u.id).padStart(9, "0"),
+      usuarioId: u.id,
+      nome: u.nome ?? "",
+      cargo,
+      contato: u.contato || "",
+      permissoes: {
+        ...defaultPerms,
+        ...(u.permissoes || {}),
+      },
+      fixo: false,
+      removivel: true,
+      ...extras,
+    });
 
     const professoresBase = professorIds
       .map((id) => baseUsuarios.find((u) => Number(u.id) === Number(id)))
@@ -314,30 +314,30 @@ const coordenadorIds = [
     );
 
     const respOverride =
-  turmaOverride && Array.isArray(turmaOverride.responsaveis)
-    ? turmaOverride.responsaveis
-    : null;
+      turmaOverride && Array.isArray(turmaOverride.responsaveis)
+        ? turmaOverride.responsaveis
+        : null;
 
-const initialResponsaveis = respOverride
-  ? respOverride.map((r) => ({
-      userId: r.userId ?? "",
-      usuarioId:
-        r.usuarioId ?? (r.userId ? Number(r.userId) || null : null),
-      nome: r.nome ?? "",
-      cargo: r.cargo ?? "",
-      contato: r.contato ?? "",
-      permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
-      fixo: Boolean(r.fixo) || r.cargo === "Coordenador",
-      removivel:
-        r.removivel === false
-          ? false
-          : r.cargo === "Coordenador"
-            ? false
-            : true,
-      coordenadorPadrao: Boolean(r.coordenadorPadrao),
-      criadoPorTurma: Boolean(r.criadoPorTurma),
-    }))
-  : listaBaseUnica;
+    const initialResponsaveis = respOverride
+      ? respOverride.map((r) => ({
+          userId: r.userId ?? "",
+          usuarioId:
+            r.usuarioId ?? (r.userId ? Number(r.userId) || null : null),
+          nome: r.nome ?? "",
+          cargo: r.cargo ?? "",
+          contato: r.contato ?? "",
+          permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+          fixo: Boolean(r.fixo) || r.cargo === "Coordenador",
+          removivel:
+            r.removivel === false
+              ? false
+              : r.cargo === "Coordenador"
+                ? false
+                : true,
+          coordenadorPadrao: Boolean(r.coordenadorPadrao),
+          criadoPorTurma: Boolean(r.criadoPorTurma),
+        }))
+      : listaBaseUnica;
 
     const coordenadoresObrigatorios = coordenadoresBase.filter(
       (coord) =>
@@ -346,37 +346,37 @@ const initialResponsaveis = respOverride
         ),
     );
 
-  const normalized = [...initialResponsaveis, ...coordenadoresObrigatorios]
-  .map((r) => ({
-    userId: r.userId ?? "",
-    usuarioId: r.usuarioId ?? (r.userId ? Number(r.userId) || null : null),
-    nome: r.nome ?? "",
-    cargo: r.cargo ?? "",
-    contato: r.contato ?? "",
-    permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
-    fixo: Boolean(r.fixo) || r.cargo === "Coordenador",
-    removivel:
-      r.removivel === false
-        ? false
-        : r.cargo === "Coordenador"
-          ? false
-          : true,
-    coordenadorPadrao: Boolean(r.coordenadorPadrao),
-    criadoPorTurma: Boolean(r.criadoPorTurma),
-  }))
-  .filter(
-    (item, index, arr) =>
-      arr.findIndex(
-        (x) =>
-          Number(x.usuarioId || 0) === Number(item.usuarioId || 0) &&
-          String(x.cargo || "") === String(item.cargo || ""),
-      ) === index,
-  )
-  .sort((a, b) => {
-    const aCoord = a.cargo === "Coordenador" ? 0 : 1;
-    const bCoord = b.cargo === "Coordenador" ? 0 : 1;
-    return aCoord - bCoord;
-  });
+    const normalized = [...initialResponsaveis, ...coordenadoresObrigatorios]
+      .map((r) => ({
+        userId: r.userId ?? "",
+        usuarioId: r.usuarioId ?? (r.userId ? Number(r.userId) || null : null),
+        nome: r.nome ?? "",
+        cargo: r.cargo ?? "",
+        contato: r.contato ?? "",
+        permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
+        fixo: Boolean(r.fixo) || r.cargo === "Coordenador",
+        removivel:
+          r.removivel === false
+            ? false
+            : r.cargo === "Coordenador"
+              ? false
+              : true,
+        coordenadorPadrao: Boolean(r.coordenadorPadrao),
+        criadoPorTurma: Boolean(r.criadoPorTurma),
+      }))
+      .filter(
+        (item, index, arr) =>
+          arr.findIndex(
+            (x) =>
+              Number(x.usuarioId || 0) === Number(item.usuarioId || 0) &&
+              String(x.cargo || "") === String(item.cargo || ""),
+          ) === index,
+      )
+      .sort((a, b) => {
+        const aCoord = a.cargo === "Coordenador" ? 0 : 1;
+        const bCoord = b.cargo === "Coordenador" ? 0 : 1;
+        return aCoord - bCoord;
+      });
 
     setResponsaveis(normalized);
 
@@ -589,7 +589,6 @@ const initialResponsaveis = respOverride
     closeModal();
   };
 
-
   if (!user) {
     return (
       <div className="editar-turma-page">
@@ -715,30 +714,30 @@ const initialResponsaveis = respOverride
         </div>
 
         <div className="tipo-area">
-  <div className="tipo-label">Selecione o tipo</div>
+          <div className="tipo-label">Selecione o tipo</div>
 
-  <div className="radio-group">
-    <label className="radio-item">
-      <input
-        type="radio"
-        name="tipoTurma"
-        checked={tipoTurma === "primaria"}
-        onChange={() => handleChangeTipo("primaria")}
-      />
-      <span>Primária</span>
-    </label>
+          <div className="radio-group">
+            <label className="radio-item">
+              <input
+                type="radio"
+                name="tipoTurma"
+                checked={tipoTurma === "primaria"}
+                onChange={() => handleChangeTipo("primaria")}
+              />
+              <span>Primária</span>
+            </label>
 
-    <label className="radio-item">
-      <input
-        type="radio"
-        name="tipoTurma"
-        checked={tipoTurma === "secundaria"}
-        onChange={() => handleChangeTipo("secundaria")}
-      />
-      <span>Secundária</span>
-    </label>
-  </div>
-</div>
+            <label className="radio-item">
+              <input
+                type="radio"
+                name="tipoTurma"
+                checked={tipoTurma === "secundaria"}
+                onChange={() => handleChangeTipo("secundaria")}
+              />
+              <span>Secundária</span>
+            </label>
+          </div>
+        </div>
       </section>
 
       <section className="editar-turma-box editar-turma-box--responsaveis">
@@ -747,49 +746,52 @@ const initialResponsaveis = respOverride
         </div>
 
         <div className="responsaveis">
-  {responsaveis.length > 0 ? (
-    responsaveis.map((r, idx) => (
-      <div className="responsavel-card" key={`${r.usuarioId || r.userId}-${idx}`}>
-        <div className="responsavel-top">
-         <span className="chip">{r.nome || "Responsável"}</span>
+          {responsaveis.length > 0 ? (
+            responsaveis.map((r, idx) => (
+              <div
+                className="responsavel-card"
+                key={`${r.usuarioId || r.userId}-${idx}`}
+              >
+                <div className="responsavel-top">
+                  <span className="chip">{r.nome || "Responsável"}</span>
+
+                  <button
+                    type="button"
+                    className="btn-edit"
+                    onClick={() => openEditarResponsavel(idx)}
+                    aria-label="Editar responsável"
+                    title="Editar"
+                  >
+                    <Pencil size={10} />
+                    <span className="btn-edit__text">Editar</span>
+                  </button>
+                </div>
+
+                <div className="grid-2 inner">
+                  <div className="field">
+                    <label>Cargo</label>
+                    <input value={r.cargo || ""} readOnly />
+                  </div>
+
+                  <div className="field">
+                    <label>Contato</label>
+                    <input value={r.contato || ""} readOnly />
+                  </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="empty-small">Nenhum responsável adicionado.</div>
+          )}
 
           <button
             type="button"
-            className="btn-edit"
-            onClick={() => openEditarResponsavel(idx)}
-            aria-label="Editar responsável"
-            title="Editar"
+            className="btn-primary wide responsavel-add-btn"
+            onClick={openAdicionarResponsavel}
           >
-            <Pencil size={10} />
-            <span className="btn-edit__text">Editar</span>
+            Adicionar Responsável
           </button>
         </div>
-
-        <div className="grid-2 inner">
-          <div className="field">
-            <label>Cargo</label>
-            <input value={r.cargo || ""} readOnly />
-          </div>
-
-          <div className="field">
-            <label>Contato</label>
-            <input value={r.contato || ""} readOnly />
-          </div>
-        </div>
-      </div>
-    ))
-  ) : (
-    <div className="empty-small">Nenhum responsável adicionado.</div>
-  )}
-
-  <button
-    type="button"
-    className="btn-primary wide responsavel-add-btn"
-    onClick={openAdicionarResponsavel}
-  >
-    Adicionar Responsável
-  </button>
-</div>
       </section>
 
       <section className="editar-turma-box editar-turma-box--alunos">
