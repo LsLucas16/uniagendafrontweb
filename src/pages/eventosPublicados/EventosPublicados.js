@@ -32,13 +32,21 @@ function normStr(s) {
     .trim();
 }
 
-function getTurmasDoEvento(ev) {
-  const fromTurmasIds =
-    Array.isArray(ev?.turmasIds) && ev.turmasIds.length > 0
-      ? ev.turmasIds
-      : null;
+function getTipoUsuario(u) {
+  const raw = u?.tipo ?? u?.cargo ?? u?.perfil ?? "";
+  return String(raw).toLowerCase().trim();
+}
 
-  if (fromTurmasIds) return fromTurmasIds.map(Number).filter(Number.isFinite);
+function getTurmasDoEvento(ev) {
+  // ✅ NOVO FORMATO
+  if (Array.isArray(ev?.disciplinaIds) && ev.disciplinaIds.length > 0) {
+    return ev.disciplinaIds.map(Number).filter(Number.isFinite);
+  }
+
+  // ✅ COMPATIBILIDADE COM FORMATO ANTIGO
+  if (Array.isArray(ev?.turmasIds) && ev.turmasIds.length > 0) {
+    return ev.turmasIds.map(Number).filter(Number.isFinite);
+  }
 
   if (Array.isArray(ev?.disciplinaId)) {
     const arr = ev.disciplinaId.map(Number).filter(Number.isFinite);
@@ -66,11 +74,6 @@ function getTurmasDoEvento(ev) {
 
   const single = Number(ev?.disciplinaId);
   return Number.isFinite(single) ? [single] : [];
-}
-
-function getTipoUsuario(u) {
-  const raw = u?.tipo ?? u?.cargo ?? u?.perfil ?? "";
-  return String(raw).toLowerCase().trim();
 }
 
 function CardCoordenador({
@@ -509,9 +512,6 @@ export default function EventosPublicados() {
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
 
-            // IMPORTANTE:
-            // botão aparece sempre que calendário = true
-            // se evento passou, fica visível porém desabilitado
             const podeEditar = !!ev.calendario;
 
             const turmasEv = getTurmasDoEvento(ev);

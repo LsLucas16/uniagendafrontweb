@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { Funnel } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import dados from "../../data/dados.json";
 import "./DetalheCalendario.scss";
@@ -62,17 +61,44 @@ function getCriadorNome(criadoPorId, usuarios = []) {
   return usuario?.nome || "Usuário não identificado";
 }
 
-function getDisciplinaNome(disciplinaId, disciplinas = []) {
-  const disciplina = disciplinas.find(
-    (d) => Number(d.id) === Number(disciplinaId),
-  );
-  return disciplina?.nome || "Disciplina não informada";
+function getDisciplinaIdsDoEvento(evento) {
+  if (Array.isArray(evento?.disciplinaIds) && evento.disciplinaIds.length > 0) {
+    return evento.disciplinaIds
+      .map(Number)
+      .filter((id) => Number.isFinite(id) && id > 0);
+  }
+
+  if (Number.isFinite(Number(evento?.disciplinaId))) {
+    return [Number(evento.disciplinaId)];
+  }
+
+  return [];
 }
 
-function getCardColor(evento) {
-  if (evento.destaque) return "red";
-  if (evento.calendario) return "blue";
-  return "green";
+function getDisciplinasNome(evento, disciplinas = []) {
+  const ids = getDisciplinaIdsDoEvento(evento);
+
+  if (!ids.length) return "Disciplina não informada";
+
+  const nomes = ids.map((id) => {
+    const disciplina = disciplinas.find((d) => Number(d.id) === Number(id));
+    return disciplina?.nome || `Turma ${id}`;
+  });
+
+  return nomes.join("   ");
+}
+
+function getBarColor(evento, disciplinas = []) {
+  const ids = getDisciplinaIdsDoEvento(evento);
+
+  if (ids.length === 1) {
+    const disciplina = disciplinas.find((d) => Number(d.id) === Number(ids[0]));
+    if (disciplina?.cor) return disciplina.cor;
+  }
+
+  if (evento.destaque) return "#E97D7D";
+  if (evento.calendario) return "#6FA8DC";
+  return "#9AD18B";
 }
 
 export default function DetalheCalendario() {
@@ -92,6 +118,8 @@ export default function DetalheCalendario() {
   const eventosDoDia = useMemo(() => {
     if (!dataSelecionada) return [];
 
+    const termo = norm(busca);
+
     return eventos
       .filter((evento) => {
         const dataEvento = parseLocalDateFromISO(evento.dataEvento);
@@ -100,11 +128,10 @@ export default function DetalheCalendario() {
       .map((evento) => ({
         ...evento,
         criadorNome: getCriadorNome(evento.criadoPorId, usuarios),
-        disciplinaNome: getDisciplinaNome(evento.disciplinaId, disciplinas),
-        cardColor: getCardColor(evento),
+        disciplinaNome: getDisciplinasNome(evento, disciplinas),
+        barColor: getBarColor(evento, disciplinas),
       }))
       .filter((evento) => {
-        const termo = norm(busca);
         if (!termo) return true;
 
         return (
@@ -123,22 +150,8 @@ export default function DetalheCalendario() {
 
   return (
     <div className="detalhe-calendario-page">
-      <section className="detalhe-calendario-card detalhe-calendario-card--filtros">
+      <section className="detalhe-calendario-card detalhe-calendario-card--title">
         <h1 className="detalhe-calendario-title">Calendário</h1>
-
-        <div className="detalhe-calendario-filter-label">
-          <Funnel size={14} />
-          <span>Filtros</span>
-        </div>
-
-        <div className="detalhe-calendario-search-wrap">
-          <input
-            type="text"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar por nome, disciplina ou professor..."
-          />
-        </div>
       </section>
 
       <section className="detalhe-calendario-card detalhe-calendario-card--lista">
@@ -157,15 +170,16 @@ export default function DetalheCalendario() {
         <div className="detalhe-calendario-list">
           {eventosDoDia.length > 0 ? (
             eventosDoDia.map((evento) => (
-              <article
-                key={evento.id}
-                className={`detalhe-evento-card is-${evento.cardColor}`}
-              >
-                <div className="detalhe-evento-card__bar" />
+              <article key={evento.id} className="detalhe-evento-card">
+                <div
+                  className="detalhe-evento-card__bar"
+                  style={{ backgroundColor: evento.barColor }}
+                />
 
                 <div className="detalhe-evento-card__content">
                   <div className="detalhe-evento-card__top">
                     <h3>{evento.titulo}</h3>
+
                     <span className="detalhe-evento-card__disciplina">
                       {evento.disciplinaNome}
                     </span>

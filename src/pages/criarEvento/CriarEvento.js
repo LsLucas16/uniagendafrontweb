@@ -63,7 +63,7 @@ const CriarEvento = () => {
     destaque: false,
   });
 
-  // ✅ Turmas (coordenador)
+  // mantém o mesmo comportamento visual do design
   const [modoTurmas, setModoTurmas] = useState("all"); // "all" | "some"
   const [turmaSelecionadaId, setTurmaSelecionadaId] = useState("");
   const [turmaIds, setTurmaIds] = useState([]);
@@ -91,7 +91,6 @@ const CriarEvento = () => {
     return m;
   }, [turmasDisponiveis]);
 
-  // ✅ Toggle
   const setAllTurmas = () => {
     setModoTurmas("all");
     setTurmaSelecionadaId("");
@@ -101,7 +100,6 @@ const CriarEvento = () => {
   const setSomeTurmas = () => {
     setModoTurmas("some");
     setTurmaSelecionadaId("");
-    // não limpa turmaIds aqui pra não perder seleção sem querer
   };
 
   const addTurma = () => {
@@ -117,6 +115,33 @@ const CriarEvento = () => {
   const removeTurma = (id) => {
     setTurmaIds((prev) => prev.filter((x) => x !== id));
   };
+
+  function resolverDisciplinaIds({ isCoordenador, modoTurmas, turmaIds, turmasDisponiveis, disciplinaAtual }) {
+    if (!isCoordenador) {
+      return disciplinaAtual ? [Number(disciplinaAtual)] : [];
+    }
+
+    if (modoTurmas === "all") {
+      return turmasDisponiveis
+        .map((t) => Number(t.id))
+        .filter((id) => Number.isFinite(id) && id > 0);
+    }
+
+    return Array.from(
+      new Set(
+        (turmaIds || [])
+          .map(Number)
+          .filter((id) => Number.isFinite(id) && id > 0),
+      ),
+    );
+  }
+
+  function resolverDestino({ isCoordenador, modoTurmas, disciplinaIds }) {
+    if (!isCoordenador) return "uma";
+    if (modoTurmas === "all") return "todas";
+    if ((disciplinaIds || []).length <= 1) return "uma";
+    return "varias";
+  }
 
   const handleSalvar = async () => {
     if (!titulo.trim()) {
@@ -152,7 +177,6 @@ const CriarEvento = () => {
       return;
     }
 
-    // ✅ Se estiver em "Selecionar", obriga escolher ao menos 1 turma
     if (isCoordenador && modoTurmas === "some" && turmaIds.length === 0) {
       Swal.fire({
         title: "Selecione ao menos uma turma",
@@ -172,7 +196,6 @@ const CriarEvento = () => {
         didOpen: () => Swal.showLoading(),
       });
 
-      // ✅ id novo (mantém seu padrão atual)
       const id = nextEventoId(dados.eventos);
 
       const dataEventoISO = notificacoes.calendario
@@ -201,7 +224,7 @@ const CriarEvento = () => {
       }
 
       const disciplinaAtual = Number(getDisciplinaAtualId()) || null;
-      if (!disciplinaAtual) {
+      if (!disciplinaAtual && !isCoordenador) {
         Swal.close();
         await Swal.fire({
           title: "Selecione uma disciplina",
@@ -226,32 +249,44 @@ const CriarEvento = () => {
         return;
       }
 
-      // ✅ regra final: sempre salvar turmasIds pro coordenador
-      const turmasIdsFinal = isCoordenador
-        ? Array.from(
-            new Set(
-              (modoTurmas === "all"
-                ? turmasDisponiveis.map((t) => Number(t.id))
-                : turmaIds
-              ).filter((x) => Number.isFinite(x) && x > 0),
-            ),
-          )
-        : undefined;
+      const disciplinaIds = resolverDisciplinaIds({
+        isCoordenador,
+        modoTurmas,
+        turmaIds,
+        turmasDisponiveis,
+        disciplinaAtual,
+      });
+
+      if (!disciplinaIds.length) {
+        Swal.close();
+        await Swal.fire({
+          title: "Selecione ao menos uma turma",
+          text: "Escolha a turma do evento antes de publicar.",
+          icon: "warning",
+          confirmButtonText: "Ok",
+          confirmButtonColor: "#2E4A67",
+        });
+        return;
+      }
+
+      const destino = resolverDestino({
+        isCoordenador,
+        modoTurmas,
+        disciplinaIds,
+      });
 
       const novoEvento = {
         id,
         titulo: titulo.trim(),
         descricao: descricao.trim(),
         ultimaAtualizacao: agoraISO,
-        dataEvento: dataEventoISO ?? null, // ✅ padroniza sempre
+        dataEvento: dataEventoISO ?? null,
         criadoPorId,
         instituicaoId: instId,
-        disciplinaId: disciplinaAtual,
+        disciplinaIds,
+        destino,
         calendario: notificacoes.calendario,
         destaque: notificacoes.destaque,
-
-        // ✅ NOVO: turmasIds (disciplinas = turmas)
-        ...(isCoordenador ? { turmasIds: turmasIdsFinal } : {}),
       };
 
       upsertEvento(novoEvento);
@@ -271,8 +306,6 @@ const CriarEvento = () => {
       setDescricao("");
       setStartDate(null);
       setNotificacoes({ calendario: false, destaque: false });
-
-      // reset turmas
       setAllTurmas();
     } catch (error) {
       Swal.close();
@@ -357,7 +390,6 @@ const CriarEvento = () => {
           </div>
         </section>
 
-        {/* CARD 2: Turmas */}
         {isCoordenador && (
           <section className="card-bloco">
             <h2 className="titulo-bloco">Turmas</h2>
@@ -451,7 +483,6 @@ const CriarEvento = () => {
           </section>
         )}
 
-        {/* CARD 3 */}
         <section className="card-bloco">
           <div className="campo">
             <label className="label-notificacao">Tipo de notificação</label>

@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { Search, Filter } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import data from "../../data/dados.json";
 import chevronIcon from "../../assets/ic_chevron.svg";
@@ -32,7 +31,15 @@ const DIAS_SEMANA = [
 
 function toDateKey(value) {
   if (!value) return "";
-  const d = new Date(value);
+
+  const raw = String(value).trim();
+
+  // pega direto a parte YYYY-MM-DD do ISO
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+    return raw.slice(0, 10);
+  }
+
+  const d = new Date(raw);
   if (Number.isNaN(d.getTime())) return "";
 
   const y = d.getFullYear();
@@ -53,7 +60,8 @@ function buildCalendarDays(year, month) {
   const startDate = new Date(year, month, 1 - startOffset);
   const cells = [];
 
-  for (let i = 0; i < 35; i += 1) {
+  // 42 células = 6 semanas completas
+  for (let i = 0; i < 42; i += 1) {
     const d = new Date(startDate);
     d.setDate(startDate.getDate() + i);
 
@@ -72,39 +80,40 @@ function buildCalendarDays(year, month) {
   return cells;
 }
 
+function isBeforeMonth(a, b) {
+  return (
+    a.getFullYear() < b.getFullYear() ||
+    (a.getFullYear() === b.getFullYear() && a.getMonth() < b.getMonth())
+  );
+}
+
+function isSameMonth(a, b) {
+  return (
+    a.getFullYear() === b.getFullYear() &&
+    a.getMonth() === b.getMonth()
+  );
+}
+
 export default function VerCalendario() {
   const navigate = useNavigate();
-  const [busca, setBusca] = useState("");
 
-  const [mesAtual, setMesAtual] = useState(() => {
+  const mesBase = useMemo(() => {
     const hoje = new Date();
     return new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-  });
+  }, []);
+
+  const [mesAtual, setMesAtual] = useState(mesBase);
 
   const eventos = Array.isArray(data?.eventos) ? data.eventos : [];
 
-  const eventosFiltrados = useMemo(() => {
-    const termo = String(busca || "").trim().toLowerCase();
-    const eventosCalendario = eventos.filter((evento) => evento.calendario);
-
-    if (!termo) return eventosCalendario;
-
-    return eventosCalendario.filter((evento) => {
-      const titulo = String(evento.titulo || "").toLowerCase();
-      const descricao = String(evento.descricao || "").toLowerCase();
-      const disciplinaId = String(evento.disciplinaId || "");
-      return (
-        titulo.includes(termo) ||
-        descricao.includes(termo) ||
-        disciplinaId.includes(termo)
-      );
-    });
-  }, [busca, eventos]);
+  const eventosCalendario = useMemo(() => {
+    return eventos.filter((evento) => evento.calendario);
+  }, [eventos]);
 
   const eventosPorDia = useMemo(() => {
     const mapa = {};
 
-    eventosFiltrados.forEach((evento) => {
+    eventosCalendario.forEach((evento) => {
       const key = toDateKey(evento.dataEvento);
       if (!key) return;
 
@@ -116,79 +125,78 @@ export default function VerCalendario() {
     });
 
     return mapa;
-  }, [eventosFiltrados]);
+  }, [eventosCalendario]);
 
   const year = mesAtual.getFullYear();
   const month = mesAtual.getMonth();
 
   const days = useMemo(() => buildCalendarDays(year, month), [year, month]);
 
+  const isMesAtualReal = isSameMonth(mesAtual, mesBase);
+
   function handlePrevMonth() {
-    setMesAtual((prev) => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
+    const prevMonth = new Date(
+      mesAtual.getFullYear(),
+      mesAtual.getMonth() - 1,
+      1
+    );
+
+    if (isBeforeMonth(prevMonth, mesBase)) return;
+
+    setMesAtual(prevMonth);
   }
 
   function handleNextMonth() {
-    setMesAtual((prev) => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
+    setMesAtual(
+      new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 1)
+    );
   }
 
- function handleOpenDay(dateKey) {
-  const eventosDoDia = eventosPorDia[dateKey] || [];
-  if (!eventosDoDia.length) return;
+  function handleOpenDay(dateKey) {
+    const eventosDoDia = eventosPorDia[dateKey] || [];
+    if (!eventosDoDia.length) return;
 
-  navigate(`/detalhe-calendario/${dateKey}`, {
-    state: {
-      dataSelecionada: dateKey,
-      eventos: eventosDoDia,
-    },
-  });
-}
+    navigate(`/detalhe-calendario/${dateKey}`, {
+      state: {
+        dataSelecionada: dateKey,
+        eventos: eventosDoDia,
+      },
+    });
+  }
+
   return (
     <div className="ver-calendario-page">
-      <section className="ver-calendario-card ver-calendario-card--filters">
+      <section className="ver-calendario-card ver-calendario-card--title">
         <h1 className="page-title">Calendário</h1>
-
-        <button type="button" className="filters-link">
-          <Filter size={13} />
-          <span>Filtros</span>
-        </button>
-
-        <div className="search-wrap">
-          <Search size={15} className="search-icon" />
-          <input
-            type="text"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder="Buscar por nome, disciplina ou professor..."
-          />
-        </div>
       </section>
 
       <section className="ver-calendario-card ver-calendario-card--calendar">
         <div className="calendar-header">
-  <div className="calendar-header__nav">
-    <button
-      type="button"
-      className="month-nav month-nav--prev"
-      aria-label="Mês anterior"
-      onClick={handlePrevMonth}
-    >
-      <img src={chevronIcon} alt="" />
-    </button>
+          <div className="calendar-header__nav">
+            <button
+              type="button"
+              className="month-nav month-nav--prev"
+              aria-label="Mês anterior"
+              onClick={handlePrevMonth}
+              disabled={isMesAtualReal}
+            >
+              <img src={chevronIcon} alt="" />
+            </button>
 
-    <h2>
-      {MESES_PT[month]} {year}
-    </h2>
+            <h2>
+              {MESES_PT[month]} {year}
+            </h2>
 
-    <button
-      type="button"
-      className="month-nav month-nav--next"
-      aria-label="Próximo mês"
-      onClick={handleNextMonth}
-    >
-      <img src={chevronIcon} alt="" />
-    </button>
-  </div>
-</div>
+            <button
+              type="button"
+              className="month-nav month-nav--next"
+              aria-label="Próximo mês"
+              onClick={handleNextMonth}
+            >
+              <img src={chevronIcon} alt="" />
+            </button>
+          </div>
+        </div>
 
         <div className="calendar-weekdays">
           {DIAS_SEMANA.map((dia) => (

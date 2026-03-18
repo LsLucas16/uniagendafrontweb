@@ -1,101 +1,61 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
-@import "../../styles/index";
 
+$dc-card: #ffffff;
+$dc-border: #e7edf3;
 $dc-title: #334e68;
-$dc-text: #486581;
-$dc-muted: #829ab1;
-$dc-soft: #9aa5b1;
-$dc-border: #d9e2ec;
-$dc-bg: #ffffff;
-$dc-input-bg: #fafbfc;
+$dc-text: #667085;
+$dc-muted: #98a2b3;
 $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
-$dc-blue: #67a2d9;
-$dc-red: #e77b7b;
-$dc-green: #86c58f;
+* {
+  box-sizing: border-box;
+}
 
 .detalhe-calendario-page {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   font-family: "Inter", sans-serif;
 }
 
 .detalhe-calendario-card {
   width: 100%;
-  background: $dc-bg;
+  background: $dc-card;
   border: 1px solid $dc-border;
-  border-radius: 16px;
+  border-radius: 14px;
   box-shadow: $dc-shadow;
 }
 
-.detalhe-calendario-card--filtros {
-  padding: 26px 26px 20px;
-}
-
-.detalhe-calendario-card--lista {
-  padding: 20px 26px 24px;
+.detalhe-calendario-card--title {
+  padding: 18px 20px;
 }
 
 .detalhe-calendario-title {
-  margin: 0 0 10px;
-  font-size: 17px;
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.15;
   font-weight: 700;
-  line-height: 1.2;
   color: $dc-title;
 }
 
-.detalhe-calendario-filter-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: $dc-title;
-
-  svg {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-.detalhe-calendario-search-wrap {
-  input {
-    width: 100%;
-    height: 34px;
-    border: 1px solid $dc-border;
-    border-radius: 3px;
-    background: $dc-input-bg;
-    padding: 0 12px;
-    font-size: 12px;
-    color: $dc-text;
-    outline: none;
-
-    &::placeholder {
-      color: #9aa5b1;
-    }
-
-    &:focus {
-      border-color: #bfd0e2;
-      box-shadow: 0 0 0 2px rgba(118, 169, 218, 0.08);
-    }
-  }
+.detalhe-calendario-card--lista {
+  padding: 18px 16px 16px;
 }
 
 .detalhe-calendario-header {
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
+  padding: 0 4px;
 
   h2 {
     margin: 0;
-    font-size: 14px;
+    font-size: 22px;
+    line-height: 1.15;
     font-weight: 700;
     color: $dc-title;
-    line-height: 1.2;
   }
 }
 
@@ -103,131 +63,142 @@ $dc-green: #86c58f;
   border: 0;
   background: transparent;
   padding: 0;
-  color: $dc-muted;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
+  color: #667085;
   cursor: pointer;
-  line-height: 1;
 
   &:hover {
-    color: $dc-title;
+    opacity: 0.85;
   }
 }
 
 .detalhe-calendario-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
 }
 
 .detalhe-evento-card {
+  position: relative;
   display: flex;
   align-items: stretch;
   min-height: 114px;
   background: #fff;
-  border: 1px solid $dc-border;
-  border-radius: 14px;
-  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.06);
+  border: 1px solid #dfe6ee;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(16, 24, 40, 0.08);
   overflow: hidden;
+}
 
-  &__bar {
-    width: 14px;
-    flex-shrink: 0;
-    border-radius: 14px 0 0 14px;
-  }
+.detalhe-evento-card__bar {
+  width: 10px;
+  flex: 0 0 10px;
+  border-radius: 10px 0 0 10px;
+}
 
-  &.is-blue .detalhe-evento-card__bar {
-    background: $dc-blue;
-  }
+.detalhe-evento-card__content {
+  flex: 1;
+  padding: 14px 18px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
 
-  &.is-red .detalhe-evento-card__bar {
-    background: $dc-red;
-  }
+.detalhe-evento-card__top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  margin-bottom: 8px;
 
-  &.is-green .detalhe-evento-card__bar {
-    background: $dc-green;
-  }
-
-  &__content {
-    flex: 1;
-    padding: 16px 18px 16px 12px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  &__top {
-    display: flex;
-    align-items: center;
-    gap: 18px;
-    flex-wrap: wrap;
-
-    h3 {
-      margin: 0;
-      font-size: 12px;
-      font-weight: 500;
-      color: #5b6f8a;
-      line-height: 1.2;
-    }
-  }
-
-  &__disciplina {
-    font-size: 9px;
-    font-weight: 500;
-    color: #486581;
-    text-decoration: underline;
-    line-height: 1.2;
-  }
-
-  &__autor {
-    font-size: 10px;
-    font-weight: 600;
-    color: #7b8794;
-    line-height: 1.2;
-  }
-
-  &__descricao {
+  h3 {
     margin: 0;
     font-size: 12px;
-    line-height: 1.35;
-    color: #6b7c93;
-    max-width: 92%;
+    line-height: 1.25;
+    font-weight: 500;
+    color: $dc-title;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
+}
+
+.detalhe-evento-card__disciplina {
+  display: inline-block;
+  min-width: 0;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: #33506f;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 420px;
+}
+
+.detalhe-evento-card__autor {
+  margin-bottom: 10px;
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 500;
+  color: #7b8794;
+}
+
+.detalhe-evento-card__descricao {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.35;
+  font-weight: 400;
+  color: #667085;
 }
 
 .detalhe-calendario-empty {
-  padding: 18px 4px 6px;
+  padding: 24px 12px;
+  text-align: center;
+  color: $dc-muted;
   font-size: 13px;
-  color: $dc-soft;
 }
 
 @media (max-width: 768px) {
-  .detalhe-calendario-card--filtros,
+  .detalhe-calendario-card--title,
   .detalhe-calendario-card--lista {
-    padding-left: 16px;
-    padding-right: 16px;
+    padding: 14px;
+  }
+
+  .detalhe-calendario-title {
+    font-size: 24px;
   }
 
   .detalhe-calendario-header {
-    flex-wrap: wrap;
-    gap: 8px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+
+    h2 {
+      font-size: 18px;
+    }
   }
 
   .detalhe-evento-card {
-    min-height: auto;
+    min-height: 104px;
+  }
 
-    &__content {
-      padding: 14px 14px 14px 10px;
-    }
+  .detalhe-evento-card__content {
+    padding: 12px;
+  }
 
-    &__top {
-      gap: 8px;
-      flex-direction: column;
-      align-items: flex-start;
-    }
+  .detalhe-evento-card__top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
 
-    &__descricao {
-      max-width: 100%;
-    }
+  .detalhe-evento-card__disciplina {
+    max-width: 100%;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: initial;
   }
 }
