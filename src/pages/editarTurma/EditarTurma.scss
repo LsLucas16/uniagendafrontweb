@@ -5,12 +5,9 @@ $azul-texto: #334e68;
 $azul-claro: #76a9da;
 $azul-claro-hover: #6a9ccf;
 $cinza-borda: #d9e2ec;
-$cinza-card: #ffffff;
-$cinza-input: #fafbfc;
+$cinza-input: #f3f5f7;
 $cinza-chip: #d9dee5;
-$cinza-secundario: #9aa5b1;
 $cinza-botao: #8d99a8;
-$shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .editar-turma-page {
   display: flex;
@@ -19,6 +16,18 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
   gap: 14px;
   padding: 0;
   background: transparent;
+}
+
+/* PROFESSOR E RESPONSÁVEL:
+   usa posicionamento base igual às demais páginas */
+.editar-turma-page--padrao {
+  @include uiPageShell;
+}
+
+/* COORDENADOR:
+   continua no fluxo atual */
+.editar-turma-page--coordenador {
+  width: 100%;
 }
 
 .btn-voltar-coordenador {
@@ -42,23 +51,26 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
 }
 
 .editar-turma-box {
+  @include uiWhiteContainer;
   width: 100%;
-  background: #fff;
-  border: 1px solid $cinza-borda;
-  border-radius: 24px;
-  box-shadow: $shadow-card;
+  box-sizing: border-box;
 }
 
-.editar-turma-box--info {
-  padding: 24px 30px 26px;
+/* no modo padrão, evita “caixa dentro de caixa” exagerada */
+.editar-turma-page--padrao .editar-turma-box {
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  padding-left: 0;
+  padding-right: 0;
+  background: transparent;
 }
 
-.editar-turma-box--responsaveis {
-  padding: 24px 30px 26px;
-}
-
+.editar-turma-box--info,
+.editar-turma-box--responsaveis,
 .editar-turma-box--alunos {
-  padding: 24px 30px 26px;
+  padding-top: 24px;
+  padding-bottom: 24px;
 }
 
 .page-header {
@@ -72,7 +84,6 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
     color: $azul-texto;
   }
 }
-
 
 .bloco-header {
   margin-bottom: 16px;
@@ -154,50 +165,53 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
   }
 }
 
-.tipo-turma {
+/* tipo da turma: só coordenador */
+.tipo-area {
   margin-top: 18px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
-
-  &__label {
-    font-size: 13px;
-    font-weight: 700;
-    color: $azul-texto;
-    margin: 0 0 2px;
-    line-height: 1.2;
-  }
+  gap: 8px;
 }
 
-.radio-line {
+.tipo-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: $azul-texto;
+}
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.radio-item {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 500;
+  gap: 8px;
+  font-size: 13px;
   color: #6f7f93;
-  line-height: 1.1;
   cursor: pointer;
 
   input[type="radio"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 12px;
-    height: 12px;
-    margin: 0;
-    border-radius: 50%;
+    width: 13px;
+    height: 13px;
     border: 1px solid #7aa8d9;
+    border-radius: 50%;
     background: #fff;
     position: relative;
+    margin: 0;
     flex-shrink: 0;
   }
 
   input[type="radio"]:checked::after {
     content: "";
     position: absolute;
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background: #7aa8d9;
     top: 50%;
@@ -206,6 +220,7 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
   }
 }
 
+/* RESPONSÁVEIS */
 .responsaveis {
   display: flex;
   flex-direction: column;
@@ -233,11 +248,76 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
   height: 34px;
   padding: 0 16px;
   border-radius: 0 14px 14px 0;
-  background: #d3d9e1;
-  color: $azul-texto;
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
+  transition: 0.18s ease;
+}
+
+.inner {
+  margin-top: 2px;
+  gap: 16px;
+}
+
+.responsavel-card .field {
+  gap: 8px;
+}
+
+.responsavel-card .field label {
+  font-size: 14px;
+  font-weight: 700;
+  color: $azul-texto;
+}
+
+.responsavel-card .field input {
+  height: 52px;
+  border-radius: 6px;
+  border: 1px solid $cinza-borda;
+  background: $cinza-input;
+  padding: 0 14px;
+  font-size: 14px;
+  color: $azul-texto;
+}
+
+/* coordenador continua separado */
+.responsavel-card--coordenador {
+  padding: 14px 0 0;
+
+  & + .responsavel-card {
+    border-top: 1px solid #eef2f6;
+    margin-top: 2px;
+  }
+
+  .chip {
+    background: #d3d9e1;
+    color: #334e68;
+  }
+}
+
+/* professor e responsável visual contínuo */
+.responsavel-card--simples {
+  padding: 4px 0 0;
+
+  .chip {
+    background: #d3d9e1;
+    color: #334e68;
+  }
+}
+
+.responsavel-card--simples + .responsavel-card--simples {
+  border-top: 1px solid #eef2f6;
+  margin-top: 2px;
+  padding-top: 14px;
+}
+
+.responsavel-card--professor .chip {
+  background: #dbeafe;
+  color: #1d4f91;
+}
+
+.responsavel-card--responsavel .chip {
+  background: #e8f7e8;
+  color: #2f6b3b;
 }
 
 .btn-edit {
@@ -276,31 +356,6 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
   }
 }
 
-.inner {
-  margin-top: 2px;
-  gap: 16px;
-}
-
-.responsavel-card .field {
-  gap: 8px;
-}
-
-.responsavel-card .field label {
-  font-size: 14px;
-  font-weight: 700;
-  color: $azul-texto;
-}
-
-.responsavel-card .field input {
-  height: 52px;
-  border-radius: 6px;
-  border: 1px solid $cinza-borda;
-  background: $cinza-input;
-  padding: 0 14px;
-  font-size: 14px;
-  color: $azul-texto;
-}
-
 .btn-primary {
   height: 48px;
   border: 0;
@@ -336,10 +391,6 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
   font-weight: 600;
 }
 
-.responsavel-add-btn {
-  margin-top: 2px;
-}
-
 .btn-importar {
   height: 34px;
   border: 0;
@@ -354,7 +405,6 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
   justify-content: center;
   gap: 6px;
   padding: 0 18px;
-  box-shadow: none;
 
   &:hover {
     background: $azul-claro-hover;
@@ -571,4 +621,46 @@ $shadow-card: 0 2px 8px rgba(16, 24, 40, 0.05);
   border-radius: 8px;
   background: #eef2f7;
   margin-bottom: 10px;
+}
+
+@media (max-width: 920px) {
+  .editar-turma-page--padrao {
+    @include uiWhiteContainerMobile;
+  }
+
+  .editar-turma-box--info,
+  .editar-turma-box--responsaveis,
+  .editar-turma-box--alunos {
+    padding-top: 20px;
+    padding-bottom: 20px;
+  }
+
+  .responsavel-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .chip {
+    min-width: 120px;
+    height: 32px;
+    padding: 0 14px;
+  }
+
+  .btn-edit {
+    min-width: 78px;
+    height: 28px;
+    font-size: 11px;
+
+    .btn-edit__text {
+      font-size: 11px;
+    }
+  }
+
+  .responsavel-card .field input {
+    height: 48px;
+  }
+
+  .responsavel-add-btn {
+    height: 50px;
+  }
 }

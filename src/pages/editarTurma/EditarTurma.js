@@ -671,48 +671,55 @@ export default function EditarTurma() {
   }
 
   return (
-    <div className="editar-turma-page">
+  <div
+    className={`editar-turma-page ${
+      isCoordenador
+        ? "editar-turma-page--coordenador"
+        : "editar-turma-page--padrao"
+    }`}
+  >
+    {isCoordenador && (
+      <button
+        type="button"
+        className="btn-voltar-coordenador"
+        onClick={() => navigate("/editar-turma-coordenador")}
+      >
+        ← Voltar
+      </button>
+    )}
+
+    <section className="editar-turma-box editar-turma-box--info">
+      <header className="page-header">
+        <h1>Editar turma</h1>
+      </header>
+
+      <div className="bloco-header">
+        <h2>Informações da Turma</h2>
+      </div>
+
+      <div className="grid-2">
+        <div className="field">
+          <label>Nome</label>
+          <input
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            onBlur={handleSalvarTopo}
+            placeholder="Nome da turma"
+          />
+        </div>
+
+        <div className="field">
+          <label>Complemento</label>
+          <input
+            value={complemento}
+            onChange={(e) => setComplemento(e.target.value)}
+            onBlur={handleSalvarTopo}
+            placeholder="Turma 8"
+          />
+        </div>
+      </div>
+
       {isCoordenador && (
-        <button
-          type="button"
-          className="btn-voltar-coordenador"
-          onClick={() => navigate("/editar-turma-coordenador")}
-        >
-          ← Voltar
-        </button>
-      )}
-
-      <section className="editar-turma-box editar-turma-box--info">
-        <header className="page-header">
-          <h1>Editar turma</h1>
-        </header>
-
-        <div className="bloco-header">
-          <h2>Informações da Turma</h2>
-        </div>
-
-        <div className="grid-2">
-          <div className="field">
-            <label>Nome</label>
-            <input
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              onBlur={handleSalvarTopo}
-              placeholder="Nome da turma"
-            />
-          </div>
-
-          <div className="field">
-            <label>Complemento</label>
-            <input
-              value={complemento}
-              onChange={(e) => setComplemento(e.target.value)}
-              onBlur={handleSalvarTopo}
-              placeholder="Turma 8"
-            />
-          </div>
-        </div>
-
         <div className="tipo-area">
           <div className="tipo-label">Selecione o tipo</div>
 
@@ -738,18 +745,35 @@ export default function EditarTurma() {
             </label>
           </div>
         </div>
-      </section>
+      )}
+    </section>
 
-      <section className="editar-turma-box editar-turma-box--responsaveis">
-        <div className="bloco-header">
-          <h2>Responsáveis da turma</h2>
-        </div>
+    <section className="editar-turma-box editar-turma-box--responsaveis">
+      <div className="bloco-header">
+        <h2>Responsáveis da turma</h2>
+      </div>
 
-        <div className="responsaveis">
-          {responsaveis.length > 0 ? (
-            responsaveis.map((r, idx) => (
+      <div className="responsaveis">
+        {responsaveis.length > 0 ? (
+          responsaveis.map((r, idx) => {
+            const cargoNormalizado = String(r.cargo || "").toLowerCase();
+
+            const tipoClasse =
+              r.cargo === "Coordenador"
+                ? "responsavel-card--coordenador"
+                : "responsavel-card--simples";
+
+            const cargoClasse =
+              cargoNormalizado === "professor"
+                ? "responsavel-card--professor"
+                : cargoNormalizado === "responsável" ||
+                    cargoNormalizado === "responsavel"
+                  ? "responsavel-card--responsavel"
+                  : "";
+
+            return (
               <div
-                className="responsavel-card"
+                className={`responsavel-card ${tipoClasse} ${cargoClasse}`}
                 key={`${r.usuarioId || r.userId}-${idx}`}
               >
                 <div className="responsavel-top">
@@ -779,149 +803,144 @@ export default function EditarTurma() {
                   </div>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="empty-small">Nenhum responsável adicionado.</div>
-          )}
+            );
+          })
+        ) : (
+          <div className="empty-small">Nenhum responsável adicionado.</div>
+        )}
+      </div>
 
-          <button
-            type="button"
-            className="btn-primary wide responsavel-add-btn"
-            onClick={openAdicionarResponsavel}
-          >
-            Adicionar Responsável
-          </button>
-        </div>
-      </section>
+      <button
+        type="button"
+        className="btn-primary wide responsavel-add-btn"
+        onClick={openAdicionarResponsavel}
+      >
+        Adicionar responsável
+      </button>
+    </section>
 
-      <section className="editar-turma-box editar-turma-box--alunos">
-        <div className="section-head">
-          <h2>Alunos da Turma</h2>
+    <section className="editar-turma-box editar-turma-box--alunos">
+      <div className="section-head">
+        <h2>Lista de Alunos</h2>
 
-          <button
-            type="button"
-            className="btn-importar"
-            onClick={() =>
-              Swal.fire("Info", "Função de importação (mock).", "info")
-            }
-          >
-            <Upload size={12} />
-            <span>Importar lista</span>
-          </button>
-        </div>
+        <button type="button" className="btn-importar">
+          <Upload size={14} />
+          Importar lista
+        </button>
+      </div>
 
-        <div className="subsection">
-          <div className="sub-title">Adicione alunos</div>
+      <div className="subsection">
+        <p className="sub-title">Adicione alunos</p>
 
+        <div className="add-aluno-actions">
           <div className="search-wrap" ref={searchWrapRef}>
-            <Search size={14} className="search-ico" />
+            <Search className="search-ico" />
             <input
+              type="text"
               value={buscaAluno}
               onChange={(e) => {
-                const v = e.target.value;
-                setBuscaAluno(v);
-                setAlunoSelecionadoId(null);
+                setBuscaAluno(e.target.value);
                 setDropdownOpen(true);
+                setAlunoSelecionadoId(null);
               }}
               onFocus={() => {
-                if (candidatosBusca.length > 0) setDropdownOpen(true);
+                if (buscaAluno.trim()) setDropdownOpen(true);
               }}
-              placeholder="Busque por nome, matrícula..."
+              placeholder="Pesquise nome, matrícula ou id do aluno"
             />
 
             {dropdownOpen && candidatosBusca.length > 0 && (
               <div className="search-dropdown">
-                {candidatosBusca.map((c) => (
-                  <button
-                    key={String(c.id)}
-                    type="button"
-                    className={`dropdown-item ${
-                      Number(alunoSelecionadoId) === Number(c.id)
-                        ? "active"
-                        : ""
-                    }`}
-                    onClick={() => {
-                      setAlunoSelecionadoId(c.id);
-                      setBuscaAluno(`${c.nome} (${c.matricula})`);
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    <div className="d-name">{c.nome}</div>
-                    <div className="d-sub">{c.matricula}</div>
-                  </button>
-                ))}
+                {candidatosBusca.map((aluno) => {
+                  const ativo = Number(alunoSelecionadoId) === Number(aluno.id);
+
+                  return (
+                    <button
+                      type="button"
+                      key={aluno.id}
+                      className={`dropdown-item ${ativo ? "active" : ""}`}
+                      onClick={() => {
+                        setBuscaAluno(`${aluno.nome} - ${aluno.matricula}`);
+                        setAlunoSelecionadoId(aluno.id);
+                        setDropdownOpen(false);
+                      }}
+                    >
+                      <span className="d-name">{aluno.nome}</span>
+                      <span className="d-sub">{aluno.matricula}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
 
-          <div className="add-aluno-actions">
-            <button
-              type="button"
-              className={`btn-primary wide add-aluno-btn ${
-                temAlunoSelecionado ? "is-active" : "is-muted"
-              }`}
-              onClick={handleAdicionarAluno}
-              disabled={!temAlunoSelecionado}
-            >
-              Adicionar aluno
-            </button>
-          </div>
-
-          <div className="alunos-list">
-            {alunosDetalhes.map((a) => (
-              <div className="aluno-row" key={a.id}>
-                <div className="aluno-info">
-                  <div className="aluno-nome">{a.nome}</div>
-                  <div className="aluno-matricula">{a.matricula}</div>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn-x"
-                  onClick={() => handleRemoverAluno(a.id)}
-                  aria-label="Remover aluno"
-                  title="Remover"
-                >
-                  <X size={13} />
-                </button>
-              </div>
-            ))}
-
-            {!alunosDetalhes.length && (
-              <div className="empty-small">Nenhum aluno adicionado.</div>
-            )}
-          </div>
+          <button
+            type="button"
+            className={`btn-primary add-aluno-btn ${
+              temAlunoSelecionado ? "is-active" : "is-muted"
+            }`}
+            onClick={handleAdicionarAluno}
+            disabled={!temAlunoSelecionado}
+          >
+            Adicionar aluno
+          </button>
         </div>
-      </section>
+      </div>
 
-      <EditarResponsavelModal
-        open={modalOpen}
-        onClose={closeModal}
-        usuarios={usuariosComUser}
-        initialValue={
-          modalMode === "edit" && editIndex !== null
-            ? responsaveis[editIndex]
-            : null
-        }
-        onSave={handleSaveResponsavelFromModal}
-        onRemove={
-          modalMode === "edit" && responsaveis[editIndex]?.removivel !== false
-            ? handleRemoveResponsavelFromModal
-            : null
-        }
-        bloquearResponsavel={
-          modalMode === "edit" &&
-          (responsaveis[editIndex]?.cargo === "Coordenador" ||
-            responsaveis[editIndex]?.fixo === true ||
-            responsaveis[editIndex]?.removivel === false)
-        }
-        bloquearRemocao={
-          modalMode === "edit" &&
-          (responsaveis[editIndex]?.cargo === "Coordenador" ||
-            responsaveis[editIndex]?.fixo === true ||
-            responsaveis[editIndex]?.removivel === false)
-        }
-      />
-    </div>
-  );
+      <div className="alunos-list">
+        {alunosDetalhes.length > 0 ? (
+          alunosDetalhes.map((aluno) => (
+            <div className="aluno-row" key={aluno.id}>
+              <div className="aluno-info">
+                <span className="aluno-nome">{aluno.nome}</span>
+                <span className="aluno-matricula">{aluno.matricula}</span>
+              </div>
+
+              <button
+                type="button"
+                className="btn-x"
+                onClick={() => handleRemoverAluno(aluno.id)}
+                aria-label={`Remover ${aluno.nome}`}
+              >
+                <X size={16} />
+              </button>
+            </div>
+          ))
+        ) : (
+          <div className="empty-small">Nenhum aluno adicionado.</div>
+        )}
+      </div>
+    </section>
+
+    <EditarResponsavelModal
+      open={modalOpen}
+      onClose={closeModal}
+      usuarios={usuariosComUser}
+      initialValue={
+        modalMode === "edit" && editIndex !== null
+          ? responsaveis[editIndex]
+          : null
+      }
+      onSave={handleSaveResponsavelFromModal}
+      onRemove={
+        modalMode === "edit" && responsaveis[editIndex]?.removivel !== false
+          ? handleRemoveResponsavelFromModal
+          : null
+      }
+      bloquearResponsavel={
+        modalMode === "edit" &&
+        (responsaveis[editIndex]?.cargo === "Coordenador" ||
+          responsaveis[editIndex]?.fixo === true ||
+          responsaveis[editIndex]?.removivel === false)
+      }
+      bloquearRemocao={
+        modalMode === "edit" &&
+        (responsaveis[editIndex]?.cargo === "Coordenador" ||
+          responsaveis[editIndex]?.fixo === true ||
+          responsaveis[editIndex]?.removivel === false)
+      }
+      podeEditarCargo={isCoordenador}
+    />
+  </div>
+);
 }
