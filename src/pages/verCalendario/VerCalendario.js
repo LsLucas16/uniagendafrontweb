@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import data from "../../data/dados.json";
 import chevronIcon from "../../assets/ic_chevron.svg";
 import "./VerCalendario.scss";
+import { getEventos } from "../../services/eventosStore";
 
 const MESES_PT = [
   "Janeiro",
@@ -96,6 +97,19 @@ function isSameMonth(a, b) {
 
 export default function VerCalendario() {
   const navigate = useNavigate();
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+  const onEventosChanged = () => setRefreshKey((k) => k + 1);
+
+  window.addEventListener("eventos:changed", onEventosChanged);
+  window.addEventListener("storage", onEventosChanged);
+
+  return () => {
+    window.removeEventListener("eventos:changed", onEventosChanged);
+    window.removeEventListener("storage", onEventosChanged);
+  };
+}, []);
 
   const mesBase = useMemo(() => {
     const hoje = new Date();
@@ -104,7 +118,10 @@ export default function VerCalendario() {
 
   const [mesAtual, setMesAtual] = useState(mesBase);
 
-  const eventos = Array.isArray(data?.eventos) ? data.eventos : [];
+  const eventos = useMemo(() => {
+  const baseEventos = Array.isArray(data?.eventos) ? data.eventos : [];
+  return getEventos(baseEventos);
+}, [refreshKey]);
 
   const eventosCalendario = useMemo(() => {
     return eventos.filter((evento) => evento.calendario);

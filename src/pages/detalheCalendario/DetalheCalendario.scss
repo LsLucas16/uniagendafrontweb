@@ -2,8 +2,10 @@
 
 $dc-card: #ffffff;
 $dc-border: #e7edf3;
-$dc-title: #334e68;
-$dc-text: #667085;
+$dc-title: #727A8E; 
+$dc-text: #727A8E;  
+$dc-autor: #727A8E;
+$dc-disciplina: #2E4A67;
 $dc-muted: #98a2b3;
 $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
@@ -33,7 +35,7 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .detalhe-calendario-title {
   margin: 0;
-  font-size: 28px;
+  font-size: 24px;
   line-height: 1.15;
   font-weight: 700;
   color: $dc-title;
@@ -47,12 +49,12 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
   display: flex;
   align-items: center;
   gap: 14px;
-  margin-bottom: 14px;
+  margin-bottom: 18px;
   padding: 0 4px;
 
   h2 {
     margin: 0;
-    font-size: 22px;
+    font-size: 20px;
     line-height: 1.15;
     font-weight: 700;
     color: $dc-title;
@@ -63,9 +65,9 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
   border: 0;
   background: transparent;
   padding: 0;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
-  color: #667085;
+  color: $dc-autor;
   cursor: pointer;
 
   &:hover {
@@ -76,30 +78,30 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 .detalhe-calendario-list {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .detalhe-evento-card {
   position: relative;
   display: flex;
   align-items: stretch;
-  min-height: 114px;
+  min-height: 136px;
   background: #fff;
   border: 1px solid #dfe6ee;
-  border-radius: 10px;
+  border-radius: 12px;
   box-shadow: 0 2px 4px rgba(16, 24, 40, 0.08);
   overflow: hidden;
 }
 
 .detalhe-evento-card__bar {
-  width: 10px;
-  flex: 0 0 10px;
-  border-radius: 10px 0 0 10px;
+  width: 12px;
+  flex: 0 0 12px;
+  border-radius: 12px 0 0 12px;
 }
 
 .detalhe-evento-card__content {
   flex: 1;
-  padding: 14px 18px 14px 14px;
+  padding: 16px 20px 16px 14px;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -107,43 +109,63 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .detalhe-evento-card__top {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: flex-start;
   min-width: 0;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
+  gap: 12px;
 
   h3 {
     margin: 0;
     font-size: 12px;
     line-height: 1.25;
-    font-weight: 500;
+    font-weight: 600;
     color: $dc-title;
     white-space: nowrap;
-    flex-shrink: 0;
+    flex: 0 0 auto;
   }
 }
 
-.detalhe-evento-card__disciplina {
-  display: inline-block;
+.detalhe-evento-card__disciplinas {
+  flex: 1;
   min-width: 0;
+  max-width: 100%;
+  font-size: 0;
+  line-height: 1.2;
+}
+
+.detalhe-evento-card__disciplina-item {
+  display: inline;
+}
+
+.detalhe-evento-card__disciplina {
+  display: inline;
   font-size: 9px;
   line-height: 1.2;
   font-weight: 500;
-  color: #33506f;
-  text-decoration: underline;
+  color: $dc-disciplina;
+  text-decoration-line: underline;
+  text-decoration-color: $dc-disciplina;
+  text-decoration-thickness: 1px;
   text-underline-offset: 2px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 420px;
+}
+
+.detalhe-evento-card__disciplina-separador {
+  display: inline-block;
+  width: 8px; 
 }
 
 .detalhe-evento-card__autor {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   font-size: 9px;
   line-height: 1.2;
-  font-weight: 500;
-  color: #7b8794;
+  font-weight: 400;
+  color: $dc-autor;
+
+  strong {
+    font-weight: 600;
+    color: $dc-autor;
+  }
 }
 
 .detalhe-evento-card__descricao {
@@ -151,7 +173,8 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
   font-size: 11px;
   line-height: 1.35;
   font-weight: 400;
-  color: #667085;
+  color: $dc-text;
+  max-width: 560px;
 }
 
 .detalhe-calendario-empty {
@@ -179,6 +202,10 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
     h2 {
       font-size: 18px;
     }
+  }
+
+  .detalhe-evento-card__disciplina {
+    white-space: normal;
   }
 
   .detalhe-evento-card {

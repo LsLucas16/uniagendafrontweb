@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import dados from "../../data/dados.json";
+import { getEventos } from "../../services/eventosStore";
 import "./DetalheCalendario.scss";
 
 function norm(value) {
@@ -13,8 +14,17 @@ function norm(value) {
 
 function parseLocalDateFromISO(isoString) {
   if (!isoString) return null;
-  const date = new Date(isoString);
+
+  const raw = String(isoString).trim();
+
+  if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
+    const [year, month, day] = raw.slice(0, 10).split("-").map(Number);
+    return new Date(year, month - 1, day);
+  }
+
+  const date = new Date(raw);
   if (Number.isNaN(date.getTime())) return null;
+
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
@@ -75,17 +85,21 @@ function getDisciplinaIdsDoEvento(evento) {
   return [];
 }
 
-function getDisciplinasNome(evento, disciplinas = []) {
+function getDisciplinasDoEvento(evento, disciplinas = []) {
   const ids = getDisciplinaIdsDoEvento(evento);
 
-  if (!ids.length) return "Disciplina não informada";
+  if (!ids.length) {
+    return [{ id: "sem-disciplina", nome: "Disciplina não informada" }];
+  }
 
-  const nomes = ids.map((id) => {
+  return ids.map((id) => {
     const disciplina = disciplinas.find((d) => Number(d.id) === Number(id));
-    return disciplina?.nome || `Turma ${id}`;
-  });
 
-  return nomes.join("   ");
+    return {
+      id,
+      nome: disciplina?.nome || `Turma ${id}`,
+    };
+  });
 }
 
 function getBarColor(evento, disciplinas = []) {
@@ -106,12 +120,29 @@ export default function DetalheCalendario() {
   const { date } = useParams();
 
   const [busca, setBusca] = useState("");
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  useEffect(() => {
+    const onEventosChanged = () => setRefreshKey((k) => k + 1);
+
+    window.addEventListener("eventos:changed", onEventosChanged);
+    window.addEventListener("storage", onEventosChanged);
+
+    return () => {
+      window.removeEventListener("eventos:changed", onEventosChanged);
+      window.removeEventListener("storage", onEventosChanged);
+    };
+  }, []);
 
   const usuarios = Array.isArray(dados.usuarios) ? dados.usuarios : [];
   const disciplinas = Array.isArray(dados.disciplinas || dados.diciplinas)
     ? dados.disciplinas || dados.diciplinas
     : [];
-  const eventos = Array.isArray(dados.eventos) ? dados.eventos : [];
+
+  const eventos = useMemo(() => {
+    const baseEventos = Array.isArray(dados.eventos) ? dados.eventos : [];
+    return getEventos(baseEventos);
+  }, [refreshKey]);
 
   const dataSelecionada = useMemo(() => parseDateParam(date), [date]);
 
@@ -122,15 +153,17 @@ export default function DetalheCalendario() {
 
     return eventos
       .filter((evento) => {
+        if (!evento?.calendario) return false;
+
         const dataEvento = parseLocalDateFromISO(evento.dataEvento);
         return sameDay(dataEvento, dataSelecionada);
       })
       .map((evento) => ({
-        ...evento,
-        criadorNome: getCriadorNome(evento.criadoPorId, usuarios),
-        disciplinaNome: getDisciplinasNome(evento, disciplinas),
-        barColor: getBarColor(evento, disciplinas),
-      }))
+  ...evento,
+  criadorNome: getCriadorNome(evento.criadoPorId, usuarios),
+  disciplinasEvento: getDisciplinasDoEvento(evento, disciplinas),
+  barColor: getBarColor(evento, disciplinas),
+}))
       .filter((evento) => {
         if (!termo) return true;
 
@@ -138,7 +171,9 @@ export default function DetalheCalendario() {
           norm(evento.titulo).includes(termo) ||
           norm(evento.descricao).includes(termo) ||
           norm(evento.criadorNome).includes(termo) ||
-          norm(evento.disciplinaNome).includes(termo)
+          evento.disciplinasEvento.some((disciplina) =>
+  norm(disciplina.nome).includes(termo)
+)
         );
       })
       .sort((a, b) => {
@@ -180,14 +215,23 @@ export default function DetalheCalendario() {
                   <div className="detalhe-evento-card__top">
                     <h3>{evento.titulo}</h3>
 
-                    <span className="detalhe-evento-card__disciplina">
-                      {evento.disciplinaNome}
-                    </span>
+                   <div className="detalhe-evento-card__disciplinas">
+  {evento.disciplinasEvento.map((disciplina, index) => (
+    <span key={disciplina.id} className="detalhe-evento-card__disciplina-item">
+      <span className="detalhe-evento-card__disciplina">
+        {disciplina.nome}
+      </span>
+      {index < evento.disciplinasEvento.length - 1 && (
+        <span className="detalhe-evento-card__disciplina-separador">  </span>
+      )}
+    </span>
+  ))}
+</div>
                   </div>
 
                   <div className="detalhe-evento-card__autor">
-                    Criado por: {evento.criadorNome}
-                  </div>
+  <strong>Criado por:</strong> {evento.criadorNome}
+</div>
 
                   <p className="detalhe-evento-card__descricao">
                     {evento.descricao}
