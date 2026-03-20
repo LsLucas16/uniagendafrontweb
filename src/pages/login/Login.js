@@ -9,7 +9,6 @@ import agenda from "../../assets/agenda.webp";
 import sombra from "../../assets/sombra.webp";
 
 export const Login = () => {
-  // Estados para capturar os inputs
   const [loginDigitado, setLoginDigitado] = useState("");
   const [senhaDigitada, setSenhaDigitada] = useState("");
   const [idInstSelecionada, setIdInstSelecionada] = useState("");

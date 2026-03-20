@@ -105,9 +105,14 @@ function getDisciplinasDoEvento(evento, disciplinas = []) {
 function getBarColor(evento, disciplinas = []) {
   const ids = getDisciplinaIdsDoEvento(evento);
 
-  if (ids.length === 1) {
-    const disciplina = disciplinas.find((d) => Number(d.id) === Number(ids[0]));
-    if (disciplina?.cor) return disciplina.cor;
+  if (ids.length > 0) {
+    const primeiraDisciplina = disciplinas.find(
+      (d) => Number(d.id) === Number(ids[0])
+    );
+
+    if (primeiraDisciplina?.cor) {
+      return primeiraDisciplina.cor;
+    }
   }
 
   if (evento.destaque) return "#E97D7D";
