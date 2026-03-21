@@ -36,8 +36,8 @@ $vc-outside-bg: #f3f4f6;
 }
 
 .page-title {
-  margin: 0;
-  font-size: 28px;
+  margin: 5px 0;
+  font-size: 24px;
   line-height: 1.15;
   font-weight: 700;
   color: $vc-title;
@@ -62,7 +62,7 @@ $vc-outside-bg: #f3f4f6;
 
   h2 {
     margin: 0;
-    font-size: 31px;
+    font-size: 24px;
     line-height: 1;
     font-weight: 700;
     color: $vc-blue-dark;
@@ -116,12 +116,12 @@ $vc-outside-bg: #f3f4f6;
 .calendar-weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 4px;
-  padding: 0 4px;
+  margin-bottom: 6px;
+  padding: 0;
 }
 
 .weekday {
-  padding: 0 10px 10px;
+  padding: 0 18px 12px;
   font-size: 12px;
   font-weight: 500;
   color: #6b7280;
@@ -130,14 +130,16 @@ $vc-outside-bg: #f3f4f6;
 
 .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  border-top: 1px solid transparent;
-  padding: 0 4px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  padding: 0;
+  background: #fff;
 }
 
 .calendar-cell {
+  position: relative;
   min-height: 64px;
-  padding: 10px 12px;
+  height: 64px;
+  padding: 10px 12px 8px;
   border: 0;
   border-right: 1px solid $vc-grid-line;
   border-bottom: 1px solid $vc-grid-line;
@@ -145,22 +147,31 @@ $vc-outside-bg: #f3f4f6;
   text-align: left;
   font-family: inherit;
   outline: none;
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
 
-  &:nth-child(7n) {
+  &.is-last-col {
     border-right: 0;
   }
 
-  &:disabled {
-    cursor: default;
+  .day-number {
+    font-size: 14px;
+    line-height: 1;
+    font-weight: 700;
+    color: $vc-blue-dark;
   }
 
-  &.is-outside {
-    background: $vc-outside-bg;
-
-    .day-number {
-      color: #c2c8d0;
-      font-weight: 600;
-    }
+  .events-badge {
+    position: absolute;
+    left: 12px;
+    top: 46px;
+    font-size: 13px;
+    line-height: 1;
+    font-weight: 500;
+    color: $vc-blue;
   }
 
   &.is-clickable {
@@ -171,27 +182,46 @@ $vc-outside-bg: #f3f4f6;
       background: #f8fbff;
     }
   }
+
+  &.is-outside {
+    background: $vc-outside-bg;
+
+    .day-number {
+      color: $vc-blue-dark;
+      font-weight: 600;
+    }
+  }
 }
 
-.calendar-cell__top {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 8px;
+/* cantos externos arredondados e lado interno reto */
+.calendar-cell.is-outside.is-first-row.is-first-col {
+  border-top-left-radius: 12px;
 }
 
-.day-number {
-  font-size: 14px;
-  line-height: 1;
-  font-weight: 700;
-  color: $vc-blue-dark;
+.calendar-cell.is-outside.is-first-row.is-last-col {
+  border-top-right-radius: 12px;
 }
 
-.events-badge {
-  font-size: 13px;
-  line-height: 1;
-  font-weight: 500;
-  color: $vc-blue;
+.calendar-cell.is-outside.is-last-row.is-first-col {
+  border-bottom-left-radius: 12px;
+}
+
+.calendar-cell.is-outside.is-last-row.is-last-col {
+  border-bottom-right-radius: 12px;
+}
+
+/* quando a continuidade começa no meio da linha final */
+.calendar-cell.is-outside.is-last-row:not(.is-first-col):not(.is-last-col) {
+  border-radius: 0;
+}
+
+/* borda branca visual como no figma */
+.calendar-cell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.9);
 }
 
 @media (max-width: 920px) {
@@ -201,7 +231,13 @@ $vc-outside-bg: #f3f4f6;
 
   .calendar-cell {
     min-height: 58px;
-    padding: 8px 10px;
+    height: 58px;
+    padding: 8px 10px 6px;
+
+    .events-badge {
+      left: 10px;
+      top: 41px;
+    }
   }
 }
 
@@ -235,14 +271,30 @@ $vc-outside-bg: #f3f4f6;
 
   .calendar-cell {
     min-height: 52px;
+    height: 52px;
     padding: 6px 8px;
+
+    .day-number {
+      font-size: 13px;
+    }
+
+    .events-badge {
+      left: 8px;
+      top: 36px;
+      font-size: 11px;
+    }
   }
+}
+
+.calendar-cell.is-past {
+  pointer-events: none;
+  cursor: default;
 
   .day-number {
-    font-size: 13px;
+    color: #cbd5e1;
   }
 
   .events-badge {
-    font-size: 11px;
+    color: #cbd5e1;
   }
 }

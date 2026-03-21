@@ -35,7 +35,6 @@ function toDateKey(value) {
 
   const raw = String(value).trim();
 
-  // pega direto a parte YYYY-MM-DD do ISO
   if (/^\d{4}-\d{2}-\d{2}/.test(raw)) {
     return raw.slice(0, 10);
   }
@@ -61,7 +60,6 @@ function buildCalendarDays(year, month) {
   const startDate = new Date(year, month, 1 - startOffset);
   const cells = [];
 
-  // 42 células = 6 semanas completas
   for (let i = 0; i < 42; i += 1) {
     const d = new Date(startDate);
     d.setDate(startDate.getDate() + i);
@@ -75,6 +73,8 @@ function buildCalendarDays(year, month) {
       date: d,
       day: d.getDate(),
       isCurrentMonth: d.getMonth() === month,
+      col: i % 7,
+      row: Math.floor(i / 7),
     });
   }
 
@@ -100,16 +100,16 @@ export default function VerCalendario() {
   const [refreshKey, setRefreshKey] = useState(0);
 
   useEffect(() => {
-  const onEventosChanged = () => setRefreshKey((k) => k + 1);
+    const onEventosChanged = () => setRefreshKey((k) => k + 1);
 
-  window.addEventListener("eventos:changed", onEventosChanged);
-  window.addEventListener("storage", onEventosChanged);
+    window.addEventListener("eventos:changed", onEventosChanged);
+    window.addEventListener("storage", onEventosChanged);
 
-  return () => {
-    window.removeEventListener("eventos:changed", onEventosChanged);
-    window.removeEventListener("storage", onEventosChanged);
-  };
-}, []);
+    return () => {
+      window.removeEventListener("eventos:changed", onEventosChanged);
+      window.removeEventListener("storage", onEventosChanged);
+    };
+  }, []);
 
   const mesBase = useMemo(() => {
     const hoje = new Date();
@@ -119,9 +119,9 @@ export default function VerCalendario() {
   const [mesAtual, setMesAtual] = useState(mesBase);
 
   const eventos = useMemo(() => {
-  const baseEventos = Array.isArray(data?.eventos) ? data.eventos : [];
-  return getEventos(baseEventos);
-}, [refreshKey]);
+    const baseEventos = Array.isArray(data?.eventos) ? data.eventos : [];
+    return getEventos(baseEventos);
+  }, [refreshKey]);
 
   const eventosCalendario = useMemo(() => {
     return eventos.filter((evento) => evento.calendario);
@@ -134,10 +134,7 @@ export default function VerCalendario() {
       const key = toDateKey(evento.dataEvento);
       if (!key) return;
 
-      if (!mapa[key]) {
-        mapa[key] = [];
-      }
-
+      if (!mapa[key]) mapa[key] = [];
       mapa[key].push(evento);
     });
 
@@ -159,14 +156,11 @@ export default function VerCalendario() {
     );
 
     if (isBeforeMonth(prevMonth, mesBase)) return;
-
     setMesAtual(prevMonth);
   }
 
   function handleNextMonth() {
-    setMesAtual(
-      new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 1)
-    );
+    setMesAtual(new Date(mesAtual.getFullYear(), mesAtual.getMonth() + 1, 1));
   }
 
   function handleOpenDay(dateKey) {
@@ -227,25 +221,39 @@ export default function VerCalendario() {
           {days.map((item) => {
             const eventosDoDia = eventosPorDia[item.key] || [];
             const eventosCount = eventosDoDia.length;
-            const isClickable = eventosCount > 0 && item.isCurrentMonth;
+
+            const hoje = new Date();
+hoje.setHours(0, 0, 0, 0);
+
+const isPast = item.date < hoje;
+
+const isClickable = !isPast && eventosCount > 0;
+
+            const classes = [
+  "calendar-cell",
+  item.isCurrentMonth ? "is-current" : "is-outside",
+  isClickable ? "is-clickable" : "",
+  isPast ? "is-past" : "",
+  item.col === 0 ? "is-first-col" : "",
+  item.col === 6 ? "is-last-col" : "",
+  item.row === 0 ? "is-first-row" : "",
+  item.row === 5 ? "is-last-row" : "",
+]
+              .filter(Boolean)
+              .join(" ");
 
             return (
               <button
                 key={item.key}
                 type="button"
-                className={`calendar-cell ${item.isCurrentMonth ? "" : "is-outside"} ${
-                  isClickable ? "is-clickable" : ""
-                }`}
-                onClick={() => handleOpenDay(item.key)}
-                disabled={!isClickable}
+                className={classes}
+                onClick={() => isClickable && handleOpenDay(item.key)}
               >
-                <div className="calendar-cell__top">
-                  <span className="day-number">{item.day}</span>
+                <span className="day-number">{item.day}</span>
 
-                  {eventosCount > 0 && (
-                    <span className="events-badge">+{eventosCount}</span>
-                  )}
-                </div>
+                {eventosCount > 0 && (
+                  <span className="events-badge">+{eventosCount}</span>
+                )}
               </button>
             );
           })}
