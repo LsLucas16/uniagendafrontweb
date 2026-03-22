@@ -21,7 +21,7 @@
     "nome": "Carlos Augusto de Silva Pinho",
     "contato": "(99)99999-9999",
     "tipo": "aluno",
-    "faculdadeId": 2
+    "faculdadeId": 1
     
   },
    {
@@ -36,11 +36,11 @@
   },
   {
     "id": 201,
-    "user": "aluno",
+    "user": "aluno22",
     "senha": "123",
     "nome": "Roberto Almeida Costa Junior",
-    "contato": "professor@faculdade.br",
-    "tipo": "professor",
+    "contato": "aluno@faculdade.br",
+    "tipo": "aluno",
     "faculdadeId": 1
     
   },
@@ -255,7 +255,7 @@
     "professorIds": [18791, 201],
     "responsavelIds": [401, 501, 502, 503],
     "coordenadorIds": [301],
-    "alunoIds": [103, 105, 106, 401, 501, 502, 503],
+    "alunoIds": [101, 103, 105, 106, 401, 501, 502, 503],
     "criado_por": 301
   },
   {
@@ -279,7 +279,7 @@
     "professorIds": [18791, 201],
     "responsavelIds": [401],
     "coordenadorIds": [301],
-    "alunoIds": [103, 104, 106, 401, 501, 502],
+    "alunoIds": [101, 103, 104, 106, 401, 501, 502],
     "criado_por": 301
   },
   {
@@ -327,7 +327,7 @@
     "professorIds": [18791],
     "responsavelIds": [401, 501, 503],
     "coordenadorIds": [301],
-    "alunoIds": [104, 105, 106, 401, 501, 503],
+    "alunoIds": [101, 104, 105, 106, 401, 501, 503],
     "criado_por": 301
   },
   {

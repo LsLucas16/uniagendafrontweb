@@ -8,7 +8,6 @@ import {
   LogOut,
   Plus,
   Calendar,
-  ChevronRight,
 } from "lucide-react";
 
 import {
@@ -18,6 +17,7 @@ import {
   getUsuariosMesclados,
   setDisciplinaAtual,
 } from "../../utils/storageData";
+import dados from "../../data/dados.json";
 
 const MenuLateral = () => {
   const navigate = useNavigate();
@@ -29,6 +29,11 @@ const MenuLateral = () => {
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(
     () => localStorage.getItem("disciplinaAtualId") || ""
   );
+
+  const [mostrarSecundarias, setMostrarSecundarias] = useState(() => {
+  const salvo = localStorage.getItem("menuAlunoSecundariasVisiveis");
+  return salvo === null ? false : salvo === "true";
+});
 
   const isActive = (path) => location.pathname === path;
 
@@ -77,7 +82,22 @@ const MenuLateral = () => {
   const instituicao = useMemo(() => {
     if (!user) return null;
     return getInstituicaoById(user.faculdadeId);
-  }, [user]);
+  }, [user, dataVersion]);
+
+useEffect(() => {
+  localStorage.setItem(
+    "menuAlunoSecundariasVisiveis",
+    String(mostrarSecundarias)
+  );
+}, [mostrarSecundarias]);
+
+  function safeJsonParse(value, fallback) {
+  try {
+    return JSON.parse(value) ?? fallback;
+  } catch {
+    return fallback;
+  }
+}
 
   const usuariosMesclados = useMemo(() => getUsuariosMesclados(), [dataVersion]);
 
@@ -96,15 +116,54 @@ const MenuLateral = () => {
     return [];
   };
 
-  const disciplinasDoUsuario = useMemo(() => {
-    if (!user) return [];
+ const disciplinasDoUsuario = useMemo(() => {
+  if (!user) return [];
 
+  if (user.tipo !== "aluno") {
     const disciplinas = getDisciplinasPermitidas(user) || [];
 
-    return disciplinas.sort((a, b) =>
+    return [...disciplinas].sort((a, b) =>
       String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR")
     );
-  }, [user, dataVersion]);
+  }
+
+  const baseDisciplinas = Array.isArray(dados?.disciplinas)
+    ? dados.disciplinas
+    : [];
+
+  const turmasOverride = safeJsonParse(
+    localStorage.getItem("turmas_override"),
+    []
+  );
+
+  const mapa = new Map();
+
+  baseDisciplinas.forEach((disc) => {
+    mapa.set(Number(disc.id), disc);
+  });
+
+  if (Array.isArray(turmasOverride)) {
+    turmasOverride.forEach((disc) => {
+      mapa.set(Number(disc.id), disc);
+    });
+  }
+
+  const disciplinasMescladas = Array.from(mapa.values());
+
+  const disciplinasFiltradas = disciplinasMescladas.filter((disc) => {
+    const alunoIds = Array.isArray(disc.alunoIds)
+      ? disc.alunoIds.map(Number).filter(Boolean)
+      : disc.alunoId !== undefined && disc.alunoId !== null && disc.alunoId !== ""
+        ? [Number(disc.alunoId)].filter(Boolean)
+        : [];
+
+    return alunoIds.includes(Number(user.id));
+  });
+
+  return disciplinasFiltradas.sort((a, b) =>
+    String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR")
+  );
+}, [user, dataVersion]);
 
   useEffect(() => {
     if (!disciplinasDoUsuario.length) {
@@ -143,6 +202,93 @@ const MenuLateral = () => {
     location.pathname === "/editar-turma" ||
     location.pathname === "/editar-turma-coordenador" ||
     location.pathname.startsWith("/editar-turma/");
+
+  const getTituloCurto = (nome) => {
+    const texto = String(nome || "").trim();
+
+    return texto
+      .replace(/\s*-\s*Turma\s+\d+$/i, "")
+      .replace(/^Monitoria do Curso de\s+/i, "Monitoria ")
+      .replace(/^Introdução aos?\s+/i, "")
+      .trim();
+  };
+
+  const disciplinasPrimarias = isAluno
+    ? disciplinasDoUsuario.filter(
+        (disc) => String(disc.tipo || "").toLowerCase() !== "secundaria"
+      )
+    : [];
+
+  const disciplinasSecundarias = isAluno
+    ? disciplinasDoUsuario.filter(
+        (disc) => String(disc.tipo || "").toLowerCase() === "secundaria"
+      )
+    : [];
+
+  const getProfessorPrincipal = (disc) => {
+    const professorIds = normalizarIds(disc.professorIds, disc.professorId);
+
+    return (
+      professorIds
+        .map((id) => getUsuarioById(id))
+        .find((p) => p && String(p.tipo || "").toLowerCase() === "professor") ||
+      professorIds.map((id) => getUsuarioById(id)).find(Boolean) ||
+      null
+    );
+  };
+
+  const renderDisciplinaAluno = (disc) => {
+    const open = disciplinaAbertaId === disc.id;
+    const professorPrincipal = getProfessorPrincipal(disc);
+
+    return (
+      <div
+        key={disc.id}
+        className={`menuLateral__materiaWrap ${open ? "open" : ""}`}
+      >
+        <button
+          type="button"
+          className={`menuLateral__materiaItem ${open ? "open" : ""}`}
+          onClick={() => setDisciplinaAbertaId(open ? null : disc.id)}
+          style={{ "--discColor": disc.cor || "#76A8D9" }}
+        >
+          <span className="menuLateral__dot" />
+          <span className="menuLateral__materiaTitle">
+            {getTituloCurto(disc.nome)}
+          </span>
+          <span className="menuLateral__materiaToggle">
+            {open ? "–" : "+"}
+          </span>
+        </button>
+
+        {open && (
+          <div className="menuLateral__materiaDetails">
+            <div className="menuLateral__detailsTitle">
+              {String(disc.nome || "")}
+            </div>
+
+            <div className="menuLateral__detailsLine">
+              <strong>Professor:</strong>{" "}
+              <span className="menuLateral__detailsValue">
+                {professorPrincipal?.nome || "—"}
+                <br />
+                {professorPrincipal?.contato || "—"}
+              </span>
+            </div>
+
+            <div className="menuLateral__detailsLine">
+              <strong>Aluno:</strong>{" "}
+              <span className="menuLateral__detailsValue">
+                {user.nome || "—"}
+                <br />
+                {user.contato || "—"}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <aside className="menuLateral">
@@ -226,106 +372,41 @@ const MenuLateral = () => {
           )}
 
           {isAluno ? (
-            <div className="menuLateral__materias">
-              {disciplinasDoUsuario.map((disc) => {
-                const open = disciplinaAbertaId === disc.id;
+  <div className="menuLateral__materias">
+    {disciplinasPrimarias.map(renderDisciplinaAluno)}
 
-                const professorIds = normalizarIds(
-                  disc.professorIds,
-                  disc.professorId
-                );
+    {!!disciplinasSecundarias.length && (
+      <div className="menuLateral__extensoes">
+        <button
+  type="button"
+  className={`menuLateral__extensoesToggle ${
+    mostrarSecundarias ? "is-open" : "is-closed"
+  }`}
+  onClick={() => setMostrarSecundarias((prev) => !prev)}
+  aria-label={
+    mostrarSecundarias
+      ? "Ocultar turmas secundárias"
+      : "Mostrar turmas secundárias"
+  }
+>
+  <span className="menuLateral__extensoesText">Extensões acadêmica</span>
+  <span
+    className={`menuLateral__extensoesEye ${
+      mostrarSecundarias ? "is-open" : "is-closed"
+    }`}
+    aria-hidden="true"
+  />
+</button>
 
-                const responsavelIds = normalizarIds(
-                  disc.responsavelIds,
-                  disc.responsavelId
-                );
-
-                const alunoIds = normalizarIds(
-                  disc.alunoIds,
-                  disc.alunoId
-                );
-
-                const professores = professorIds
-                  .map((id) => getUsuarioById(id))
-                  .filter(Boolean);
-
-                const responsaveis = responsavelIds
-                  .map((id) => getUsuarioById(id))
-                  .filter(Boolean);
-
-                const alunos = alunoIds
-                  .map((id) => getUsuarioById(id))
-                  .filter(Boolean);
-
-                const tituloCurto = String(disc.nome || "").split(" - ")[0];
-
-                return (
-                  <div key={disc.id} className="menuLateral__materiaWrap">
-                    <button
-                      type="button"
-                      className={`menuLateral__materiaItem ${open ? "open" : ""}`}
-                      onClick={() =>
-                        setDisciplinaAbertaId(open ? null : disc.id)
-                      }
-                      style={{ "--discColor": disc.cor }}
-                    >
-                      <span className="menuLateral__dot" />
-                      <span className="menuLateral__materiaTitle">
-                        {tituloCurto}
-                      </span>
-                      <ChevronRight size={18} className="menuLateral__chev" />
-                    </button>
-
-                    {open && (
-                      <div
-                        className="menuLateral__materiaDetails"
-                        style={{ "--discColor": disc.cor }}
-                      >
-                        <div className="menuLateral__detailsTitle">
-                          {String(disc.nome || "")}
-                        </div>
-
-                        <div className="menuLateral__detailsLine">
-                          <strong>Professores:</strong>{" "}
-                          <span>
-                            {professores.length
-                              ? professores
-                                  .map(
-                                    (p) =>
-                                      `${p.nome}${p.contato ? ` | ${p.contato}` : ""}`
-                                  )
-                                  .join(" • ")
-                              : "—"}
-                          </span>
-                        </div>
-
-                        <div className="menuLateral__detailsLine">
-                          <strong>Responsáveis:</strong>{" "}
-                          <span>
-                            {responsaveis.length
-                              ? responsaveis
-                                  .map(
-                                    (r) =>
-                                      `${r.nome}${r.contato ? ` | ${r.contato}` : ""}`
-                                  )
-                                  .join(" • ")
-                              : "—"}
-                          </span>
-                        </div>
-
-                        <div className="menuLateral__detailsLine">
-                          <strong>Alunos:</strong>{" "}
-                          <span>
-                            {alunos.length ? alunos.length : "—"}
-                          </span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : isCoordenador ? (
+        {mostrarSecundarias && (
+          <div className="menuLateral__extensoesList">
+            {disciplinasSecundarias.map(renderDisciplinaAluno)}
+          </div>
+        )}
+      </div>
+    )}
+  </div>
+) : isCoordenador ? (
             <>
               <button
                 className={`menuLateral__btn ${isActive("/nova-turma") ? "active" : ""}`}
