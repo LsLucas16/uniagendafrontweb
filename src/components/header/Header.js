@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import "./Header.scss"; // Importe o arquivo scss aqui
+import "./Header.scss";
 
-export default function Header() {
+export default function Header({ isAluno = false }) {
   const [nome, setNome] = useState("");
   const [dataAtual, setDataAtual] = useState("");
   const [saudacao, setSaudacao] = useState("");
@@ -12,9 +12,7 @@ export default function Header() {
     if (usuario && usuario.nome) {
       const primeiroNome = usuario.nome.split(" ")[0];
       setNome(primeiroNome);
-    } else {
-      setNome("Ana"); // Fallback para o exemplo da imagem
-    }
+    } 
 
     // Define saudação
     const hora = new Date().getHours();
@@ -37,7 +35,7 @@ export default function Header() {
   }, []);
 
   return (
-    <header className="header-container">
+    <header className={`header-container ${isAluno ? "is-aluno" : ""}`}>
       <div className="left-content">
         <span className="text-saudacao">
           {saudacao}, {nome}! <span className="emoji">👋</span>

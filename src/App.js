@@ -1,146 +1,69 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
-import { Login } from "./pages/login/Login";
-import { PrivateRoute } from "./PrivateRoute";
-import { RoleRoute } from "./RoleRoute";
-import Layout from "./components/Layout";
+import { Login }                  from "./pages/login/Login";
+import { PrivateRoute }           from "./PrivateRoute";
+import { RoleRoute }              from "./RoleRoute";
+import Layout                     from "./components/Layout";
+import Dashboard                  from "./pages/dashboard/Dashboard";
+import DashboardAluno             from "./pages/dashboardAluno/DashboardAluno";
+import CriarEvento                from "./pages/criarEvento/CriarEvento";
+import EventosPublicados          from "./pages/eventosPublicados/EventosPublicados";
+import EditarEvento               from "./pages/editarEvento/EditarEvento";
+import EditarTurma                from "./pages/editarTurma/EditarTurma";
+import EditarTurmaCoordenador     from "./pages/editarTurmaCoordenador/EditarTurmaCoordenador";
+import ListaAlunos                from "./pages/listaAlunos/ListaAlunos";
+import CriarTurma                 from "./pages/criarTurma/CriarTurma";
+import VerCalendario              from "./pages/verCalendario/VerCalendario";
+import DetalheCalendario          from "./pages/detalheCalendario/DetalheCalendario";
+import DetalheCalendarioAluno     from "./pages/detalheCalendarioAluno/DetalheCalendarioAluno";
 
-import Dashboard from "./pages/dashboard/Dashboard";
-import CriarEvento from "./pages/criarEvento/CriarEvento";
-import PaginaTemporaria from "./pages/temp/PaginaTemporaria";
-import EventosPublicados from "./pages/eventosPublicados/EventosPublicados";
-import EditarEvento from "./pages/editarEvento/EditarEvento";
-import EditarTurma from "./pages/editarTurma/EditarTurma";
-import EditarTurmaCoordenador from "./pages/editarTurmaCoordenador/EditarTurmaCoordenador";
-import ListaAlunos from "./pages/listaAlunos/ListaAlunos";
-import CriarTurma from "./pages/criarTurma/CriarTurma";
-import VerCalendario from "./pages/verCalendario/VerCalendario";
-import DetalheCalendario from "./pages/detalheCalendario/DetalheCalendario";
+function DashboardPage() {
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+  if (usuario?.tipo === "aluno") return <DashboardAluno />;
+  return <Dashboard />;
+}
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Público */}
+
         <Route path="/" element={<Login />} />
 
-        {/* Privado */}
         <Route element={<PrivateRoute />}>
-          {/* Todos autenticados */}
-          <Route
-            path="/dashboard"
-            element={
-              <Layout>
-                <Dashboard />
-              </Layout>
-            }
-          />
+          <Route element={<Layout />}>
 
-          {/* professor, coordenador, responsável */}
-          <Route
-            element={
-              <RoleRoute
-                allowed={["professor", "coordenador", "responsavel"]}
-              />
-            }
-          >
-            <Route
-              path="/criar-evento"
-              element={
-                <Layout>
-                  <CriarEvento />
-                </Layout>
-              }
-            />
+            <Route path="/dashboard" element={<DashboardPage />} />
 
-            <Route
-              path="/turma/:turmaId/alunos"
-              element={
-                <Layout>
-                  <ListaAlunos />
-                </Layout>
-              }
-            />
+            <Route element={<RoleRoute allowed={["aluno"]} />}>
+              <Route path="/detalhe-calendario-aluno/:data" element={<DetalheCalendarioAluno />} />
+            </Route>
 
-            <Route
-              path="/eventos"
-              element={
-                <Layout>
-                  <EventosPublicados />
-                </Layout>
-              }
-            />
+            <Route element={<RoleRoute allowed={["professor", "coordenador", "responsavel"]} />}>
+              <Route path="/criar-evento"           element={<CriarEvento />} />
+              <Route path="/turma/:turmaId/alunos"  element={<ListaAlunos />} />
+              <Route path="/eventos"                element={<EventosPublicados />} />
+              <Route path="/eventos/:id/editar"     element={<EditarEvento />} />
+            </Route>
 
-            <Route
-              path="/eventos/:id/editar"
-              element={
-                <Layout>
-                  <EditarEvento />
-                </Layout>
-              }
-            />
-          </Route>
+            <Route element={<RoleRoute allowed={["professor", "responsavel"]} />}>
+              <Route path="/editar-turma" element={<EditarTurma />} />
+            </Route>
 
-          {/* Somente professor e responsável */}
-          <Route element={<RoleRoute allowed={["professor", "responsavel"]} />}>
-            <Route
-              path="/editar-turma"
-              element={
-                <Layout>
-                  <EditarTurma />
-                </Layout>
-              }
-            />
-          </Route>
+            <Route element={<RoleRoute allowed={["coordenador"]} />}>
+              <Route path="/nova-turma"                element={<CriarTurma />} />
+              <Route path="/editar-turma-coordenador"  element={<EditarTurmaCoordenador />} />
+              <Route path="/editar-turma/:id"          element={<EditarTurma />} />
+              <Route path="/ver-calendario"            element={<VerCalendario />} />
+              <Route path="/detalhe-calendario/:date"  element={<DetalheCalendario />} />
+            </Route>
 
-          {/* Somente coordenador */}
-          <Route element={<RoleRoute allowed={["coordenador"]} />}>
-            <Route
-              path="/nova-turma"
-              element={
-                <Layout>
-                  <CriarTurma/>
-                </Layout>
-              }
-            />
-
-            <Route
-              path="/editar-turma-coordenador"
-              element={
-                <Layout>
-                  <EditarTurmaCoordenador />
-                </Layout>
-              }
-            />
-
-            <Route
-              path="/editar-turma/:id"
-              element={
-                <Layout>
-                  <EditarTurma />
-                </Layout>
-              }
-            />
-
-            <Route
-              path="/ver-calendario"
-              element={
-                <Layout>
-                  <VerCalendario />
-                </Layout>
-              }
-            />
-            <Route
-  path="/detalhe-calendario/:date"
-  element={
-    <Layout>
-      <DetalheCalendario />
-    </Layout>
-  }
-/>
           </Route>
         </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+
       </Routes>
     </Router>
   );

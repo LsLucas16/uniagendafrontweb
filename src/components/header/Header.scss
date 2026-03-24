@@ -3,17 +3,17 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px; 
+  padding: 20px 40px;
   background-color: #ffffff;
-  border-bottom: 1.5px solid #e0e0e0; 
+  border-bottom: 1.5px solid #e0e0e0;
   box-sizing: border-box;
-  font-family: 'Inter', sans-serif; 
+  font-family: 'Inter', sans-serif;
 
   .left-content {
     .text-saudacao {
       font-size: 20px;
-      font-weight: 700; 
-      color: rgba(46, 74, 103, 1);    
+      font-weight: 700;
+      color: rgba(46, 74, 103, 1);
       display: flex;
       align-items: center;
 
@@ -26,9 +26,33 @@
 
   .right-content {
     .data-text {
-      font-size: 15px;
-      font-weight: 400; 
-      color: #7f8c8d;    
+      font-size: 16px;
+      font-weight: 400;
+      color: #7f8c8d;
+    }
+  }
+
+  /* 👇 VARIAÇÃO ALUNO (IMPORTANTE) */
+  &.is-aluno {
+    padding: 8px 16px;            // 🔥 reduz altura
+    border-bottom: 1px solid #e6ebf1;
+
+    .left-content {
+      .text-saudacao {
+        font-size: 20px;          // 🔥 menor
+        font-weight: 600;
+      }
+
+      .emoji {
+        font-size: 1rem;
+      }
+    }
+
+    .right-content {
+      .data-text {
+        font-size: 14px;          
+        color: #8a94a6;
+      }
     }
   }
 }

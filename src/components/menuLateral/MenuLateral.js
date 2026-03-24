@@ -27,13 +27,13 @@ const MenuLateral = () => {
   const [disciplinaAbertaId, setDisciplinaAbertaId] = useState(null);
   const [dataVersion, setDataVersion] = useState(0);
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(
-    () => localStorage.getItem("disciplinaAtualId") || ""
+    () => localStorage.getItem("disciplinaAtualId") || "",
   );
 
   const [mostrarSecundarias, setMostrarSecundarias] = useState(() => {
-  const salvo = localStorage.getItem("menuAlunoSecundariasVisiveis");
-  return salvo === null ? false : salvo === "true";
-});
+    const salvo = localStorage.getItem("menuAlunoSecundariasVisiveis");
+    return salvo === null ? false : salvo === "true";
+  });
 
   const isActive = (path) => location.pathname === path;
 
@@ -72,7 +72,10 @@ const MenuLateral = () => {
 
     return () => {
       window.removeEventListener("app:data-changed", bump);
-      window.removeEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
+      window.removeEventListener(
+        "disciplinaAtual:changed",
+        syncDisciplinaAtual,
+      );
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -84,22 +87,25 @@ const MenuLateral = () => {
     return getInstituicaoById(user.faculdadeId);
   }, [user, dataVersion]);
 
-useEffect(() => {
-  localStorage.setItem(
-    "menuAlunoSecundariasVisiveis",
-    String(mostrarSecundarias)
-  );
-}, [mostrarSecundarias]);
+  useEffect(() => {
+    localStorage.setItem(
+      "menuAlunoSecundariasVisiveis",
+      String(mostrarSecundarias),
+    );
+  }, [mostrarSecundarias]);
 
   function safeJsonParse(value, fallback) {
-  try {
-    return JSON.parse(value) ?? fallback;
-  } catch {
-    return fallback;
+    try {
+      return JSON.parse(value) ?? fallback;
+    } catch {
+      return fallback;
+    }
   }
-}
 
-  const usuariosMesclados = useMemo(() => getUsuariosMesclados(), [dataVersion]);
+  const usuariosMesclados = useMemo(
+    () => getUsuariosMesclados(),
+    [dataVersion],
+  );
 
   const getUsuarioById = (id) =>
     usuariosMesclados.find((u) => Number(u.id) === Number(id)) || null;
@@ -116,54 +122,56 @@ useEffect(() => {
     return [];
   };
 
- const disciplinasDoUsuario = useMemo(() => {
-  if (!user) return [];
+  const disciplinasDoUsuario = useMemo(() => {
+    if (!user) return [];
 
-  if (user.tipo !== "aluno") {
-    const disciplinas = getDisciplinasPermitidas(user) || [];
+    if (user.tipo !== "aluno") {
+      const disciplinas = getDisciplinasPermitidas(user) || [];
 
-    return [...disciplinas].sort((a, b) =>
-      String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR")
+      return [...disciplinas].sort((a, b) =>
+        String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"),
+      );
+    }
+
+    const baseDisciplinas = Array.isArray(dados?.disciplinas)
+      ? dados.disciplinas
+      : [];
+
+    const turmasOverride = safeJsonParse(
+      localStorage.getItem("turmas_override"),
+      [],
     );
-  }
 
-  const baseDisciplinas = Array.isArray(dados?.disciplinas)
-    ? dados.disciplinas
-    : [];
+    const mapa = new Map();
 
-  const turmasOverride = safeJsonParse(
-    localStorage.getItem("turmas_override"),
-    []
-  );
-
-  const mapa = new Map();
-
-  baseDisciplinas.forEach((disc) => {
-    mapa.set(Number(disc.id), disc);
-  });
-
-  if (Array.isArray(turmasOverride)) {
-    turmasOverride.forEach((disc) => {
+    baseDisciplinas.forEach((disc) => {
       mapa.set(Number(disc.id), disc);
     });
-  }
 
-  const disciplinasMescladas = Array.from(mapa.values());
+    if (Array.isArray(turmasOverride)) {
+      turmasOverride.forEach((disc) => {
+        mapa.set(Number(disc.id), disc);
+      });
+    }
 
-  const disciplinasFiltradas = disciplinasMescladas.filter((disc) => {
-    const alunoIds = Array.isArray(disc.alunoIds)
-      ? disc.alunoIds.map(Number).filter(Boolean)
-      : disc.alunoId !== undefined && disc.alunoId !== null && disc.alunoId !== ""
-        ? [Number(disc.alunoId)].filter(Boolean)
-        : [];
+    const disciplinasMescladas = Array.from(mapa.values());
 
-    return alunoIds.includes(Number(user.id));
-  });
+    const disciplinasFiltradas = disciplinasMescladas.filter((disc) => {
+      const alunoIds = Array.isArray(disc.alunoIds)
+        ? disc.alunoIds.map(Number).filter(Boolean)
+        : disc.alunoId !== undefined &&
+            disc.alunoId !== null &&
+            disc.alunoId !== ""
+          ? [Number(disc.alunoId)].filter(Boolean)
+          : [];
 
-  return disciplinasFiltradas.sort((a, b) =>
-    String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR")
-  );
-}, [user, dataVersion]);
+      return alunoIds.includes(Number(user.id));
+    });
+
+    return disciplinasFiltradas.sort((a, b) =>
+      String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"),
+    );
+  }, [user, dataVersion]);
 
   useEffect(() => {
     if (!disciplinasDoUsuario.length) {
@@ -174,7 +182,7 @@ useEffect(() => {
     }
 
     const existeNaLista = disciplinasDoUsuario.some(
-      (d) => String(d.id) === String(disciplinaAtualId)
+      (d) => String(d.id) === String(disciplinaAtualId),
     );
 
     if (!disciplinaAtualId || !existeNaLista) {
@@ -187,7 +195,10 @@ useEffect(() => {
 
   if (!user) return null;
 
-  const primeiraLetra = String(user.nome || "").trim().charAt(0).toUpperCase();
+  const primeiraLetra = String(user.nome || "")
+    .trim()
+    .charAt(0)
+    .toUpperCase();
   const isAluno = user.tipo === "aluno";
   const isCoordenador = user.tipo === "coordenador";
 
@@ -215,13 +226,13 @@ useEffect(() => {
 
   const disciplinasPrimarias = isAluno
     ? disciplinasDoUsuario.filter(
-        (disc) => String(disc.tipo || "").toLowerCase() !== "secundaria"
+        (disc) => String(disc.tipo || "").toLowerCase() !== "secundaria",
       )
     : [];
 
   const disciplinasSecundarias = isAluno
     ? disciplinasDoUsuario.filter(
-        (disc) => String(disc.tipo || "").toLowerCase() === "secundaria"
+        (disc) => String(disc.tipo || "").toLowerCase() === "secundaria",
       )
     : [];
 
@@ -256,9 +267,7 @@ useEffect(() => {
           <span className="menuLateral__materiaTitle">
             {getTituloCurto(disc.nome)}
           </span>
-          <span className="menuLateral__materiaToggle">
-            {open ? "–" : "+"}
-          </span>
+          <span className="menuLateral__materiaToggle">{open ? "–" : "+"}</span>
         </button>
 
         {open && (
@@ -372,41 +381,43 @@ useEffect(() => {
           )}
 
           {isAluno ? (
-  <div className="menuLateral__materias">
-    {disciplinasPrimarias.map(renderDisciplinaAluno)}
+            <div className="menuLateral__materias">
+              {disciplinasPrimarias.map(renderDisciplinaAluno)}
 
-    {!!disciplinasSecundarias.length && (
-      <div className="menuLateral__extensoes">
-        <button
-  type="button"
-  className={`menuLateral__extensoesToggle ${
-    mostrarSecundarias ? "is-open" : "is-closed"
-  }`}
-  onClick={() => setMostrarSecundarias((prev) => !prev)}
-  aria-label={
-    mostrarSecundarias
-      ? "Ocultar turmas secundárias"
-      : "Mostrar turmas secundárias"
-  }
->
-  <span className="menuLateral__extensoesText">Extensões acadêmica</span>
-  <span
-    className={`menuLateral__extensoesEye ${
-      mostrarSecundarias ? "is-open" : "is-closed"
-    }`}
-    aria-hidden="true"
-  />
-</button>
+              {!!disciplinasSecundarias.length && (
+                <div className="menuLateral__extensoes">
+                  <button
+                    type="button"
+                    className={`menuLateral__extensoesToggle ${
+                      mostrarSecundarias ? "is-open" : "is-closed"
+                    }`}
+                    onClick={() => setMostrarSecundarias((prev) => !prev)}
+                    aria-label={
+                      mostrarSecundarias
+                        ? "Ocultar turmas secundárias"
+                        : "Mostrar turmas secundárias"
+                    }
+                  >
+                    <span className="menuLateral__extensoesText">
+                      Extensões acadêmica
+                    </span>
+                    <span
+                      className={`menuLateral__extensoesEye ${
+                        mostrarSecundarias ? "is-open" : "is-closed"
+                      }`}
+                      aria-hidden="true"
+                    />
+                  </button>
 
-        {mostrarSecundarias && (
-          <div className="menuLateral__extensoesList">
-            {disciplinasSecundarias.map(renderDisciplinaAluno)}
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-) : isCoordenador ? (
+                  {mostrarSecundarias && (
+                    <div className="menuLateral__extensoesList">
+                      {disciplinasSecundarias.map(renderDisciplinaAluno)}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : isCoordenador ? (
             <>
               <button
                 className={`menuLateral__btn ${isActive("/nova-turma") ? "active" : ""}`}

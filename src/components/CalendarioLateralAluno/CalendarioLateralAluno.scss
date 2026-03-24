@@ -1,0 +1,116 @@
+.calendario-aluno-lateral {
+  height: 100%;
+  background: #ffffff;
+  overflow-y: auto;
+}
+
+.calendario-aluno-lateral__group {
+  background: #ffffff;
+  border-bottom: 1px solid #e6ebf1;
+}
+
+.calendario-aluno-lateral__groupHeader {
+  width: 100%;
+  min-height: 29px;
+  padding: 13px 8px;
+  border: 0;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-align: left;
+  cursor: pointer;
+}
+
+.calendario-aluno-lateral__groupLabel {
+  font-size: 12px;
+  font-weight: 700;
+  color: #2f5173;
+  line-height: 1;
+}
+
+.calendario-aluno-lateral__chevron {
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #2f5173;
+  transition: transform 0.18s ease;
+  flex: 0 0 14px;
+
+  svg {
+    width: 12px;
+    height: 12px;
+    display: block;
+  }
+
+  &.is-open {
+    transform: rotate(180deg);
+  }
+}
+
+.calendario-aluno-lateral__list {
+  padding: 0 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: #ffffff;
+  border-top: 1px solid #e6ebf1;
+}
+
+.calendario-aluno-lateral__card {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  padding: 12px 0 10px;
+  box-shadow: none;
+  border-bottom: 1px solid #e6ebf1;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+}
+
+.calendario-aluno-lateral__title {
+  margin: 0 0 5px;
+  font-size: 12px;
+  line-height: 1.25;
+  color: #2f5173;
+  font-weight: 700;
+}
+
+.calendario-aluno-lateral__description {
+  margin: 0 0 7px;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #697586;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.calendario-aluno-lateral__tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  color: #b0b8c2;
+  line-height: 1;
+}
+
+.calendario-aluno-lateral__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--dot-color);
+  flex: 0 0 7px;
+}
+
+.calendario-aluno-lateral__empty {
+  padding: 12px 10px;
+  font-size: 11px;
+  color: #7b8794;
+  background: #ffffff;
+}

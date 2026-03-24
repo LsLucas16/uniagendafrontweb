@@ -89,10 +89,7 @@ function isBeforeMonth(a, b) {
 }
 
 function isSameMonth(a, b) {
-  return (
-    a.getFullYear() === b.getFullYear() &&
-    a.getMonth() === b.getMonth()
-  );
+  return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth();
 }
 
 export default function VerCalendario() {
@@ -152,7 +149,7 @@ export default function VerCalendario() {
     const prevMonth = new Date(
       mesAtual.getFullYear(),
       mesAtual.getMonth() - 1,
-      1
+      1,
     );
 
     if (isBeforeMonth(prevMonth, mesBase)) return;
@@ -223,22 +220,22 @@ export default function VerCalendario() {
             const eventosCount = eventosDoDia.length;
 
             const hoje = new Date();
-hoje.setHours(0, 0, 0, 0);
+            hoje.setHours(0, 0, 0, 0);
 
-const isPast = item.date < hoje;
+            const isPast = item.date < hoje;
 
-const isClickable = !isPast && eventosCount > 0;
+            const isClickable = !isPast && eventosCount > 0;
 
             const classes = [
-  "calendar-cell",
-  item.isCurrentMonth ? "is-current" : "is-outside",
-  isClickable ? "is-clickable" : "",
-  isPast ? "is-past" : "",
-  item.col === 0 ? "is-first-col" : "",
-  item.col === 6 ? "is-last-col" : "",
-  item.row === 0 ? "is-first-row" : "",
-  item.row === 5 ? "is-last-row" : "",
-]
+              "calendar-cell",
+              item.isCurrentMonth ? "is-current" : "is-outside",
+              isClickable ? "is-clickable" : "",
+              isPast ? "is-past" : "",
+              item.col === 0 ? "is-first-col" : "",
+              item.col === 6 ? "is-last-col" : "",
+              item.row === 0 ? "is-first-row" : "",
+              item.row === 5 ? "is-last-row" : "",
+            ]
               .filter(Boolean)
               .join(" ");
 

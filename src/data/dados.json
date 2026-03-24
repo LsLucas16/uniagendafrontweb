@@ -267,7 +267,7 @@
     "professorIds": [18791],
     "responsavelIds": [401, 501],
     "coordenadorIds": [301],
-    "alunoIds": [103, 104, 401, 501, 502, 503],
+    "alunoIds": [101, 103, 104, 401, 501, 502, 503],
     "criado_por": 301
   },
   {
@@ -349,10 +349,10 @@
     "titulo": "Prova web",
     "descricao": "Não se esqueçam da avaliação sobre derivadas e integrais. Finaliza hoje, a entrega deve ser feita pela plataforma.",
     "ultimaAtualizacao": "2026-03-18T10:30:00.000Z",
-    "dataEvento": "2026-03-20T00:00:00.000Z",
+    "dataEvento": "2026-03-25T00:00:00.000Z",
     "criadoPorId": 18791,
     "instituicaoId": 1,
-    "disciplinaIds": [1],
+    "disciplinaIds": [1, 7],
     "destino": "uma",
     "calendario": true,
     "destaque": true
@@ -378,7 +378,7 @@
     "dataEvento": "2026-03-21T00:00:00.000Z",
     "criadoPorId": 301,
     "instituicaoId": 1,
-    "disciplinaIds": [2, 4],
+    "disciplinaIds": [1, 2, 4],
     "destino": "varias",
     "calendario": true,
     "destaque": false
@@ -391,7 +391,7 @@
     "dataEvento": "2026-03-24T00:00:00.000Z",
     "criadoPorId": 302,
     "instituicaoId": 3,
-    "disciplinaIds": [10],
+    "disciplinaIds": [1, 10],
     "destino": "uma",
     "calendario": true,
     "destaque": true
@@ -404,7 +404,7 @@
     "dataEvento": "2026-03-22T00:00:00.000Z",
     "criadoPorId": 202,
     "instituicaoId": 3,
-    "disciplinaIds": [11],
+    "disciplinaIds": [1, 11],
     "destino": "uma",
     "calendario": false,
     "destaque": false
