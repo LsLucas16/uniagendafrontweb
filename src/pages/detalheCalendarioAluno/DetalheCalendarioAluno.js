@@ -7,21 +7,6 @@ const STORAGE_EVENTOS = "eventos_override";
 const STORAGE_DISCIPLINAS = "disciplinas_override";
 const STORAGE_USUARIO = "usuario";
 
-const MESES = [
-  "Janeiro",
-  "Fevereiro",
-  "Março",
-  "Abril",
-  "Maio",
-  "Junho",
-  "Julho",
-  "Agosto",
-  "Setembro",
-  "Outubro",
-  "Novembro",
-  "Dezembro",
-];
-
 const DIAS = [
   "Domingo",
   "Segunda-feira",
@@ -87,19 +72,30 @@ function toDateKey(date) {
 
 function formatHeaderDate(date) {
   return `${String(date.getDate()).padStart(2, "0")}/${String(
-    date.getMonth() + 1,
+    date.getMonth() + 1
   ).padStart(2, "0")} - ${DIAS[date.getDay()]}`;
 }
 
-function formatUpdate(value) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-
-  return date.toLocaleDateString("pt-BR", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+function BellIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M14 18a2 2 0 1 1-4 0"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M18 16H6c.8-.9 1.5-2.1 1.5-3.9V10a4.5 4.5 0 1 1 9 0v2.1c0 1.8.7 3 1.5 3.9Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
 }
 
 export default function DetalheCalendarioAluno() {
@@ -143,16 +139,16 @@ export default function DetalheCalendarioAluno() {
       disciplinasBase
         .filter(
           (disc) =>
-            Array.isArray(disc.alunoIds) && disc.alunoIds.includes(alunoId),
+            Array.isArray(disc.alunoIds) && disc.alunoIds.includes(alunoId)
         )
-        .map((disc) => Number(disc.id)),
+        .map((disc) => Number(disc.id))
     );
   }, [disciplinasBase, alunoId]);
 
   const dataSelecionada = useMemo(() => parseISODateOnly(data), [data]);
   const dateKey = useMemo(
     () => (dataSelecionada ? toDateKey(dataSelecionada) : ""),
-    [dataSelecionada],
+    [dataSelecionada]
   );
 
   const eventosDaData = useMemo(() => {
@@ -257,35 +253,15 @@ export default function DetalheCalendarioAluno() {
                   {evento.descricao}
                 </p>
 
-                {evento.disciplinasRelacionadas.length > 1 && (
-                  <div className="evento-card-aluno__tags">
-                    {evento.disciplinasRelacionadas.map((disciplina) => (
-                      <span
-                        key={disciplina.id}
-                        className="evento-card-aluno__tag"
-                        style={{
-                          borderColor: disciplina.cor || "#d9dee5",
-                          color: disciplina.cor || "#6b7280",
-                        }}
-                      >
-                        {disciplina.nome}
-                      </span>
-                    ))}
-                  </div>
-                )}
-
                 <div className="evento-card-aluno__footer">
                   <button type="button" className="evento-card-aluno__action">
                     ✓ Marcar como visto
                   </button>
 
                   <button type="button" className="evento-card-aluno__action">
-                    ⏲ Agendar lembrete
+                    <BellIcon />
+                    <span>Agendar lembrete</span>
                   </button>
-
-                  <span className="evento-card-aluno__updated">
-                    Atualizado em {formatUpdate(evento.ultimaAtualizacao)}
-                  </span>
                 </div>
               </article>
             ))
