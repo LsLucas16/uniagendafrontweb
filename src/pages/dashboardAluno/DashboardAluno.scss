@@ -24,20 +24,20 @@ $radius-card: 22px;
   border: 1px solid $card-border;
   border-radius: $radius-card;
   box-shadow: $card-shadow;
-  padding: 20px 20px 22px;
+  padding: 16px 16px 18px;
 }
 
 .ver-calendario-aluno__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 18px;
+  margin-bottom: 12px;
 }
 
 .ver-calendario-aluno__titleWrap {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .ver-calendario-aluno__title {
@@ -89,8 +89,8 @@ $radius-card: 22px;
   }
 
   img {
-    width: 12px;
-    height: 12px;
+    width: 20px;
+    height: 20px;
     display: block;
   }
 }
@@ -112,7 +112,7 @@ $radius-card: 22px;
 .ver-calendario-aluno__weekdays {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .ver-calendario-aluno__weekday {
@@ -120,7 +120,7 @@ $radius-card: 22px;
   font-size: 11px;
   font-weight: 600;
   color: $weekday-color;
-  padding: 8px 0 10px;
+  padding: 6px 0 8px;
 }
 
 .ver-calendario-aluno__grid {
@@ -130,12 +130,12 @@ $radius-card: 22px;
 
 .ver-calendario-aluno__cell {
   position: relative;
-  min-height: 92px;
+  min-height: 72px;
   border: none;
   border-top: 1px solid $grid-line;
   border-right: 1px solid $grid-line;
   background: #ffffff;
-  padding: 12px 10px 10px;
+  padding: 10px 8px 8px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -191,19 +191,19 @@ $radius-card: 22px;
   align-items: center;
   gap: 4px;
   margin-top: auto;
-  padding-top: 14px;
+  padding-top: 10px;
   flex-wrap: nowrap;
 }
 
 .ver-calendario-aluno__dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  flex: 0 0 10px;
+  flex: 0 0 9px;
 }
 
 .ver-calendario-aluno__more {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #6b7280;
   line-height: 1;
