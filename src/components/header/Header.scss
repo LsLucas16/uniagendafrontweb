@@ -3,7 +3,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px;
+  padding: 21px 40px;
   background-color: #ffffff;
   border-bottom: 1.5px solid #e0e0e0;
   box-sizing: border-box;
@@ -34,7 +34,7 @@
 
   /* 👇 VARIAÇÃO ALUNO (IMPORTANTE) */
   &.is-aluno {
-    padding: 8px 16px;            // 🔥 reduz altura
+    padding: 21px 16px;            // 🔥 reduz altura
     border-bottom: 1px solid #e6ebf1;
 
     .left-content {
@@ -50,7 +50,7 @@
 
     .right-content {
       .data-text {
-        font-size: 14px;          
+        font-size: 16px;          
         color: #8a94a6;
       }
     }

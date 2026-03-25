@@ -294,7 +294,7 @@
     }
   }
 
-  /* ALUNO */
+  
   &__materias {
     display: flex;
     flex-direction: column;
@@ -464,25 +464,24 @@
   display: none !important;
 }
 
-/* exemplo em MenuLateral.scss ou arquivo de estilo equivalente */
 .menuLateral__btn--back {
   display: flex;
   align-items: center;
-  gap: 8px; /* espaço entre ícone e texto */
-  color: #e34d5c; /* cor coral/rosa do texto e ícone; ajuste conforme o token do Figma */
-  background: none; /* transparente, sem fundo colorido */
-  border: none; /* sem borda */
-  padding: 8px 0; /* apenas um pouco de espaço vertical */
-  font-size: 14px; /* ajuste para o tamanho usado no Figma */
-  font-weight: 500; /* ou o peso definido no design */
-  line-height: 1.2; /* evitar que o texto fique muito alto */
+  gap: 8px; 
+  color: #e34d5c; 
+  background: none; 
+  border: none; 
+  padding: 8px 0; 
+  font-size: 14px; 
+  font-weight: 500; 
+  line-height: 1.2; 
   cursor: pointer;
-  transition: color 0.2s; /* leve transição no hover */
+  transition: color 0.2s; 
 }
 
 .menuLateral__btn--back:hover,
 .menuLateral__btn--back:focus {
-  color: #c43d4c; /* tom ligeiramente mais escuro no hover; ajuste conforme design */
+  color: #c43d4c; 
 }
 
 .menuLateral__btn--back svg {
