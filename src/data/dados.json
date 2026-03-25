@@ -251,6 +251,10 @@
     "nome": "Calculo I - Turma 8",
     "tipo": "primaria",
     "cor": "#3B82F6",
+    "coresPorUsuario": {
+      "101": "#FF6B6B",
+      "501": "#0EA5E9"
+    },
     "instituicaoId": 1,
     "professorIds": [18791, 201],
     "responsavelIds": [401, 501, 502, 503],
@@ -263,6 +267,9 @@
     "nome": "Matemática Básica - Turma 1",
     "tipo": "primaria",
     "cor": "#22C55E",
+    "coresPorUsuario": {
+      "101": "#F97316"
+    },
     "instituicaoId": 1,
     "professorIds": [18791],
     "responsavelIds": [401, 501],
@@ -275,6 +282,10 @@
     "nome": "Introdução aos Modelos Matemáticos",
     "tipo": "secundaria",
     "cor": "#A855F7",
+    "coresPorUsuario": {
+      "101": "#06B6D4",
+      "501": "#F43F5E"
+    },
     "instituicaoId": 1,
     "professorIds": [18791, 201],
     "responsavelIds": [401],
@@ -287,6 +298,7 @@
     "nome": "Monitoria do Curso de Matemática e Exatas",
     "tipo": "secundaria",
     "cor": "#F59E0B",
+    "coresPorUsuario": {},
     "instituicaoId": 1,
     "professorIds": [18791],
     "responsavelIds": [401, 501],
@@ -299,6 +311,9 @@
     "nome": "Álgebra Linear I - Turma 2",
     "tipo": "primaria",
     "cor": "#EF4444",
+    "coresPorUsuario": {
+      "103": "#10B981"
+    },
     "instituicaoId": 1,
     "professorIds": [201],
     "responsavelIds": [401, 503],
@@ -311,6 +326,7 @@
     "nome": "Geometria Analítica - Turma 3",
     "tipo": "primaria",
     "cor": "#14B8A6",
+    "coresPorUsuario": {},
     "instituicaoId": 1,
     "professorIds": [18791, 201],
     "responsavelIds": [501, 502],
@@ -323,6 +339,9 @@
     "nome": "Estatística Aplicada - Turma 1",
     "tipo": "primaria",
     "cor": "#8B5CF6",
+    "coresPorUsuario": {
+      "101": "#EAB308"
+    },
     "instituicaoId": 1,
     "professorIds": [18791],
     "responsavelIds": [401, 501, 503],
@@ -335,6 +354,7 @@
     "nome": "Lógica Matemática - Turma 4",
     "tipo": "primaria",
     "cor": "#84CC16",
+    "coresPorUsuario": {},
     "instituicaoId": 1,
     "professorIds": [201],
     "responsavelIds": [401, 502],

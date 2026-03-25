@@ -26,6 +26,8 @@ const MenuLateral = () => {
 
   const [perfilAberto, setPerfilAberto] = useState(false);
   const [disciplinaAbertaId, setDisciplinaAbertaId] = useState(null);
+  const [paletaAbertaId, setPaletaAbertaId] = useState(null);
+  const [corTemporaria, setCorTemporaria] = useState("#76A8D9");
   const [dataVersion, setDataVersion] = useState(0);
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(
     () => localStorage.getItem("disciplinaAtualId") || "",
@@ -73,10 +75,7 @@ const MenuLateral = () => {
 
     return () => {
       window.removeEventListener("app:data-changed", bump);
-      window.removeEventListener(
-        "disciplinaAtual:changed",
-        syncDisciplinaAtual,
-      );
+      window.removeEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -123,10 +122,20 @@ const MenuLateral = () => {
     return [];
   };
 
+  const tipoUsuario = String(user?.tipo || "").toLowerCase();
+
+  const rotaComMenuAluno =
+    location.pathname === "/dashboard" ||
+    location.pathname.startsWith("/detalhe-calendario-aluno");
+
+  const usarFluxoAluno =
+    tipoUsuario === "aluno" ||
+    (tipoUsuario === "responsavel" && rotaComMenuAluno);
+
   const disciplinasDoUsuario = useMemo(() => {
     if (!user) return [];
 
-    if (user.tipo !== "aluno") {
+    if (!usarFluxoAluno) {
       const disciplinas = getDisciplinasPermitidas(user) || [];
 
       return [...disciplinas].sort((a, b) =>
@@ -172,7 +181,7 @@ const MenuLateral = () => {
     return disciplinasFiltradas.sort((a, b) =>
       String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"),
     );
-  }, [user, dataVersion]);
+  }, [user, usarFluxoAluno, dataVersion]);
 
   useEffect(() => {
     if (!disciplinasDoUsuario.length) {
@@ -201,18 +210,10 @@ const MenuLateral = () => {
     .charAt(0)
     .toUpperCase();
 
-  const tipoUsuario = String(user?.tipo || "").toLowerCase();
-
-  const rotaComMenuAluno =
-    location.pathname === "/dashboard" ||
-    location.pathname.startsWith("/detalhe-calendario-aluno");
-
-  const isAluno =
-    tipoUsuario === "aluno" ||
-    (tipoUsuario === "responsavel" && rotaComMenuAluno);
-
+  const isAluno = usarFluxoAluno;
   const isCoordenador = tipoUsuario === "coordenador";
   const isResponsavel = tipoUsuario === "responsavel";
+  const mostrarBotaoVoltarInicio = isResponsavel && !isAluno;
 
   const handleLogout = (e) => {
     e.stopPropagation();
@@ -234,6 +235,93 @@ const MenuLateral = () => {
       .replace(/^Monitoria do Curso de\s+/i, "Monitoria ")
       .replace(/^Introdução aos?\s+/i, "")
       .trim();
+  };
+
+  const getCorDisciplinaUsuario = (disc) => {
+    const usuarioId = String(user?.id || "");
+    return disc?.coresPorUsuario?.[usuarioId] || disc?.cor || "#76A8D9";
+  };
+
+  const salvarCorDisciplinaUsuario = (disciplinaId, novaCor) => {
+    const usuarioId = String(user?.id || "");
+
+    const baseDisciplinas = Array.isArray(dados?.disciplinas)
+      ? dados.disciplinas
+      : [];
+
+    const turmasOverride = safeJsonParse(
+      localStorage.getItem("turmas_override"),
+      [],
+    );
+
+    const mapa = new Map();
+
+    baseDisciplinas.forEach((disc) => {
+      mapa.set(Number(disc.id), { ...disc });
+    });
+
+    if (Array.isArray(turmasOverride)) {
+      turmasOverride.forEach((disc) => {
+        mapa.set(Number(disc.id), { ...disc });
+      });
+    }
+
+    const disciplinasAtualizadas = Array.from(mapa.values()).map((disc) => {
+      if (Number(disc.id) !== Number(disciplinaId)) return disc;
+
+      return {
+        ...disc,
+        coresPorUsuario: {
+          ...(disc.coresPorUsuario || {}),
+          [usuarioId]: novaCor,
+        },
+      };
+    });
+
+    localStorage.setItem("turmas_override", JSON.stringify(disciplinasAtualizadas));
+    setDataVersion((v) => v + 1);
+    window.dispatchEvent(new Event("app:data-changed"));
+  };
+
+  const resetarCorDisciplinaUsuario = (disciplinaId) => {
+    const usuarioId = String(user?.id || "");
+
+    const baseDisciplinas = Array.isArray(dados?.disciplinas)
+      ? dados.disciplinas
+      : [];
+
+    const turmasOverride = safeJsonParse(
+      localStorage.getItem("turmas_override"),
+      [],
+    );
+
+    const mapa = new Map();
+
+    baseDisciplinas.forEach((disc) => {
+      mapa.set(Number(disc.id), { ...disc });
+    });
+
+    if (Array.isArray(turmasOverride)) {
+      turmasOverride.forEach((disc) => {
+        mapa.set(Number(disc.id), { ...disc });
+      });
+    }
+
+    const disciplinasAtualizadas = Array.from(mapa.values()).map((disc) => {
+      if (Number(disc.id) !== Number(disciplinaId)) return disc;
+
+      const proximasCores = { ...(disc.coresPorUsuario || {}) };
+      delete proximasCores[usuarioId];
+
+      return {
+        ...disc,
+        coresPorUsuario: proximasCores,
+      };
+    });
+
+    localStorage.setItem("turmas_override", JSON.stringify(disciplinasAtualizadas));
+    setDataVersion((v) => v + 1);
+    window.dispatchEvent(new Event("app:data-changed"));
   };
 
   const disciplinasPrimarias = isAluno
@@ -262,25 +350,99 @@ const MenuLateral = () => {
 
   const renderDisciplinaAluno = (disc) => {
     const open = disciplinaAbertaId === disc.id;
+    const paletaAberta = paletaAbertaId === disc.id;
     const professorPrincipal = getProfessorPrincipal(disc);
+    const corAtual = getCorDisciplinaUsuario(disc);
 
     return (
       <div
         key={disc.id}
         className={`menuLateral__materiaWrap ${open ? "open" : ""}`}
+        style={{ "--discColor": corAtual }}
       >
-        <button
-          type="button"
-          className={`menuLateral__materiaItem ${open ? "open" : ""}`}
-          onClick={() => setDisciplinaAbertaId(open ? null : disc.id)}
-          style={{ "--discColor": disc.cor || "#76A8D9" }}
-        >
-          <span className="menuLateral__dot" />
-          <span className="menuLateral__materiaTitle">
-            {getTituloCurto(disc.nome)}
-          </span>
-          <span className="menuLateral__materiaToggle">{open ? "–" : "+"}</span>
-        </button>
+        <div className={`menuLateral__materiaItem ${open ? "open" : ""}`}>
+          <button
+            type="button"
+            className="menuLateral__dotBtn"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPaletaAbertaId((prev) => {
+                const vaiAbrir = prev !== disc.id;
+                if (vaiAbrir) {
+                  setCorTemporaria(corAtual);
+                }
+                return vaiAbrir ? disc.id : null;
+              });
+            }}
+            aria-label="Alterar cor da turma"
+            title="Alterar cor da turma"
+          >
+            <span className="menuLateral__dot" />
+          </button>
+
+          <button
+            type="button"
+            className="menuLateral__materiaMain"
+            onClick={() => setDisciplinaAbertaId(open ? null : disc.id)}
+          >
+            <span className="menuLateral__materiaTitle">
+              {getTituloCurto(disc.nome)}
+            </span>
+            <span className="menuLateral__materiaToggle">{open ? "–" : "+"}</span>
+          </button>
+        </div>
+
+        {paletaAberta && (
+          <div
+            className="menuLateral__colorPopover"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="menuLateral__colorHeader">Selecionar cor</div>
+
+            <div className="menuLateral__colorBody">
+              <input
+                type="color"
+                className="menuLateral__colorInput"
+                value={corTemporaria}
+                onChange={(e) => setCorTemporaria(e.target.value)}
+              />
+
+              <div className="menuLateral__colorPreviewWrap">
+                <span
+                  className="menuLateral__colorPreview"
+                  style={{ backgroundColor: corTemporaria }}
+                />
+                <span className="menuLateral__colorHex">
+                  {String(corTemporaria || "").toUpperCase()}
+                </span>
+              </div>
+            </div>
+
+            <div className="menuLateral__colorActions">
+              <button
+                type="button"
+                className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
+                onClick={() => {
+                  resetarCorDisciplinaUsuario(disc.id);
+                  setPaletaAbertaId(null);
+                }}
+              >
+                Resetar
+              </button>
+
+              <button
+                type="button"
+                className="menuLateral__colorBtn menuLateral__colorBtn--primary"
+                onClick={() => {
+                  salvarCorDisciplinaUsuario(disc.id, corTemporaria);
+                  setPaletaAbertaId(null);
+                }}
+              >
+                Aplicar
+              </button>
+            </div>
+          </div>
+        )}
 
         {open && (
           <div className="menuLateral__materiaDetails">
@@ -471,7 +633,7 @@ const MenuLateral = () => {
                 <span>Ver Calendário</span>
               </button>
             </>
-                    ) : (
+          ) : (
             <>
               <button
                 className={`menuLateral__btn ${isActive("/criar-evento") ? "active" : ""}`}
@@ -497,7 +659,7 @@ const MenuLateral = () => {
                 <span>Editar Turma</span>
               </button>
 
-              {isResponsavel && !isAluno && (
+              {mostrarBotaoVoltarInicio && (
                 <button
                   className="menuLateral__btn menuLateral__btn--back"
                   onClick={() => navigate("/dashboard")}

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import dados from "../../data/dados.json";
 import "./CalendarioLateralAluno.scss";
 
@@ -10,8 +10,8 @@ const STORAGE_EVENTOS_KEYS = [
 ];
 
 const STORAGE_DISCIPLINAS_KEYS = [
-  "disciplinas_override",
   "turmas_override",
+  "disciplinas_override",
   "disciplinas",
   "turmas",
 ];
@@ -103,7 +103,13 @@ function getMergedDisciplinas() {
   const storageList = readFirstStorageArray(STORAGE_DISCIPLINAS_KEYS);
 
   const map = new Map();
-  [...jsonList, ...storageList].forEach((item) => {
+
+  jsonList.forEach((item) => {
+    if (!item || item.id == null) return;
+    map.set(Number(item.id), item);
+  });
+
+  storageList.forEach((item) => {
     if (!item || item.id == null) return;
     map.set(Number(item.id), item);
   });
@@ -116,7 +122,13 @@ function getMergedEventos() {
   const storageList = readFirstStorageArray(STORAGE_EVENTOS_KEYS);
 
   const map = new Map();
-  [...jsonList, ...storageList].forEach((item) => {
+
+  jsonList.forEach((item) => {
+    if (!item || item.id == null) return;
+    map.set(Number(item.id), item);
+  });
+
+  storageList.forEach((item) => {
     if (!item || item.id == null) return;
     map.set(Number(item.id), item);
   });
@@ -204,14 +216,52 @@ function clampDescription(text, max = 58) {
   return `${value.slice(0, max).trim()}...`;
 }
 
+function getCorDisciplinaParaUsuario(disciplina, usuarioId) {
+  const userId = String(usuarioId || "");
+  return (
+    disciplina?.coresPorUsuario?.[userId] ||
+    disciplina?.cor ||
+    "#E4B84C"
+  );
+}
+
 export default function CalendarioAlunoLateral() {
+  const [dataVersion, setDataVersion] = useState(0);
   const today = startOfToday();
-  const usuarioLogado = readLoggedUser();
+
+  useEffect(() => {
+    const bump = () => setDataVersion((v) => v + 1);
+
+    const onStorage = (e) => {
+      if (!e.key) {
+        bump();
+        return;
+      }
+
+      if (
+        STORAGE_DISCIPLINAS_KEYS.includes(e.key) ||
+        STORAGE_EVENTOS_KEYS.includes(e.key) ||
+        STORAGE_USUARIO_KEYS.includes(e.key)
+      ) {
+        bump();
+      }
+    };
+
+    window.addEventListener("app:data-changed", bump);
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("app:data-changed", bump);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  const usuarioLogado = useMemo(() => readLoggedUser(), [dataVersion]);
   const tipoUsuario = String(usuarioLogado?.tipo || "").toLowerCase();
   const isAluno = tipoUsuario === "aluno" || tipoUsuario === "responsavel";
 
-  const disciplinas = useMemo(() => getMergedDisciplinas(), []);
-  const eventos = useMemo(() => getMergedEventos(), []);
+  const disciplinas = useMemo(() => getMergedDisciplinas(), [dataVersion]);
+  const eventos = useMemo(() => getMergedEventos(), [dataVersion]);
 
   const alunoId = useMemo(() => {
     if (!isAluno) return null;
@@ -278,22 +328,25 @@ export default function CalendarioAlunoLateral() {
         return {
           ...evento,
           disciplinaNome: disciplina?.nome || "Sem disciplina",
-          disciplinaCor: disciplina?.cor || "#E4B84C",
+          disciplinaCor: getCorDisciplinaParaUsuario(disciplina, alunoId),
         };
       }),
     }));
-  }, [eventosDoAluno, today, disciplinasMap, disciplinaIdsDoAluno]);
+  }, [eventosDoAluno, today, disciplinasMap, disciplinaIdsDoAluno, alunoId]);
 
   const firstOpenKey = grupos[0]?.key || null;
   const [openKey, setOpenKey] = useState(firstOpenKey);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!grupos.length) {
       setOpenKey(null);
       return;
     }
 
-    if (openKey === null) return;
+    if (openKey === null) {
+      setOpenKey(grupos[0].key);
+      return;
+    }
 
     const stillExists = grupos.some((grupo) => grupo.key === openKey);
     if (!stillExists) {

@@ -1,11 +1,11 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import dados from "../../data/dados.json";
 import "./DashboardAluno.scss";
 import chevronIcon from "../../assets/ic_chevron.svg";
 
 const STORAGE_EVENTOS = "eventos_override";
-const STORAGE_DISCIPLINAS = "disciplinas_override";
+const STORAGE_TURMAS = "turmas_override";
 const STORAGE_USUARIO = "usuario";
 
 const MESES = [
@@ -100,9 +100,44 @@ function isPastDay(date) {
   return date < today;
 }
 
+function getCorDisciplinaParaUsuario(disciplina, usuarioId) {
+  const userId = String(usuarioId || "");
+  return disciplina?.coresPorUsuario?.[userId] || disciplina?.cor || "#76A9DA";
+}
+
 export default function DashboardAluno() {
   const navigate = useNavigate();
-  const usuarioLogado = getUsuarioLogado();
+
+  const [dataVersion, setDataVersion] = useState(0);
+
+  useEffect(() => {
+    const bump = () => setDataVersion((v) => v + 1);
+
+    const onStorage = (e) => {
+      if (!e.key) {
+        bump();
+        return;
+      }
+
+      if (
+        e.key === STORAGE_TURMAS ||
+        e.key === STORAGE_EVENTOS ||
+        e.key === STORAGE_USUARIO
+      ) {
+        bump();
+      }
+    };
+
+    window.addEventListener("app:data-changed", bump);
+    window.addEventListener("storage", onStorage);
+
+    return () => {
+      window.removeEventListener("app:data-changed", bump);
+      window.removeEventListener("storage", onStorage);
+    };
+  }, []);
+
+  const usuarioLogado = useMemo(() => getUsuarioLogado(), [dataVersion]);
 
   const tipoUsuario = String(usuarioLogado?.tipo || "").toLowerCase();
   const isResponsavel = tipoUsuario === "responsavel";
@@ -114,13 +149,33 @@ export default function DashboardAluno() {
     : [];
   const eventosJson = Array.isArray(dados?.eventos) ? dados.eventos : [];
 
-  const disciplinasStorage = getStorageArray(STORAGE_DISCIPLINAS, []);
-  const eventosStorage = getStorageArray(STORAGE_EVENTOS, []);
+  const turmasOverride = useMemo(
+    () => getStorageArray(STORAGE_TURMAS, []),
+    [dataVersion],
+  );
 
-  const disciplinasBase = disciplinasStorage.length
-    ? disciplinasStorage
-    : disciplinasJson;
-  const eventosBase = eventosStorage.length ? eventosStorage : eventosJson;
+  const eventosStorage = useMemo(
+    () => getStorageArray(STORAGE_EVENTOS, []),
+    [dataVersion],
+  );
+
+  const disciplinasBase = useMemo(() => {
+    const mapa = new Map();
+
+    disciplinasJson.forEach((disc) => {
+      mapa.set(Number(disc.id), disc);
+    });
+
+    turmasOverride.forEach((disc) => {
+      mapa.set(Number(disc.id), disc);
+    });
+
+    return Array.from(mapa.values());
+  }, [disciplinasJson, turmasOverride]);
+
+  const eventosBase = useMemo(() => {
+    return eventosStorage.length ? eventosStorage : eventosJson;
+  }, [eventosStorage, eventosJson]);
 
   const hoje = new Date();
   const primeiroDiaMesAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -138,10 +193,12 @@ export default function DashboardAluno() {
   const disciplinaIdsDoAluno = useMemo(() => {
     return new Set(
       disciplinasBase
-        .filter(
-          (disc) =>
-            Array.isArray(disc.alunoIds) && disc.alunoIds.includes(alunoId),
-        )
+        .filter((disc) => {
+          const alunoIds = Array.isArray(disc.alunoIds)
+            ? disc.alunoIds.map(Number)
+            : [];
+          return alunoIds.includes(alunoId);
+        })
         .map((disc) => Number(disc.id)),
     );
   }, [disciplinasBase, alunoId]);
@@ -194,7 +251,7 @@ export default function DashboardAluno() {
         ) {
           current.dots.push({
             disciplinaId: disciplinaIdNum,
-            cor: disciplina.cor || "#76A9DA",
+            cor: getCorDisciplinaParaUsuario(disciplina, alunoId),
             nome: disciplina.nome,
           });
         }
@@ -202,7 +259,7 @@ export default function DashboardAluno() {
     });
 
     return map;
-  }, [eventosDoAluno, disciplinaIdsDoAluno, disciplinaMap]);
+  }, [eventosDoAluno, disciplinaIdsDoAluno, disciplinaMap, alunoId]);
 
   const dias = useMemo(() => {
     const start = getCalendarStart(mesAtual);
@@ -242,6 +299,7 @@ export default function DashboardAluno() {
           >
             <img src={chevronIcon} alt="" className="mes_anterior" />
           </button>
+
           <h1 className="ver-calendario-aluno__title">
             {MESES[mesAtual.getMonth()]} {mesAtual.getFullYear()}
           </h1>
