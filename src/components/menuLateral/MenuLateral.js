@@ -8,6 +8,7 @@ import {
   LogOut,
   Plus,
   Calendar,
+  ArrowLeft,
 } from "lucide-react";
 
 import {
@@ -199,8 +200,19 @@ const MenuLateral = () => {
     .trim()
     .charAt(0)
     .toUpperCase();
-  const isAluno = user.tipo === "aluno";
-  const isCoordenador = user.tipo === "coordenador";
+
+  const tipoUsuario = String(user?.tipo || "").toLowerCase();
+
+  const rotaComMenuAluno =
+    location.pathname === "/dashboard" ||
+    location.pathname.startsWith("/detalhe-calendario-aluno");
+
+  const isAluno =
+    tipoUsuario === "aluno" ||
+    (tipoUsuario === "responsavel" && rotaComMenuAluno);
+
+  const isCoordenador = tipoUsuario === "coordenador";
+  const isResponsavel = tipoUsuario === "responsavel";
 
   const handleLogout = (e) => {
     e.stopPropagation();
@@ -459,7 +471,7 @@ const MenuLateral = () => {
                 <span>Ver Calendário</span>
               </button>
             </>
-          ) : (
+                    ) : (
             <>
               <button
                 className={`menuLateral__btn ${isActive("/criar-evento") ? "active" : ""}`}
@@ -484,6 +496,16 @@ const MenuLateral = () => {
                 <Settings size={20} />
                 <span>Editar Turma</span>
               </button>
+
+              {isResponsavel && !isAluno && (
+                <button
+                  className="menuLateral__btn menuLateral__btn--back"
+                  onClick={() => navigate("/dashboard")}
+                >
+                  <ArrowLeft size={20} />
+                  <span>Voltar para a página inicial</span>
+                </button>
+              )}
             </>
           )}
         </div>

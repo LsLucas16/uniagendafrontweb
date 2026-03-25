@@ -15,15 +15,25 @@ function getUsuario() {
 export default function Layout() {
   const location = useLocation();
   const usuario = getUsuario();
-  const isAluno = String(usuario?.tipo || "").toLowerCase() === "aluno";
+
+  const tipoUsuario = String(usuario?.tipo || "").toLowerCase();
+
+  const usuarioPodeUsarVisaoAluno =
+    tipoUsuario === "aluno" || tipoUsuario === "responsavel";
+
+  const rotaComVisaoAluno =
+    location.pathname === "/dashboard" ||
+    location.pathname.startsWith("/detalhe-calendario-aluno");
+
+  const usarLayoutAluno = usuarioPodeUsarVisaoAluno && rotaComVisaoAluno;
 
   return (
     <div className="app-layout">
       <MenuLateral />
 
-      <div className={`app-layout__main ${isAluno ? "is-aluno" : ""}`}>
+      <div className={`app-layout__main ${usarLayoutAluno ? "is-aluno" : ""}`}>
         <div className="app-layout__center">
-          <Header isAluno={isAluno} />
+          <Header isAluno={usarLayoutAluno} />
 
           <div className="app-layout__body">
             <main key={location.pathname} className="app-layout__content">
@@ -32,7 +42,7 @@ export default function Layout() {
           </div>
         </div>
 
-        {isAluno && (
+        {usarLayoutAluno && (
           <aside className="app-layout__right">
             <CalendarioAlunoLateral />
           </aside>

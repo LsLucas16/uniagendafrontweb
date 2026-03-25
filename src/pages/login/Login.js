@@ -12,8 +12,8 @@ import sombra from "../../assets/sombra.webp";
 export const Login = () => {
   const navigate = useNavigate();
 
-  const [loginDigitado, setLoginDigitado]     = useState("");
-  const [senhaDigitada, setSenhaDigitada]     = useState("");
+  const [loginDigitado, setLoginDigitado] = useState("");
+  const [senhaDigitada, setSenhaDigitada] = useState("");
   const [idInstSelecionada, setIdInstSelecionada] = useState("");
 
   const handleLogin = (e) => {
@@ -21,42 +21,46 @@ export const Login = () => {
 
     const usuarioAuth = dados.usuarios.find(
       (u) =>
-        u.user       === loginDigitado &&
-        u.senha      === senhaDigitada &&
-        u.faculdadeId === parseInt(idInstSelecionada),
+        u.user === loginDigitado &&
+        u.senha === senhaDigitada &&
+        u.faculdadeId === Number(idInstSelecionada)
     );
 
     if (usuarioAuth) {
       Swal.fire({
-        icon              : "success",
-        title             : "Acesso autorizado",
-        text              : `Bem-vindo, ${usuarioAuth.nome}.`,
-        showConfirmButton : false,
-        timer             : 1500,
+        icon: "success",
+        title: "Acesso autorizado",
+        text: `Bem-vindo, ${usuarioAuth.nome}.`,
+        showConfirmButton: false,
+        timer: 1500,
       }).then(() => {
+        const tipoNormalizado = String(usuarioAuth.tipo || "").toLowerCase();
+
         localStorage.setItem("token", "ok");
         localStorage.setItem(
           "usuario",
           JSON.stringify({
-            id         : usuarioAuth.id,
-            nome       : usuarioAuth.nome,
-            tipo       : usuarioAuth.tipo,
+            id: usuarioAuth.id,
+            nome: usuarioAuth.nome,
+            tipo: usuarioAuth.tipo,
             faculdadeId: usuarioAuth.faculdadeId,
-          }),
+          })
         );
 
-        const ehResponsavel = ["coordenador", "professor", "responsavel"].includes(
-          usuarioAuth.tipo.toLowerCase(),
-        );
+        const vaiParaCriarEvento =
+          tipoNormalizado === "coordenador" ||
+          tipoNormalizado === "professor";
 
-        navigate(ehResponsavel ? "/criar-evento" : "/dashboard", { replace: true });
+        navigate(vaiParaCriarEvento ? "/criar-evento" : "/dashboard", {
+          replace: true,
+        });
       });
     } else {
       Swal.fire({
-        title             : "Não foi possível acessar",
-        text              : "Verifique se a unidade selecionada está correta e se as credenciais estão válidas.",
-        icon              : "error",
-        confirmButtonText : "Entendido",
+        title: "Não foi possível acessar",
+        text: "Verifique se a unidade selecionada está correta e se as credenciais estão válidas.",
+        icon: "error",
+        confirmButtonText: "Entendido",
         confirmButtonColor: "#170645",
       });
     }
@@ -82,6 +86,7 @@ export const Login = () => {
               <select
                 className="institution-select"
                 required
+                value={idInstSelecionada}
                 onChange={(e) => setIdInstSelecionada(e.target.value)}
               >
                 <option value="">Selecione sua instituição</option>
@@ -121,10 +126,10 @@ export const Login = () => {
                 className="forgot-link"
                 onClick={() =>
                   Swal.fire({
-                    title             : "Suporte",
-                    text              : "Entre em contato com a secretaria/suporte da sua instituição para recuperar o acesso.",
-                    icon              : "info",
-                    confirmButtonText : "Entendido",
+                    title: "Suporte",
+                    text: "Entre em contato com a secretaria/suporte da sua instituição para recuperar o acesso.",
+                    icon: "info",
+                    confirmButtonText: "Entendido",
                     confirmButtonColor: "#2E4A67",
                   })
                 }
@@ -136,6 +141,7 @@ export const Login = () => {
             <button type="submit" className="btn-login">
               Entrar
             </button>
+
             <div className="bottom-lines" />
           </form>
         </section>

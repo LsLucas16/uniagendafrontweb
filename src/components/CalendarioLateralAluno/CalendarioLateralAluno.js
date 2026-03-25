@@ -207,7 +207,8 @@ function clampDescription(text, max = 58) {
 export default function CalendarioAlunoLateral() {
   const today = startOfToday();
   const usuarioLogado = readLoggedUser();
-  const isAluno = normalizeText(usuarioLogado?.tipo) === "aluno";
+  const tipoUsuario = String(usuarioLogado?.tipo || "").toLowerCase();
+  const isAluno = tipoUsuario === "aluno" || tipoUsuario === "responsavel";
 
   const disciplinas = useMemo(() => getMergedDisciplinas(), []);
   const eventos = useMemo(() => getMergedEventos(), []);
