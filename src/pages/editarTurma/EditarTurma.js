@@ -24,12 +24,36 @@ function safeJsonParse(v, fallback) {
 }
 
 function getTurmasOverride() {
-  return safeJsonParse(localStorage.getItem(STORAGE_TURMAS), {});
+  const raw = safeJsonParse(localStorage.getItem(STORAGE_TURMAS), []);
+
+  if (Array.isArray(raw)) return raw;
+  if (raw && typeof raw === "object") return Object.values(raw);
+
+  return [];
 }
 
-function setTurmasOverride(map) {
-  localStorage.setItem(STORAGE_TURMAS, JSON.stringify(map));
+function setTurmasOverride(items) {
+  localStorage.setItem(STORAGE_TURMAS, JSON.stringify(items));
   window.dispatchEvent(new Event("turmas:changed"));
+  window.dispatchEvent(new Event("app:data-changed"));
+}
+
+function getTurmaOverrideById(turmaId) {
+  const lista = getTurmasOverride();
+  return lista.find((item) => Number(item?.id) === Number(turmaId)) || null;
+}
+
+function upsertTurmaOverride(turmaId, partial) {
+  const lista = getTurmasOverride();
+  const index = lista.findIndex((item) => Number(item?.id) === Number(turmaId));
+
+  if (index >= 0) {
+    lista[index] = { ...lista[index], ...partial, id: Number(turmaId) };
+  } else {
+    lista.push({ id: Number(turmaId), ...partial });
+  }
+
+  setTurmasOverride(lista);
 }
 
 function getTurmaAlunosOverride() {
@@ -88,7 +112,7 @@ export default function EditarTurma() {
   const searchWrapRef = useRef(null);
 
   const navigate = useNavigate();
-  const { id: routeTurmaId } = useParams();
+  const { turmaId: routeTurmaId } = useParams();
 
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(
@@ -195,13 +219,12 @@ export default function EditarTurma() {
   const disciplinaBase = useMemo(() => {
     if (!turmaId) return null;
 
-    const base =
-      baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null;
+    const override = getTurmaOverrideById(turmaId);
+    if (override) return override;
 
-    if (base) return base;
-
-    const overrideMap = getTurmasOverride();
-    return overrideMap[String(turmaId)] || null;
+    return (
+      baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null
+    );
   }, [baseDisciplinas, turmaId]);
 
   useEffect(() => {
@@ -212,8 +235,7 @@ export default function EditarTurma() {
       return;
     }
 
-    const turmasOverride = getTurmasOverride();
-    const turmaOverride = turmasOverride[String(turmaId)];
+    const turmaOverride = getTurmaOverrideById(turmaId);
 
     if (
       turmaOverride &&
@@ -225,12 +247,10 @@ export default function EditarTurma() {
         turmaOverride.complementoCustom,
       );
 
-      turmasOverride[String(turmaId)] = {
+      upsertTurmaOverride(turmaId, {
         ...turmaOverride,
         nome: nomeCompleto,
-      };
-
-      setTurmasOverride(turmasOverride);
+      });
     }
 
     const disciplinaMerged = {
@@ -396,18 +416,19 @@ export default function EditarTurma() {
     setLoading(false);
   }, [turmaId, disciplinaBase, baseUsuarios]);
 
-  const alunosDetalhes = useMemo(() => {
-    const mapUsuarios = new Map(baseUsuarios.map((u) => [Number(u.id), u]));
-    return alunosIds
-      .map((uid) => mapUsuarios.get(Number(uid)))
-      .filter(Boolean)
-      .map((u) => ({
-        id: u.id,
-        nome: u.nome,
-        matricula: u.user,
-      }))
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [alunosIds, baseUsuarios]);
+ const alunosDetalhes = useMemo(() => {
+  const mapUsuarios = new Map(baseUsuarios.map((u) => [Number(u.id), u]));
+
+  return alunosIds
+    .map((uid) => mapUsuarios.get(Number(uid)))
+    .filter(Boolean)
+    .map((u) => ({
+      id: u.id,
+      nome: u.nome,
+      matricula: u.user ?? String(u.id).padStart(9, "0"),
+    }))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}, [alunosIds, baseUsuarios]);
 
   const candidatosBusca = useMemo(() => {
     const q = buscaAluno.trim().toLowerCase();
@@ -436,12 +457,9 @@ export default function EditarTurma() {
   }, [buscaAluno, baseUsuarios, disciplinaBase]);
 
   function persistTurma(partial) {
-    if (!turmaId) return;
-    const map = getTurmasOverride();
-    const prev = map[String(turmaId)] || {};
-    map[String(turmaId)] = { ...prev, ...partial };
-    setTurmasOverride(map);
-  }
+  if (!turmaId) return;
+  upsertTurmaOverride(turmaId, partial);
+}
 
   function persistAlunos(nextIds) {
     if (!turmaId) return;

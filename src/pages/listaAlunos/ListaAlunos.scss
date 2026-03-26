@@ -7,21 +7,23 @@ $fundo: #f4f4f4;
 $input-bg: #f3f5f7;
 
 .lista-alunos-page {
-  background: $fundo;
-  min-height: 100vh;
+  width: 100%;
+  background: #f4f6f9;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  font-family: "Inter", sans-serif;
+  flex-direction: column;
 }
 
 .lista-alunos-card {
   width: min(1128px, calc(100% - 10px));
+  margin: 0;
+  align-self: flex-start; // 🔥 ESSENCIAL
+
   background: #fff;
   border-radius: 20px 0 0 20px;
   border: 1px solid #e9edf3;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.04);
-  padding: 26px 42px 34px;
+
+  padding: 34px 42px; // 🔥 igual outras páginas
 }
 
 .la__top {
@@ -67,8 +69,8 @@ $input-bg: #f3f5f7;
 
 .la__title {
   margin-top: 14px;
-  font-size: 18px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 500;
   color: $azul;
 }
 

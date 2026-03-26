@@ -54,7 +54,7 @@ function App() {
             </Route>
 
             <Route element={<RoleRoute allowed={["professor", "responsavel"]} />}>
-              <Route path="/editar-turma" element={<EditarTurma />} />
+              <Route path="/editar-turma/:turmaId" element={<EditarTurma />} />
             </Route>
 
             <Route element={<RoleRoute allowed={["coordenador"]} />}>

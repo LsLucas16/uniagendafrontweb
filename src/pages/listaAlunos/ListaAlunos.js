@@ -42,11 +42,15 @@ export default function ListaAlunos() {
   }, [params.turmaId]);
 
   const baseUsuarios = Array.isArray(data.usuarios) ? data.usuarios : [];
-  const baseDisciplinas = Array.isArray(data.disciplinas) ? data.disciplinas : [];
+  const baseDisciplinas = Array.isArray(data.disciplinas)
+    ? data.disciplinas
+    : [];
 
   const disciplina = useMemo(() => {
     if (!turmaId) return null;
-    return baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null;
+    return (
+      baseDisciplinas.find((d) => Number(d.id) === Number(turmaId)) || null
+    );
   }, [turmaId, baseDisciplinas]);
 
   // alunos atuais (IDs) da turma
@@ -63,25 +67,21 @@ export default function ListaAlunos() {
   useEffect(() => {
     if (!turmaId) return;
 
-    // alunos base da turma (dados.json)
-    const alunosBase = baseUsuarios
-      .filter((u) => u.tipo === "aluno" && Array.isArray(u.disciplinas))
-      .filter((u) => u.disciplinas.map(Number).includes(Number(turmaId)))
-      .map((u) => Number(u.id));
+    const alunosBase = Array.isArray(disciplina?.alunoIds)
+      ? disciplina.alunoIds.map(Number).filter(Boolean)
+      : [];
 
-    // override
     const map = getTurmaAlunosOverride();
     const overrideIds = Array.isArray(map[String(turmaId)])
-      ? map[String(turmaId)].map(Number)
+      ? map[String(turmaId)].map(Number).filter(Boolean)
       : null;
 
     setAlunosIds(overrideIds ?? alunosBase);
 
-    // reseta UI
     setBuscaAluno("");
     setDropdownOpen(false);
     setSelecionadosIds([]);
-  }, [turmaId, baseUsuarios]);
+  }, [turmaId, disciplina]);
 
   // fecha dropdown ao clicar fora
   useEffect(() => {
@@ -100,18 +100,20 @@ export default function ListaAlunos() {
     setTurmaAlunosOverride(map);
   }
 
-  const alunosDetalhes = useMemo(() => {
-    const mapUsuarios = new Map(baseUsuarios.map((u) => [Number(u.id), u]));
-    return alunosIds
-      .map((id) => mapUsuarios.get(Number(id)))
-      .filter(Boolean)
-      .map((u) => ({
-        id: u.id,
-        nome: u.nome,
-        login: getLoginDoUsuario(u),
-      }))
-      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-  }, [alunosIds, baseUsuarios]);
+ const alunosDetalhes = useMemo(() => {
+  const mapUsuarios = new Map(baseUsuarios.map((u) => [Number(u.id), u]));
+
+  return alunosIds
+    .map((id) => mapUsuarios.get(Number(id)))
+    .filter(Boolean)
+    .map((u) => ({
+      id: u.id,
+      nome: u.nome,
+      matricula: u.user ?? String(u.id).padStart(9, "0"),
+      tipo: u.tipo || "",
+    }))
+    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+}, [alunosIds, baseUsuarios]);
 
   // ✅ candidatos: não mostra quem já está na turma e nem quem já está no buffer
   const candidatosBusca = useMemo(() => {
@@ -135,7 +137,7 @@ export default function ListaAlunos() {
         return nomeOk || idOk || loginOk;
       })
       .filter((u) => !jaVinculados.has(Number(u.id))) // ✅ remove já vinculados
-      .filter((u) => !jaNoBuffer.has(Number(u.id)))   // ✅ remove já selecionados
+      .filter((u) => !jaNoBuffer.has(Number(u.id))) // ✅ remove já selecionados
       .slice(0, 8)
       .map((u) => ({
         id: Number(u.id),
@@ -149,8 +151,8 @@ export default function ListaAlunos() {
     if (Number.isNaN(n)) return;
 
     setSelecionadosIds((prev) => Array.from(new Set([...prev, n])));
-    setBuscaAluno("");        // pronto pra buscar o próximo
-    setDropdownOpen(false);   // não tampa o botão
+    setBuscaAluno(""); // pronto pra buscar o próximo
+    setDropdownOpen(false); // não tampa o botão
   }
 
   function removerDoBuffer(id) {
@@ -197,7 +199,11 @@ export default function ListaAlunos() {
     return (
       <div className="lista-alunos-page">
         <div className="lista-alunos-card">
-          <button className="la__back" onClick={() => navigate(-1)} type="button">
+          <button
+            className="la__back"
+            onClick={() => navigate(-1)}
+            type="button"
+          >
             <ArrowLeft size={14} />
             Voltar
           </button>
@@ -214,7 +220,11 @@ export default function ListaAlunos() {
     <div className="lista-alunos-page">
       <div className="lista-alunos-card">
         <div className="la__top">
-          <button className="la__back" onClick={() => navigate(-1)} type="button">
+          <button
+            className="la__back"
+            onClick={() => navigate(-1)}
+            type="button"
+          >
             <ArrowLeft size={14} />
             Voltar
           </button>
@@ -222,7 +232,9 @@ export default function ListaAlunos() {
           <button
             type="button"
             className="la__import"
-            onClick={() => Swal.fire("Info", "Função de importação (mock).", "info")}
+            onClick={() =>
+              Swal.fire("Info", "Função de importação (mock).", "info")
+            }
           >
             <Upload size={14} />
             Importar lista

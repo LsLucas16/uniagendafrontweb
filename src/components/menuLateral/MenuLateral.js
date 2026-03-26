@@ -75,7 +75,10 @@ const MenuLateral = () => {
 
     return () => {
       window.removeEventListener("app:data-changed", bump);
-      window.removeEventListener("disciplinaAtual:changed", syncDisciplinaAtual);
+      window.removeEventListener(
+        "disciplinaAtual:changed",
+        syncDisciplinaAtual,
+      );
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -138,9 +141,7 @@ const MenuLateral = () => {
     if (!usarFluxoAluno) {
       const disciplinas = getDisciplinasPermitidas(user) || [];
 
-      return [...disciplinas].sort((a, b) =>
-        String(a.nome || "").localeCompare(String(b.nome || ""), "pt-BR"),
-      );
+      return [...disciplinas];
     }
 
     const baseDisciplinas = Array.isArray(dados?.disciplinas)
@@ -278,7 +279,10 @@ const MenuLateral = () => {
       };
     });
 
-    localStorage.setItem("turmas_override", JSON.stringify(disciplinasAtualizadas));
+    localStorage.setItem(
+      "turmas_override",
+      JSON.stringify(disciplinasAtualizadas),
+    );
     setDataVersion((v) => v + 1);
     window.dispatchEvent(new Event("app:data-changed"));
   };
@@ -319,7 +323,10 @@ const MenuLateral = () => {
       };
     });
 
-    localStorage.setItem("turmas_override", JSON.stringify(disciplinasAtualizadas));
+    localStorage.setItem(
+      "turmas_override",
+      JSON.stringify(disciplinasAtualizadas),
+    );
     setDataVersion((v) => v + 1);
     window.dispatchEvent(new Event("app:data-changed"));
   };
@@ -388,7 +395,9 @@ const MenuLateral = () => {
             <span className="menuLateral__materiaTitle">
               {getTituloCurto(disc.nome)}
             </span>
-            <span className="menuLateral__materiaToggle">{open ? "–" : "+"}</span>
+            <span className="menuLateral__materiaToggle">
+              {open ? "–" : "+"}
+            </span>
           </button>
         </div>
 
@@ -541,8 +550,20 @@ const MenuLateral = () => {
                 value={disciplinaAtualId}
                 onChange={(e) => {
                   const next = e.target.value;
+
                   setDisciplinaAtualId(next);
                   setDisciplinaAtual(next);
+
+                  if (
+                    location.pathname.startsWith("/editar-turma-coordenador")
+                  ) {
+                    navigate(`/editar-turma-coordenador/${next}`);
+                    return;
+                  }
+
+                  if (location.pathname.startsWith("/editar-turma")) {
+                    navigate(`/editar-turma/${next}`);
+                  }
                 }}
               >
                 {disciplinasDoUsuario.map((d) => (
@@ -653,7 +674,10 @@ const MenuLateral = () => {
 
               <button
                 className={`menuLateral__btn ${isEditarTurmaAtivo ? "active" : ""}`}
-                onClick={() => navigate("/editar-turma")}
+                onClick={() => {
+                  if (!disciplinaAtualId) return;
+                  navigate(`/editar-turma/${disciplinaAtualId}`);
+                }}
               >
                 <Settings size={20} />
                 <span>Editar Turma</span>
