@@ -192,10 +192,10 @@ function CardDefault({
           {(temCalendario || temDestaque) && (
             <div className="evento-default-chips">
               {temCalendario && (
-                <span className="chip chip--calendario">Destaque</span>
+                <span className="chip chip--calendario">Calendário</span>
               )}
               {temDestaque && (
-                <span className="chip chip--destaque">Calendário</span>
+                <span className="chip chip--destaque">Destaque</span>
               )}
             </div>
           )}
