@@ -1,10 +1,12 @@
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Pencil, Upload, Search, X } from "lucide-react";
-import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
+import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
+
+import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
 import data from "../../data/dados.json";
 import "./EditarTurma.scss";
-import React, { useEffect, useMemo, useRef, useState } from "react";
 
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_TURMA_ALUNOS = "turma_alunos_override";
@@ -75,8 +77,10 @@ function splitNomeComplemento(disciplinaNome = "") {
 function buildNomeCompleto(nome = "", complemento = "") {
   const n = String(nome || "").trim();
   const c = String(complemento || "").trim();
+
   if (!n && !c) return "";
   if (!c) return n;
+
   return `${n} - ${c}`;
 }
 
@@ -104,12 +108,22 @@ function normalizarIds(ids, idAntigo) {
   return [];
 }
 
+function normalizeMatricula(value) {
+  return String(value || "").trim();
+}
+
+function getUsuarioMatricula(u) {
+  return normalizeMatricula(u?.user);
+}
+
 export default function EditarTurma() {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState("edit");
   const [editIndex, setEditIndex] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
   const searchWrapRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const navigate = useNavigate();
   const { turmaId: routeTurmaId } = useParams();
@@ -148,11 +162,15 @@ export default function EditarTurma() {
   };
 
   useEffect(() => {
-    const onDisciplinaChanged = () =>
+    const onDisciplinaChanged = () => {
       setDisciplinaAtualId(getDisciplinaAtualId());
+    };
 
     const onStorage = (e) => {
-      if (e.key === "usuario") setUsuarioLogado(getUsuarioLogado());
+      if (e.key === "usuario") {
+        setUsuarioLogado(getUsuarioLogado());
+      }
+
       if (e.key === "disciplinaAtualId") {
         setDisciplinaAtualId(getDisciplinaAtualId());
       }
@@ -162,10 +180,7 @@ export default function EditarTurma() {
     window.addEventListener("storage", onStorage);
 
     return () => {
-      window.removeEventListener(
-        "disciplinaAtual:changed",
-        onDisciplinaChanged,
-      );
+      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -199,6 +214,7 @@ export default function EditarTurma() {
   const baseDisciplinas = Array.isArray(data.disciplinas || data.diciplinas)
     ? data.disciplinas || data.diciplinas
     : [];
+
   const baseUsuarios = Array.isArray(data.usuarios) ? data.usuarios : [];
 
   const usuariosComUser = useMemo(() => {
@@ -211,7 +227,7 @@ export default function EditarTurma() {
   const user = useMemo(() => {
     const id = usuarioLogado?.id;
     if (!id) return null;
-    return baseUsuarios.find((u) => u.id === id) || null;
+    return baseUsuarios.find((u) => Number(u.id) === Number(id)) || null;
   }, [usuarioLogado, baseUsuarios]);
 
   const isCoordenador = user?.tipo === "coordenador";
@@ -416,36 +432,38 @@ export default function EditarTurma() {
     setLoading(false);
   }, [turmaId, disciplinaBase, baseUsuarios]);
 
- const alunosDetalhes = useMemo(() => {
-  const mapUsuarios = new Map(baseUsuarios.map((u) => [Number(u.id), u]));
+  const alunosDetalhes = useMemo(() => {
+    const mapUsuarios = new Map(baseUsuarios.map((u) => [Number(u.id), u]));
 
-  return alunosIds
-    .map((uid) => mapUsuarios.get(Number(uid)))
-    .filter(Boolean)
-    .map((u) => ({
-      id: u.id,
-      nome: u.nome,
-      matricula: u.user ?? String(u.id).padStart(9, "0"),
-    }))
-    .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
-}, [alunosIds, baseUsuarios]);
+    return alunosIds
+      .map((uid) => mapUsuarios.get(Number(uid)))
+      .filter(Boolean)
+      .map((u) => ({
+        id: u.id,
+        nome: u.nome,
+        matricula: u.user ?? String(u.id).padStart(9, "0"),
+      }))
+      .sort((a, b) => a.nome.localeCompare(b.nome, "pt-BR"));
+  }, [alunosIds, baseUsuarios]);
 
   const candidatosBusca = useMemo(() => {
     const q = buscaAluno.trim().toLowerCase();
     if (!q) return [];
 
     const instituicaoId = disciplinaBase?.instituicaoId;
-    const candidatos = baseUsuarios.filter((u) => u.tipo === "aluno");
+    const jaVinculados = new Set(alunosIds.map(Number));
+
+    const candidatos = baseUsuarios.filter((u) =>
+      instituicaoId ? Number(u.faculdadeId) === Number(instituicaoId) : true,
+    );
 
     const filtrados = candidatos
-      .filter((u) =>
-        instituicaoId ? Number(u.faculdadeId) === Number(instituicaoId) : true,
-      )
+      .filter((u) => !jaVinculados.has(Number(u.id)))
       .filter(
         (u) =>
-          u.nome?.toLowerCase().includes(q) ||
-          String(u.id).includes(q) ||
-          String(u.user).toLowerCase().includes(q),
+          String(u.nome || "").toLowerCase().includes(q) ||
+          String(u.id || "").includes(q) ||
+          String(u.user || "").toLowerCase().includes(q),
       )
       .slice(0, 8);
 
@@ -454,12 +472,12 @@ export default function EditarTurma() {
       nome: u.nome,
       matricula: u.user,
     }));
-  }, [buscaAluno, baseUsuarios, disciplinaBase]);
+  }, [buscaAluno, baseUsuarios, disciplinaBase, alunosIds]);
 
   function persistTurma(partial) {
-  if (!turmaId) return;
-  upsertTurmaOverride(turmaId, partial);
-}
+    if (!turmaId) return;
+    upsertTurmaOverride(turmaId, partial);
+  }
 
   function persistAlunos(nextIds) {
     if (!turmaId) return;
@@ -467,6 +485,267 @@ export default function EditarTurma() {
     map[String(turmaId)] = nextIds;
     setTurmaAlunosOverride(map);
   }
+
+  const handleOpenImport = () => {
+    if (!fileInputRef.current) return;
+    fileInputRef.current.value = "";
+    fileInputRef.current.click();
+  };
+
+  const handleImportLista = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!turmaId || !user) {
+      await Swal.fire({
+        icon: "warning",
+        title: "Turma não identificada",
+        text: "Selecione uma turma antes de importar a lista.",
+        confirmButtonColor: "#76a9da",
+      });
+      return;
+    }
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const workbook = XLSX.read(buffer, { type: "array" });
+
+      const firstSheetName = workbook.SheetNames?.[0];
+      if (!firstSheetName) {
+        await Swal.fire({
+          icon: "warning",
+          title: "Arquivo vazio",
+          text: "Não foi encontrada nenhuma aba no arquivo enviado.",
+          confirmButtonColor: "#76a9da",
+        });
+        return;
+      }
+
+      const worksheet = workbook.Sheets[firstSheetName];
+
+      const rows = XLSX.utils.sheet_to_json(worksheet, {
+        header: 1,
+        raw: false,
+        defval: "",
+      });
+
+      const matriculasLidas = rows
+        .flat()
+        .map((cell) => normalizeMatricula(cell))
+        .filter(Boolean);
+
+      if (!matriculasLidas.length) {
+        await Swal.fire({
+          icon: "warning",
+          title: "Nenhuma matrícula encontrada",
+          text: "O arquivo não possui dados válidos para importação.",
+          confirmButtonColor: "#76a9da",
+        });
+        return;
+      }
+
+      const matriculasUnicas = Array.from(new Set(matriculasLidas));
+
+      const usuariosDaFaculdade = baseUsuarios.filter(
+        (u) => Number(u.faculdadeId) === Number(user.faculdadeId),
+      );
+
+      const mapaPorMatricula = new Map(
+        usuariosDaFaculdade.map((u) => [getUsuarioMatricula(u), u]),
+      );
+
+      const encontrados = [];
+      const naoEncontrados = [];
+
+      matriculasUnicas.forEach((matricula) => {
+        const usuarioEncontrado = mapaPorMatricula.get(matricula);
+
+        if (usuarioEncontrado) {
+          encontrados.push(usuarioEncontrado);
+        } else {
+          naoEncontrados.push(matricula);
+        }
+      });
+
+      const encontradosUnicos = encontrados.filter(
+        (item, index, arr) =>
+          arr.findIndex((x) => Number(x.id) === Number(item.id)) === index,
+      );
+
+      const novosIds = encontradosUnicos.map((u) => Number(u.id));
+      const idsJaNaTurma = new Set(alunosIds.map(Number));
+
+      const realmenteNovos = novosIds.filter(
+        (id) => !idsJaNaTurma.has(Number(id)),
+      );
+      const jaExistiam = novosIds.filter((id) => idsJaNaTurma.has(Number(id)));
+
+      const htmlEncontrados =
+        encontradosUnicos.length > 0
+          ? `
+            <div style="text-align:left; margin-top:12px;">
+              <div style="font-weight:700; color:#2e4a67; margin-bottom:8px;">
+                Identificados na faculdade (${encontradosUnicos.length})
+              </div>
+              <div style="
+                max-height:160px;
+                overflow:auto;
+                border:1px solid #e9edf3;
+                border-radius:8px;
+                padding:10px 12px;
+                background:#f8fbfe;
+                font-size:13px;
+                color:#334e68;
+              ">
+                ${encontradosUnicos
+                  .map(
+                    (u) =>
+                      `<div style="margin-bottom:6px;"><strong>${u.nome}</strong> — ${getUsuarioMatricula(u)}</div>`,
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `
+          : "";
+
+      const htmlNaoEncontrados =
+        naoEncontrados.length > 0
+          ? `
+            <div style="text-align:left; margin-top:14px;">
+              <div style="font-weight:700; color:#2e4a67; margin-bottom:8px;">
+                Matrículas não identificadas (${naoEncontrados.length})
+              </div>
+              <div style="
+                max-height:120px;
+                overflow:auto;
+                border:1px solid #e9edf3;
+                border-radius:8px;
+                padding:10px 12px;
+                background:#fff;
+                font-size:13px;
+                color:#667085;
+              ">
+                ${naoEncontrados
+                  .map(
+                    (matricula) =>
+                      `<div style="margin-bottom:6px;">${matricula}</div>`,
+                  )
+                  .join("")}
+              </div>
+            </div>
+          `
+          : "";
+
+      const htmlResumo = `
+        <div style="text-align:left;">
+          <div style="
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+            margin-top:8px;
+          ">
+            <div style="
+              border:1px solid #e9edf3;
+              border-radius:10px;
+              padding:12px;
+              background:#f8fbfe;
+            ">
+              <div style="font-size:12px; color:#667085;">Lidas no arquivo</div>
+              <div style="font-size:20px; font-weight:700; color:#2e4a67;">${matriculasUnicas.length}</div>
+            </div>
+
+            <div style="
+              border:1px solid #e9edf3;
+              border-radius:10px;
+              padding:12px;
+              background:#f8fbfe;
+            ">
+              <div style="font-size:12px; color:#667085;">Encontradas</div>
+              <div style="font-size:20px; font-weight:700; color:#2e4a67;">${encontradosUnicos.length}</div>
+            </div>
+
+            <div style="
+              border:1px solid #e9edf3;
+              border-radius:10px;
+              padding:12px;
+              background:#f8fbfe;
+            ">
+              <div style="font-size:12px; color:#667085;">Novos para adicionar</div>
+              <div style="font-size:20px; font-weight:700; color:#2e4a67;">${realmenteNovos.length}</div>
+            </div>
+
+            <div style="
+              border:1px solid #e9edf3;
+              border-radius:10px;
+              padding:12px;
+              background:#f8fbfe;
+            ">
+              <div style="font-size:12px; color:#667085;">Já estavam na turma</div>
+              <div style="font-size:20px; font-weight:700; color:#2e4a67;">${jaExistiam.length}</div>
+            </div>
+          </div>
+
+          ${htmlEncontrados}
+          ${htmlNaoEncontrados}
+        </div>
+      `;
+
+      const result = await Swal.fire({
+        icon: "info",
+        title: "Conferir importação",
+        html: htmlResumo,
+        width: 760,
+        showCancelButton: true,
+        confirmButtonText: "Finalizar importação",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#76a9da",
+        cancelButtonColor: "#d9dee5",
+        background: "#ffffff",
+        color: "#334e68",
+        customClass: {
+          popup: "swal-import-popup",
+          title: "swal-import-title",
+          confirmButton: "swal-import-confirm",
+          cancelButton: "swal-import-cancel",
+        },
+      });
+
+      if (!result.isConfirmed) return;
+
+      if (!realmenteNovos.length) {
+        await Swal.fire({
+          icon: "info",
+          title: "Nada para importar",
+          text: "Todos os identificados já estavam vinculados à turma.",
+          confirmButtonColor: "#76a9da",
+        });
+        return;
+      }
+
+      const next = Array.from(
+        new Set([...alunosIds, ...realmenteNovos].map(Number)),
+      );
+
+      setAlunosIds(next);
+      persistAlunos(next);
+
+      await Swal.fire({
+        icon: "success",
+        title: "Importação concluída",
+        text: `${realmenteNovos.length} aluno(s) foram adicionados à turma com sucesso.`,
+        confirmButtonColor: "#76a9da",
+      });
+    } catch (error) {
+      console.error(error);
+
+      await Swal.fire({
+        icon: "error",
+        title: "Erro ao importar",
+        text: "Não foi possível ler o arquivo Excel. Verifique se ele está no formato esperado.",
+        confirmButtonColor: "#76a9da",
+      });
+    }
+  };
 
   const handleSalvarTopo = () => {
     const nomeCompleto = buildNomeCompleto(nome, complemento);
@@ -841,11 +1120,23 @@ export default function EditarTurma() {
         <div className="section-head">
           <h2>Lista de Alunos</h2>
 
-          <button type="button" className="btn-importar">
+          <button
+            type="button"
+            className="btn-importar"
+            onClick={handleOpenImport}
+          >
             <Upload size={14} />
             Importar lista
           </button>
         </div>
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls"
+          style={{ display: "none" }}
+          onChange={handleImportLista}
+        />
 
         <div className="subsection">
           <p className="sub-title">Adicione alunos</p>
@@ -913,100 +1204,6 @@ export default function EditarTurma() {
         >
           Ver lista completa de alunos
         </button>
-
-        <div className="alunos-list">
-          {alunosDetalhes.length > 0 ? (
-            alunosDetalhes.map((aluno) => (
-              <div className="aluno-row" key={aluno.id}>
-                <div className="aluno-info">
-                  <span className="aluno-nome">{aluno.nome}</span>
-                  <span className="aluno-matricula">{aluno.matricula}</span>
-                </div>
-
-                <button
-                  type="button"
-                  className="btn-x"
-                  onClick={() => handleRemoverAluno(aluno.id)}
-                  aria-label={`Remover ${aluno.nome}`}
-                >
-                  <X size={16} />
-                </button>
-              </div>
-            ))
-          ) : (
-            <div className="empty-small">Nenhum aluno adicionado.</div>
-          )}
-        </div>
-      </section>
-
-      <section className="editar-turma-box editar-turma-box--alunos">
-        <div className="section-head">
-          <h2>Lista de Alunos</h2>
-
-          <button type="button" className="btn-importar">
-            <Upload size={14} />
-            Importar lista
-          </button>
-        </div>
-
-        <div className="subsection">
-          <p className="sub-title">Adicione alunos</p>
-
-          <div className="add-aluno-actions">
-            <div className="search-wrap" ref={searchWrapRef}>
-              <Search className="search-ico" />
-              <input
-                type="text"
-                value={buscaAluno}
-                onChange={(e) => {
-                  setBuscaAluno(e.target.value);
-                  setDropdownOpen(true);
-                  setAlunoSelecionadoId(null);
-                }}
-                onFocus={() => {
-                  if (buscaAluno.trim()) setDropdownOpen(true);
-                }}
-                placeholder="Pesquise nome, matrícula ou email..."
-              />
-
-              {dropdownOpen && candidatosBusca.length > 0 && (
-                <div className="search-dropdown">
-                  {candidatosBusca.map((aluno) => {
-                    const ativo =
-                      Number(alunoSelecionadoId) === Number(aluno.id);
-
-                    return (
-                      <button
-                        type="button"
-                        key={aluno.id}
-                        className={`dropdown-item ${ativo ? "active" : ""}`}
-                        onClick={() => {
-                          setBuscaAluno(`${aluno.nome} - ${aluno.matricula}`);
-                          setAlunoSelecionadoId(aluno.id);
-                          setDropdownOpen(false);
-                        }}
-                      >
-                        <span className="d-name">{aluno.nome}</span>
-                        <span className="d-sub">{aluno.matricula}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            <button
-              type="button"
-              className={`btn-primary add-aluno-btn ${
-                temAlunoSelecionado ? "is-active" : "is-muted"
-              }`}
-              onClick={handleAdicionarAluno}
-              disabled={!temAlunoSelecionado}
-            >
-              Adicionar aluno
-            </button>
-          </div>
-        </div>
 
         <div className="alunos-list">
           {alunosDetalhes.length > 0 ? (
