@@ -180,14 +180,10 @@ function CardDefault({
         <div className="evento-default-left">
           <div className="evento-default-title">{ev.titulo}</div>
 
-          {!temDataEvento && (
-            <div className="evento-default-subline">
-              <span className="evento-default-subline-label">
-                Última atualização:
-              </span>{" "}
-              {dataAtual}
-            </div>
-          )}
+          <div className="evento-default-updatedBottom">
+            <span className="evento-default-footer-label">Criado por:</span>{" "}
+            <span className="evento-default-footer-value">{criadoPor}</span>
+          </div>
 
           {(temCalendario || temDestaque) && (
             <div className="evento-default-chips">
@@ -247,9 +243,11 @@ function CardDefault({
             </div>
           </>
         ) : (
-          <div className="evento-default-createdBottom">
-            <span className="evento-default-footer-label">Criado por:</span>{" "}
-            {criadoPor}
+          <div className="evento-default-updatedBottom">
+            <span className="evento-default-footer-label">
+              Última atualização:
+            </span>{" "}
+            {dataAtual}
           </div>
         )}
       </div>
