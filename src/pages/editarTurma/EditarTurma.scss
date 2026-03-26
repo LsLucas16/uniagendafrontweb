@@ -18,14 +18,14 @@ $cinza-botao: #8d99a8;
   background: transparent;
 }
 
-/* PROFESSOR E RESPONSÁVEL:
-   usa posicionamento base igual às demais páginas */
+/* PROFESSOR E RESPONSÁVEL */
 .editar-turma-page--padrao {
   @include uiPageShell;
+  gap: 0; /* evita “descer” o conteúdo */
+  padding-top: 34px; /* mesmo topo visual do padrão */
 }
 
-/* COORDENADOR:
-   continua no fluxo atual */
+/* COORDENADOR */
 .editar-turma-page--coordenador {
   width: 100%;
 }
@@ -56,7 +56,7 @@ $cinza-botao: #8d99a8;
   box-sizing: border-box;
 }
 
-/* no modo padrão, evita “caixa dentro de caixa” exagerada */
+/* professor/responsável: sem caixa interna duplicada */
 .editar-turma-page--padrao .editar-turma-box {
   border: 0;
   box-shadow: none;
@@ -66,6 +66,11 @@ $cinza-botao: #8d99a8;
   background: transparent;
 }
 
+/* remove respiro extra do primeiro bloco no modo padrão */
+.editar-turma-page--padrao .editar-turma-box--info {
+  padding-top: 0;
+}
+
 .editar-turma-box--info,
 .editar-turma-box--responsaveis,
 .editar-turma-box--alunos {
@@ -73,18 +78,17 @@ $cinza-botao: #8d99a8;
   padding-bottom: 24px;
 }
 
+/* título principal */
 .page-header {
-  margin-bottom: 28px;
+  margin: 0 0 24px;
+  padding: 0;
 
   h1 {
-    margin: 0;
-    font-size: 26px;
-    line-height: 1.15;
-    font-weight: 700;
-    color: $azul-texto;
+    @include titulo;
   }
 }
 
+/* títulos internos */
 .bloco-header {
   margin-bottom: 16px;
 
@@ -279,7 +283,6 @@ $cinza-botao: #8d99a8;
   color: $azul-texto;
 }
 
-/* coordenador continua separado */
 .responsavel-card--coordenador {
   padding: 14px 0 0;
 
@@ -294,7 +297,6 @@ $cinza-botao: #8d99a8;
   }
 }
 
-/* professor e responsável visual contínuo */
 .responsavel-card--simples {
   padding: 4px 0 0;
 
@@ -616,6 +618,8 @@ $cinza-botao: #8d99a8;
 @media (max-width: 920px) {
   .editar-turma-page--padrao {
     @include uiWhiteContainerMobile;
+    gap: 0;
+    padding-top: 20px;
   }
 
   .editar-turma-box--info,
@@ -623,6 +627,14 @@ $cinza-botao: #8d99a8;
   .editar-turma-box--alunos {
     padding-top: 20px;
     padding-bottom: 20px;
+  }
+
+  .editar-turma-page--padrao .editar-turma-box--info {
+    padding-top: 0;
+  }
+
+  .page-header {
+    margin-bottom: 20px;
   }
 
   .responsavel-top {
@@ -652,5 +664,42 @@ $cinza-botao: #8d99a8;
 
   .responsavel-add-btn {
     height: 50px;
+  }
+}
+
+.editar-turma-box--responsaveis,
+.editar-turma-box--alunos {
+  position: relative;
+  margin-top: 22px;
+  padding-top: 30px;
+}
+
+.editar-turma-box--responsaveis::before,
+.editar-turma-box--alunos::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #e9edf3;
+}
+
+.btn-ver-lista {
+  margin-top: 16px;
+  margin-left: auto;
+  display: block;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #2e4a67;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  text-align: right;
+
+  &:hover {
+    text-decoration: underline;
   }
 }

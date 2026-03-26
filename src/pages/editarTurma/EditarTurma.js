@@ -671,276 +671,379 @@ export default function EditarTurma() {
   }
 
   return (
-  <div
-    className={`editar-turma-page ${
-      isCoordenador
-        ? "editar-turma-page--coordenador"
-        : "editar-turma-page--padrao"
-    }`}
-  >
-    {isCoordenador && (
-      <button
-        type="button"
-        className="btn-voltar-coordenador"
-        onClick={() => navigate("/editar-turma-coordenador")}
-      >
-        ← Voltar
-      </button>
-    )}
-
-    <section className="editar-turma-box editar-turma-box--info">
-      <header className="page-header">
-        <h1>Editar turma</h1>
-      </header>
-
-      <div className="bloco-header">
-        <h2>Informações da Turma</h2>
-      </div>
-
-      <div className="grid-2">
-        <div className="field">
-          <label>Nome</label>
-          <input
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            onBlur={handleSalvarTopo}
-            placeholder="Nome da turma"
-          />
-        </div>
-
-        <div className="field">
-          <label>Complemento</label>
-          <input
-            value={complemento}
-            onChange={(e) => setComplemento(e.target.value)}
-            onBlur={handleSalvarTopo}
-            placeholder="Turma 8"
-          />
-        </div>
-      </div>
-
+    <div
+      className={`editar-turma-page ${
+        isCoordenador
+          ? "editar-turma-page--coordenador"
+          : "editar-turma-page--padrao"
+      }`}
+    >
       {isCoordenador && (
-        <div className="tipo-area">
-          <div className="tipo-label">Selecione o tipo</div>
+        <button
+          type="button"
+          className="btn-voltar-coordenador"
+          onClick={() => navigate("/editar-turma-coordenador")}
+        >
+          ← Voltar
+        </button>
+      )}
 
-          <div className="radio-group">
-            <label className="radio-item">
-              <input
-                type="radio"
-                name="tipoTurma"
-                checked={tipoTurma === "primaria"}
-                onChange={() => handleChangeTipo("primaria")}
-              />
-              <span>Primária</span>
-            </label>
+      <section className="editar-turma-box editar-turma-box--info">
+        <header className="page-header">
+          <h1>Editar turma</h1>
+        </header>
 
-            <label className="radio-item">
-              <input
-                type="radio"
-                name="tipoTurma"
-                checked={tipoTurma === "secundaria"}
-                onChange={() => handleChangeTipo("secundaria")}
-              />
-              <span>Secundária</span>
-            </label>
+        <div className="bloco-header">
+          <h2>Informações da Turma</h2>
+        </div>
+
+        <div className="grid-2">
+          <div className="field">
+            <label>Nome</label>
+            <input
+              value={nome}
+              onChange={(e) => setNome(e.target.value)}
+              onBlur={handleSalvarTopo}
+              placeholder="Nome da turma"
+            />
+          </div>
+
+          <div className="field">
+            <label>Complemento</label>
+            <input
+              value={complemento}
+              onChange={(e) => setComplemento(e.target.value)}
+              onBlur={handleSalvarTopo}
+              placeholder="Turma 8"
+            />
           </div>
         </div>
-      )}
-    </section>
 
-    <section className="editar-turma-box editar-turma-box--responsaveis">
-      <div className="bloco-header">
-        <h2>Responsáveis da turma</h2>
-      </div>
+        {isCoordenador && (
+          <div className="tipo-area">
+            <div className="tipo-label">Selecione o tipo</div>
 
-      <div className="responsaveis">
-        {responsaveis.length > 0 ? (
-          responsaveis.map((r, idx) => {
-            const cargoNormalizado = String(r.cargo || "").toLowerCase();
+            <div className="radio-group">
+              <label className="radio-item">
+                <input
+                  type="radio"
+                  name="tipoTurma"
+                  checked={tipoTurma === "primaria"}
+                  onChange={() => handleChangeTipo("primaria")}
+                />
+                <span>Primária</span>
+              </label>
 
-            const tipoClasse =
-              r.cargo === "Coordenador"
-                ? "responsavel-card--coordenador"
-                : "responsavel-card--simples";
-
-            const cargoClasse =
-              cargoNormalizado === "professor"
-                ? "responsavel-card--professor"
-                : cargoNormalizado === "responsável" ||
-                    cargoNormalizado === "responsavel"
-                  ? "responsavel-card--responsavel"
-                  : "";
-
-            return (
-              <div
-                className={`responsavel-card ${tipoClasse} ${cargoClasse}`}
-                key={`${r.usuarioId || r.userId}-${idx}`}
-              >
-                <div className="responsavel-top">
-                  <span className="chip">{r.nome || "Responsável"}</span>
-
-                  <button
-                    type="button"
-                    className="btn-edit"
-                    onClick={() => openEditarResponsavel(idx)}
-                    aria-label="Editar responsável"
-                    title="Editar"
-                  >
-                    <Pencil size={10} />
-                    <span className="btn-edit__text">Editar</span>
-                  </button>
-                </div>
-
-                <div className="grid-2 inner">
-                  <div className="field">
-                    <label>Cargo</label>
-                    <input value={r.cargo || ""} readOnly />
-                  </div>
-
-                  <div className="field">
-                    <label>Contato</label>
-                    <input value={r.contato || ""} readOnly />
-                  </div>
-                </div>
-              </div>
-            );
-          })
-        ) : (
-          <div className="empty-small">Nenhum responsável adicionado.</div>
+              <label className="radio-item">
+                <input
+                  type="radio"
+                  name="tipoTurma"
+                  checked={tipoTurma === "secundaria"}
+                  onChange={() => handleChangeTipo("secundaria")}
+                />
+                <span>Secundária</span>
+              </label>
+            </div>
+          </div>
         )}
-      </div>
+      </section>
 
-      <button
-        type="button"
-        className="btn-primary wide responsavel-add-btn"
-        onClick={openAdicionarResponsavel}
-      >
-        Adicionar responsável
-      </button>
-    </section>
+      <section className="editar-turma-box editar-turma-box--responsaveis">
+        <div className="bloco-header">
+          <h2>Responsáveis da turma</h2>
+        </div>
 
-    <section className="editar-turma-box editar-turma-box--alunos">
-      <div className="section-head">
-        <h2>Lista de Alunos</h2>
+        <div className="responsaveis">
+          {responsaveis.length > 0 ? (
+            responsaveis.map((r, idx) => {
+              const cargoNormalizado = String(r.cargo || "").toLowerCase();
 
-        <button type="button" className="btn-importar">
-          <Upload size={14} />
-          Importar lista
-        </button>
-      </div>
+              const tipoClasse =
+                r.cargo === "Coordenador"
+                  ? "responsavel-card--coordenador"
+                  : "responsavel-card--simples";
 
-      <div className="subsection">
-        <p className="sub-title">Adicione alunos</p>
+              const cargoClasse =
+                cargoNormalizado === "professor"
+                  ? "responsavel-card--professor"
+                  : cargoNormalizado === "responsável" ||
+                      cargoNormalizado === "responsavel"
+                    ? "responsavel-card--responsavel"
+                    : "";
 
-        <div className="add-aluno-actions">
-          <div className="search-wrap" ref={searchWrapRef}>
-            <Search className="search-ico" />
-            <input
-              type="text"
-              value={buscaAluno}
-              onChange={(e) => {
-                setBuscaAluno(e.target.value);
-                setDropdownOpen(true);
-                setAlunoSelecionadoId(null);
-              }}
-              onFocus={() => {
-                if (buscaAluno.trim()) setDropdownOpen(true);
-              }}
-              placeholder="Pesquise nome, matrícula ou id do aluno"
-            />
+              return (
+                <div
+                  className={`responsavel-card ${tipoClasse} ${cargoClasse}`}
+                  key={`${r.usuarioId || r.userId}-${idx}`}
+                >
+                  <div className="responsavel-top">
+                    <span className="chip">{r.nome || "Responsável"}</span>
 
-            {dropdownOpen && candidatosBusca.length > 0 && (
-              <div className="search-dropdown">
-                {candidatosBusca.map((aluno) => {
-                  const ativo = Number(alunoSelecionadoId) === Number(aluno.id);
-
-                  return (
                     <button
                       type="button"
-                      key={aluno.id}
-                      className={`dropdown-item ${ativo ? "active" : ""}`}
-                      onClick={() => {
-                        setBuscaAluno(`${aluno.nome} - ${aluno.matricula}`);
-                        setAlunoSelecionadoId(aluno.id);
-                        setDropdownOpen(false);
-                      }}
+                      className="btn-edit"
+                      onClick={() => openEditarResponsavel(idx)}
+                      aria-label="Editar responsável"
+                      title="Editar"
                     >
-                      <span className="d-name">{aluno.nome}</span>
-                      <span className="d-sub">{aluno.matricula}</span>
+                      <Pencil size={10} />
+                      <span className="btn-edit__text">Editar</span>
                     </button>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+                  </div>
 
-          <button
-            type="button"
-            className={`btn-primary add-aluno-btn ${
-              temAlunoSelecionado ? "is-active" : "is-muted"
-            }`}
-            onClick={handleAdicionarAluno}
-            disabled={!temAlunoSelecionado}
-          >
-            Adicionar aluno
+                  <div className="grid-2 inner">
+                    <div className="field">
+                      <label>Cargo</label>
+                      <input value={r.cargo || ""} readOnly />
+                    </div>
+
+                    <div className="field">
+                      <label>Contato</label>
+                      <input value={r.contato || ""} readOnly />
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          ) : (
+            <div className="empty-small">Nenhum responsável adicionado.</div>
+          )}
+        </div>
+
+        <button
+          type="button"
+          className="btn-primary wide responsavel-add-btn"
+          onClick={openAdicionarResponsavel}
+        >
+          Adicionar responsável
+        </button>
+      </section>
+
+      <section className="editar-turma-box editar-turma-box--alunos">
+        <div className="section-head">
+          <h2>Lista de Alunos</h2>
+
+          <button type="button" className="btn-importar">
+            <Upload size={14} />
+            Importar lista
           </button>
         </div>
-      </div>
 
-      <div className="alunos-list">
-        {alunosDetalhes.length > 0 ? (
-          alunosDetalhes.map((aluno) => (
-            <div className="aluno-row" key={aluno.id}>
-              <div className="aluno-info">
-                <span className="aluno-nome">{aluno.nome}</span>
-                <span className="aluno-matricula">{aluno.matricula}</span>
-              </div>
+        <div className="subsection">
+          <p className="sub-title">Adicione alunos</p>
 
-              <button
-                type="button"
-                className="btn-x"
-                onClick={() => handleRemoverAluno(aluno.id)}
-                aria-label={`Remover ${aluno.nome}`}
-              >
-                <X size={16} />
-              </button>
+          <div className="add-aluno-actions">
+            <div className="search-wrap" ref={searchWrapRef}>
+              <Search className="search-ico" />
+              <input
+                type="text"
+                value={buscaAluno}
+                onChange={(e) => {
+                  setBuscaAluno(e.target.value);
+                  setDropdownOpen(true);
+                  setAlunoSelecionadoId(null);
+                }}
+                onFocus={() => {
+                  if (buscaAluno.trim()) setDropdownOpen(true);
+                }}
+                placeholder="Pesquise nome, matrícula ou email..."
+              />
+
+              {dropdownOpen && candidatosBusca.length > 0 && (
+                <div className="search-dropdown">
+                  {candidatosBusca.map((aluno) => {
+                    const ativo =
+                      Number(alunoSelecionadoId) === Number(aluno.id);
+
+                    return (
+                      <button
+                        type="button"
+                        key={aluno.id}
+                        className={`dropdown-item ${ativo ? "active" : ""}`}
+                        onClick={() => {
+                          setBuscaAluno(`${aluno.nome} - ${aluno.matricula}`);
+                          setAlunoSelecionadoId(aluno.id);
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <span className="d-name">{aluno.nome}</span>
+                        <span className="d-sub">{aluno.matricula}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
             </div>
-          ))
-        ) : (
-          <div className="empty-small">Nenhum aluno adicionado.</div>
-        )}
-      </div>
-    </section>
 
-    <EditarResponsavelModal
-      open={modalOpen}
-      onClose={closeModal}
-      usuarios={usuariosComUser}
-      initialValue={
-        modalMode === "edit" && editIndex !== null
-          ? responsaveis[editIndex]
-          : null
-      }
-      onSave={handleSaveResponsavelFromModal}
-      onRemove={
-        modalMode === "edit" && responsaveis[editIndex]?.removivel !== false
-          ? handleRemoveResponsavelFromModal
-          : null
-      }
-      bloquearResponsavel={
-        modalMode === "edit" &&
-        (responsaveis[editIndex]?.cargo === "Coordenador" ||
-          responsaveis[editIndex]?.fixo === true ||
-          responsaveis[editIndex]?.removivel === false)
-      }
-      bloquearRemocao={
-        modalMode === "edit" &&
-        (responsaveis[editIndex]?.cargo === "Coordenador" ||
-          responsaveis[editIndex]?.fixo === true ||
-          responsaveis[editIndex]?.removivel === false)
-      }
-      podeEditarCargo={isCoordenador}
-    />
-  </div>
-);
+            <button
+              type="button"
+              className={`btn-primary add-aluno-btn ${
+                temAlunoSelecionado ? "is-active" : "is-muted"
+              }`}
+              onClick={handleAdicionarAluno}
+              disabled={!temAlunoSelecionado}
+            >
+              Adicionar aluno
+            </button>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="btn-ver-lista"
+          onClick={() => navigate(`/turma/${turmaId}/alunos`)}
+        >
+          Ver lista completa de alunos
+        </button>
+
+        <div className="alunos-list">
+          {alunosDetalhes.length > 0 ? (
+            alunosDetalhes.map((aluno) => (
+              <div className="aluno-row" key={aluno.id}>
+                <div className="aluno-info">
+                  <span className="aluno-nome">{aluno.nome}</span>
+                  <span className="aluno-matricula">{aluno.matricula}</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn-x"
+                  onClick={() => handleRemoverAluno(aluno.id)}
+                  aria-label={`Remover ${aluno.nome}`}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="empty-small">Nenhum aluno adicionado.</div>
+          )}
+        </div>
+      </section>
+
+      <section className="editar-turma-box editar-turma-box--alunos">
+        <div className="section-head">
+          <h2>Lista de Alunos</h2>
+
+          <button type="button" className="btn-importar">
+            <Upload size={14} />
+            Importar lista
+          </button>
+        </div>
+
+        <div className="subsection">
+          <p className="sub-title">Adicione alunos</p>
+
+          <div className="add-aluno-actions">
+            <div className="search-wrap" ref={searchWrapRef}>
+              <Search className="search-ico" />
+              <input
+                type="text"
+                value={buscaAluno}
+                onChange={(e) => {
+                  setBuscaAluno(e.target.value);
+                  setDropdownOpen(true);
+                  setAlunoSelecionadoId(null);
+                }}
+                onFocus={() => {
+                  if (buscaAluno.trim()) setDropdownOpen(true);
+                }}
+                placeholder="Pesquise nome, matrícula ou email..."
+              />
+
+              {dropdownOpen && candidatosBusca.length > 0 && (
+                <div className="search-dropdown">
+                  {candidatosBusca.map((aluno) => {
+                    const ativo =
+                      Number(alunoSelecionadoId) === Number(aluno.id);
+
+                    return (
+                      <button
+                        type="button"
+                        key={aluno.id}
+                        className={`dropdown-item ${ativo ? "active" : ""}`}
+                        onClick={() => {
+                          setBuscaAluno(`${aluno.nome} - ${aluno.matricula}`);
+                          setAlunoSelecionadoId(aluno.id);
+                          setDropdownOpen(false);
+                        }}
+                      >
+                        <span className="d-name">{aluno.nome}</span>
+                        <span className="d-sub">{aluno.matricula}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            <button
+              type="button"
+              className={`btn-primary add-aluno-btn ${
+                temAlunoSelecionado ? "is-active" : "is-muted"
+              }`}
+              onClick={handleAdicionarAluno}
+              disabled={!temAlunoSelecionado}
+            >
+              Adicionar aluno
+            </button>
+          </div>
+        </div>
+
+        <div className="alunos-list">
+          {alunosDetalhes.length > 0 ? (
+            alunosDetalhes.map((aluno) => (
+              <div className="aluno-row" key={aluno.id}>
+                <div className="aluno-info">
+                  <span className="aluno-nome">{aluno.nome}</span>
+                  <span className="aluno-matricula">{aluno.matricula}</span>
+                </div>
+
+                <button
+                  type="button"
+                  className="btn-x"
+                  onClick={() => handleRemoverAluno(aluno.id)}
+                  aria-label={`Remover ${aluno.nome}`}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="empty-small">Nenhum aluno adicionado.</div>
+          )}
+        </div>
+      </section>
+
+      <EditarResponsavelModal
+        open={modalOpen}
+        onClose={closeModal}
+        usuarios={usuariosComUser}
+        initialValue={
+          modalMode === "edit" && editIndex !== null
+            ? responsaveis[editIndex]
+            : null
+        }
+        onSave={handleSaveResponsavelFromModal}
+        onRemove={
+          modalMode === "edit" && responsaveis[editIndex]?.removivel !== false
+            ? handleRemoveResponsavelFromModal
+            : null
+        }
+        bloquearResponsavel={
+          modalMode === "edit" &&
+          (responsaveis[editIndex]?.cargo === "Coordenador" ||
+            responsaveis[editIndex]?.fixo === true ||
+            responsaveis[editIndex]?.removivel === false)
+        }
+        bloquearRemocao={
+          modalMode === "edit" &&
+          (responsaveis[editIndex]?.cargo === "Coordenador" ||
+            responsaveis[editIndex]?.fixo === true ||
+            responsaveis[editIndex]?.removivel === false)
+        }
+        podeEditarCargo={isCoordenador}
+      />
+    </div>
+  );
 }
