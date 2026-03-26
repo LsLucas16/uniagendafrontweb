@@ -174,37 +174,28 @@ function CardDefault({
   temCalendario,
   temDestaque,
 }) {
-  const isBoth = temCalendario && temDestaque;
-
   return (
-    <article
-      className={`evento-card evento-card--default ${
-        isBoth ? "evento-card--both" : "evento-card--single"
-      }`}
-    >
+    <article className="evento-card evento-card--default">
       <div className="evento-default-top">
         <div className="evento-default-left">
           <div className="evento-default-title">{ev.titulo}</div>
 
-          {!isBoth && (
-            <div className="evento-default-updatedTop">
-              Última atualização: {dataAtual}
-            </div>
-          )}
-
-          {isBoth && (
-            <div className="evento-default-createdTop">
-              Criado por: {criadoPor}
+          {!temDataEvento && (
+            <div className="evento-default-subline">
+              <span className="evento-default-subline-label">
+                Última atualização:
+              </span>{" "}
+              {dataAtual}
             </div>
           )}
 
           {(temCalendario || temDestaque) && (
             <div className="evento-default-chips">
               {temCalendario && (
-                <span className="chip chip--calendario">Calendário</span>
+                <span className="chip chip--calendario">Destaque</span>
               )}
               {temDestaque && (
-                <span className="chip chip--destaque">Destaque</span>
+                <span className="chip chip--destaque">Calendário</span>
               )}
             </div>
           )}
@@ -232,18 +223,33 @@ function CardDefault({
         <div className="evento-default-desc">{ev.descricao}</div>
       ) : null}
 
-      <div className="evento-default-footer">
-        <div className="evento-default-eventdate">
-          {temDataEvento ? `Data do evento: ${dataEventoFmt}` : ""}
-        </div>
+      <div
+        className={`evento-default-footer ${
+          temDataEvento
+            ? "evento-default-footer--with-date"
+            : "evento-default-footer--no-date"
+        }`}
+      >
+        {temDataEvento ? (
+          <>
+            <div className="evento-default-eventdate">
+              <span className="evento-default-footer-label">
+                Data do evento:
+              </span>{" "}
+              {dataEventoFmt}
+            </div>
 
-        {isBoth ? (
-          <div className="evento-default-updatedBottom">
-            Última atualização: {dataAtual}
-          </div>
+            <div className="evento-default-updatedBottom">
+              <span className="evento-default-footer-label">
+                Última atualização:
+              </span>{" "}
+              {dataAtual}
+            </div>
+          </>
         ) : (
           <div className="evento-default-createdBottom">
-            Criado por: {criadoPor}
+            <span className="evento-default-footer-label">Criado por:</span>{" "}
+            {criadoPor}
           </div>
         )}
       </div>
@@ -255,7 +261,7 @@ export default function EventosPublicados() {
   const [usuarioLogado, setUsuarioLogado] = useState(() => getUsuarioLogado());
   const navigate = useNavigate();
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(() =>
-    getDisciplinaAtualId()
+    getDisciplinaAtualId(),
   );
   const [refreshKey, setRefreshKey] = useState(0);
   const [busca, setBusca] = useState("");
@@ -279,7 +285,10 @@ export default function EventosPublicados() {
     window.addEventListener("eventos:changed", onEventosChanged);
 
     return () => {
-      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
+      window.removeEventListener(
+        "disciplinaAtual:changed",
+        onDisciplinaChanged,
+      );
       window.removeEventListener("storage", onStorage);
       window.removeEventListener("eventos:changed", onEventosChanged);
     };
@@ -307,7 +316,9 @@ export default function EventosPublicados() {
   }, [usuarioLogado]);
 
   const tipo = useMemo(() => {
-    return String(user?.tipo || "").toLowerCase().trim();
+    return String(user?.tipo || "")
+      .toLowerCase()
+      .trim();
   }, [user]);
 
   const isCoordenador = tipo === "coordenador";
@@ -318,7 +329,8 @@ export default function EventosPublicados() {
   const userTurmasSet = useMemo(() => {
     const ids =
       (Array.isArray(user?.disciplinas) && user.disciplinas) ||
-      (Array.isArray(usuarioLogado?.disciplinas) && usuarioLogado.disciplinas) ||
+      (Array.isArray(usuarioLogado?.disciplinas) &&
+        usuarioLogado.disciplinas) ||
       [];
 
     return new Set(ids.map(Number).filter(Number.isFinite));
@@ -399,7 +411,7 @@ export default function EventosPublicados() {
           .join(" ");
 
         const hay = normStr(
-          `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`
+          `${ev.titulo} ${ev.descricao} ${criadoPor} ${nomesTurmas}`,
         );
 
         return hay.includes(q);
@@ -520,7 +532,9 @@ export default function EventosPublicados() {
               nome: disciplinasById.get(Number(id))?.nome || `Turma ${id}`,
             }));
 
-            const turmasOrdenadas = [...turmasNomes].sort((a, b) => a.id - b.id);
+            const turmasOrdenadas = [...turmasNomes].sort(
+              (a, b) => a.id - b.id,
+            );
             const mostrarTodasTurmas = isCoordenador;
 
             if (isCoordenador) {
