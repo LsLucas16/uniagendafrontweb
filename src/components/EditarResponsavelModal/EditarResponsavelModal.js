@@ -52,9 +52,9 @@ export default function EditarResponsavelModal({
       contato: iv.contato ?? "",
       permissoes: isAdd
         ? {
-            eventos: false,
-            responsaveis: false,
-            alunos: false,
+            eventos: true,
+            responsaveis: true,
+            alunos: true,
           }
         : {
             ...defaultPerms,
