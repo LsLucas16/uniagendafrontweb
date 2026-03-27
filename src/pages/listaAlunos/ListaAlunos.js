@@ -307,7 +307,7 @@ export default function ListaAlunos() {
           onClick={handleAdicionarSelecionados}
           disabled={!temSelecionados}
         >
-          Adicionar selecionados
+          Adicionar aluno
         </button>
 
         <div className="la__list">
