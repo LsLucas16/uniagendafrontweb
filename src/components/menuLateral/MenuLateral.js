@@ -615,14 +615,6 @@ const MenuLateral = () => {
           ) : isCoordenador ? (
             <>
               <button
-                className={`menuLateral__btn ${isActive("/nova-turma") ? "active" : ""}`}
-                onClick={() => navigate("/nova-turma")}
-              >
-                <Plus size={20} />
-                <span>Novas Turmas</span>
-              </button>
-
-              <button
                 className={`menuLateral__btn ${isActive("/criar-evento") ? "active" : ""}`}
                 onClick={() => navigate("/criar-evento")}
               >
@@ -639,11 +631,19 @@ const MenuLateral = () => {
               </button>
 
               <button
+                className={`menuLateral__btn ${isActive("/nova-turma") ? "active" : ""}`}
+                onClick={() => navigate("/nova-turma")}
+              >
+                <Plus size={20} />
+                <span>Criar Turmas</span>
+              </button>
+
+              <button
                 className={`menuLateral__btn ${isEditarTurmaAtivo ? "active" : ""}`}
                 onClick={() => navigate("/editar-turma-coordenador")}
               >
                 <Settings size={20} />
-                <span>Editar Turma</span>
+                <span>Editar Turmas</span>
               </button>
 
               <button
@@ -651,7 +651,7 @@ const MenuLateral = () => {
                 onClick={() => navigate("/ver-calendario")}
               >
                 <Calendar size={20} />
-                <span>Ver Calendário</span>
+                <span>Calendário</span>
               </button>
             </>
           ) : (
