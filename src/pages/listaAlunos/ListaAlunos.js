@@ -315,7 +315,7 @@ export default function ListaAlunos() {
             <div className="la__row" key={a.id}>
               <div className="la__info">
                 <div className="la__name">{a.nome}</div>
-                <div className="la__mat">{a.login}</div>
+                <div className="la__mat">{a.matricula}</div>
               </div>
 
               <button

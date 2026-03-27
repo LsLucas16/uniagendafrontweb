@@ -486,11 +486,93 @@ export default function EditarTurma() {
     setTurmaAlunosOverride(map);
   }
 
-  const handleOpenImport = () => {
-    if (!fileInputRef.current) return;
-    fileInputRef.current.value = "";
-    fileInputRef.current.click();
-  };
+  const handleOpenImport = async () => {
+  if (!fileInputRef.current) return;
+
+  const htmlTutorial = `
+    <div style="text-align:left; color:#334e68;">
+      <div style="
+        border:1px solid #e9edf3;
+        border-radius:12px;
+        padding:14px;
+        background:#f8fbfe;
+        margin-top:8px;
+      ">
+        <div style="font-size:15px; font-weight:700; margin-bottom:10px; color:#2e4a67;">
+          Como importar a lista de alunos
+        </div>
+
+        <ol style="padding-left:18px; margin:0; line-height:1.7;">
+          <li>Crie um arquivo <strong>Excel</strong> (.xlsx ou .xls).</li>
+          <li>Preencha com os <strong>números de matrícula</strong> dos alunos.</li>
+          <li>Informe <strong>uma matrícula por linha</strong> para evitar erros.</li>
+          <li>Ao importar, o sistema vai mostrar quais alunos foram encontrados e quais entrarão na turma.</li>
+        </ol>
+      </div>
+
+      <div style="
+        margin-top:14px;
+        border:1px dashed #cbd5e1;
+        border-radius:12px;
+        padding:14px;
+        background:#fff;
+      ">
+        <div style="font-size:14px; font-weight:700; margin-bottom:8px; color:#2e4a67;">
+          Exemplo do Excel
+        </div>
+
+        <div style="
+          border:1px solid #e9edf3;
+          border-radius:8px;
+          overflow:hidden;
+          font-size:13px;
+        ">
+          <div style="display:grid; grid-template-columns:60px 1fr; background:#eef6fc; font-weight:700;">
+            <div style="padding:8px; border-right:1px solid #e9edf3;">Linha</div>
+            <div style="padding:8px;">Matrícula</div>
+          </div>
+          <div style="display:grid; grid-template-columns:60px 1fr; border-top:1px solid #e9edf3;">
+            <div style="padding:8px; border-right:1px solid #e9edf3;">1</div>
+            <div style="padding:8px;">202610103</div>
+          </div>
+          <div style="display:grid; grid-template-columns:60px 1fr; border-top:1px solid #e9edf3;">
+            <div style="padding:8px; border-right:1px solid #e9edf3;">2</div>
+            <div style="padding:8px;">202610104</div>
+          </div>
+          <div style="display:grid; grid-template-columns:60px 1fr; border-top:1px solid #e9edf3;">
+            <div style="padding:8px; border-right:1px solid #e9edf3;">3</div>
+            <div style="padding:8px;">202610105</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const result = await Swal.fire({
+    icon: "info",
+    title: "Tutorial de importação",
+    html: htmlTutorial,
+    width: 760,
+    showCancelButton: true,
+    confirmButtonText: "Continuar",
+    cancelButtonText: "Cancelar",
+    confirmButtonColor: "#76a9da",
+    cancelButtonColor: "#d9dee5",
+    background: "#ffffff",
+    color: "#334e68",
+    customClass: {
+      popup: "swal-import-popup",
+      title: "swal-import-title",
+      confirmButton: "swal-import-confirm",
+      cancelButton: "swal-import-cancel",
+    },
+  });
+
+  if (!result.isConfirmed) return;
+
+  fileInputRef.current.value = "";
+  fileInputRef.current.click();
+};
 
   const handleImportLista = async (event) => {
     const file = event.target.files?.[0];
