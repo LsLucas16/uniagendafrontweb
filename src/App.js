@@ -46,14 +46,15 @@ function App() {
               />
             </Route>
 
-            <Route element={<RoleRoute allowed={["professor", "coordenador", "responsavel"]} />}>
+            <Route
+              element={
+                <RoleRoute allowed={["professor", "coordenador", "responsavel"]} />
+              }
+            >
               <Route path="/criar-evento" element={<CriarEvento />} />
               <Route path="/turma/:turmaId/alunos" element={<ListaAlunos />} />
               <Route path="/eventos" element={<EventosPublicados />} />
               <Route path="/eventos/:id/editar" element={<EditarEvento />} />
-            </Route>
-
-            <Route element={<RoleRoute allowed={["professor", "responsavel"]} />}>
               <Route path="/editar-turma/:turmaId" element={<EditarTurma />} />
             </Route>
 
@@ -63,9 +64,11 @@ function App() {
                 path="/editar-turma-coordenador"
                 element={<EditarTurmaCoordenador />}
               />
-              <Route path="/editar-turma/:id" element={<EditarTurma />} />
               <Route path="/ver-calendario" element={<VerCalendario />} />
-              <Route path="/detalhe-calendario/:date" element={<DetalheCalendario />} />
+              <Route
+                path="/detalhe-calendario/:date"
+                element={<DetalheCalendario />}
+              />
             </Route>
           </Route>
         </Route>
