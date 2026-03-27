@@ -475,8 +475,7 @@ const CriarEvento = () => {
 
               {modoTurmas === "all" && (
                 <div className="turmas-info">
-                  Todas as turmas aos cuidados dessa coordenação serão
-                  notificadas.
+                  Todas as turmas serão selecionadas.
                 </div>
               )}
             </div>
