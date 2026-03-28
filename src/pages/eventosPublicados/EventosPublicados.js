@@ -38,12 +38,10 @@ function getTipoUsuario(u) {
 }
 
 function getTurmasDoEvento(ev) {
-  // ✅ NOVO FORMATO
   if (Array.isArray(ev?.disciplinaIds) && ev.disciplinaIds.length > 0) {
     return ev.disciplinaIds.map(Number).filter(Number.isFinite);
   }
 
-  // ✅ COMPATIBILIDADE COM FORMATO ANTIGO
   if (Array.isArray(ev?.turmasIds) && ev.turmasIds.length > 0) {
     return ev.turmasIds.map(Number).filter(Number.isFinite);
   }
@@ -440,14 +438,74 @@ export default function EventosPublicados() {
     navigate(`/eventos/${eventoId}/editar`);
   };
 
+  const topoCoordenador = (
+    <section className="card-bloco criar-evento-card eventos-publicados-topo-coordenador">
+      <div className="eventos-publicados-topo-coordenador__header">
+        <h1 className="page-title">Eventos Publicados</h1>
+      </div>
+
+      <div className="eventos-publicados-topo-coordenador__filtros">
+        <div className="filtros-top">
+          <div className="filtros-title">
+            <Filter size={16} className="filtros-icon" aria-hidden="true" />
+            Filtros
+          </div>
+
+          <button
+            type="button"
+            className={`filtros-pill ${apenasCoordenadores ? "is-on" : ""}`}
+            onClick={() => setApenasCoordenadores((v) => !v)}
+            aria-pressed={apenasCoordenadores}
+            title="Apenas eventos criados por coordenadores"
+          >
+            Selecionar apenas meus eventos
+            <span
+              className={`filtros-pill-dot ${
+                apenasCoordenadores ? "is-filled" : "is-empty"
+              }`}
+              aria-hidden="true"
+            />
+          </button>
+        </div>
+
+        <div className="filtros-row">
+          <div className="filtro-search">
+            <Search
+              size={16}
+              className="filtro-search__icon"
+              aria-hidden="true"
+            />
+            <input
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder="Buscar por nome, disciplina ou professor..."
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+
+  const topoDefault = (
+    <header className="eventos-publicados-header">
+      <h1>Eventos Publicados</h1>
+      <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
+    </header>
+  );
+
   if (!user && !usuarioLogado) {
     return (
-      <div className="eventos-publicados-page">
-        <div className="eventos-publicados-container">
-          <header className="eventos-publicados-header">
-            <h1>Eventos Publicados</h1>
-            <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
-          </header>
+      <div
+        className={`eventos-publicados-page ${
+          isCoordenador ? "eventos-publicados-page--coordenador" : ""
+        }`}
+      >
+        <div
+          className={`eventos-publicados-container ${
+            isCoordenador ? "eventos-publicados-container--coordenador" : ""
+          }`}
+        >
+          {isCoordenador ? topoCoordenador : topoDefault}
 
           <div className="eventos-publicados-empty">
             Usuário não identificado. Faça login novamente.
@@ -458,56 +516,20 @@ export default function EventosPublicados() {
   }
 
   return (
-    <div className="eventos-publicados-page">
-      <div className="eventos-publicados-container">
-        <header className="eventos-publicados-header">
-          <h1>Eventos Publicados</h1>
-          <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
-        </header>
+    <div
+      className={`eventos-publicados-page ${
+        isCoordenador ? "eventos-publicados-page--coordenador" : ""
+      }`}
+    >
+      <div
+        className={`eventos-publicados-container ${
+          isCoordenador ? "eventos-publicados-container--coordenador" : ""
+        }`}
+      >
+        {isCoordenador ? topoCoordenador : topoDefault}
 
-        {isCoordenador && (
-          <section className="filtros-card">
-            <div className="filtros-top">
-              <div className="filtros-title">
-                <Filter size={16} className="filtros-icon" aria-hidden="true" />
-                Filtros
-              </div>
-
-              <button
-                type="button"
-                className={`filtros-pill ${apenasCoordenadores ? "is-on" : ""}`}
-                onClick={() => setApenasCoordenadores((v) => !v)}
-                aria-pressed={apenasCoordenadores}
-                title="Apenas eventos criados por coordenadores"
-              >
-                Criados por essa coordenação
-                <span
-                  className={`filtros-pill-dot ${
-                    apenasCoordenadores ? "is-filled" : "is-empty"
-                  }`}
-                  aria-hidden="true"
-                />
-              </button>
-            </div>
-
-            <div className="filtros-row">
-              <div className="filtro-search">
-                <Search
-                  size={16}
-                  className="filtro-search__icon"
-                  aria-hidden="true"
-                />
-                <input
-                  value={busca}
-                  onChange={(e) => setBusca(e.target.value)}
-                  placeholder="Buscar por nome, disciplina ou professor..."
-                />
-              </div>
-            </div>
-          </section>
-        )}
-
-        <div className="eventos-publicados-list">
+       <div className="eventos-publicados-list-wrap">
+  <div className="eventos-publicados-list">
           {eventosFiltrados.map((ev) => {
             const criadoPor =
               usuariosById.get(Number(ev.criadoPorId))?.nome || "—";
@@ -521,7 +543,6 @@ export default function EventosPublicados() {
             const eventoPassado = isDataEventoPassada(ev.dataEvento);
             const temCalendario = !!ev.calendario;
             const temDestaque = !!ev.destaque;
-
             const podeEditar = !!ev.calendario;
 
             const turmasEv = getTurmasDoEvento(ev);
@@ -579,6 +600,7 @@ export default function EventosPublicados() {
           )}
         </div>
       </div>
+    </div>
     </div>
   );
 }

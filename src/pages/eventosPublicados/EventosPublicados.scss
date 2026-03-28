@@ -14,7 +14,7 @@ $azul-caneta: #8e8e93;
       margin: 0;
       font-size: 28px;
       line-height: 1.15;
-      font-weight: 800;
+      font-weight: 400;
       color: $azul-principal;
       letter-spacing: -0.2px;
     }
@@ -48,7 +48,7 @@ $azul-caneta: #8e8e93;
     align-items: center;
     gap: 10px;
     font-size: 16px;
-    font-weight: 800;
+    font-weight: 600;
     color: $azul-principal;
   }
 
@@ -412,6 +412,130 @@ $azul-caneta: #8e8e93;
   line-height: 1.2;
   font-weight: 400;
   color: $azul-caneta;
+}
+
+.eventos-publicados-header {
+  margin-bottom: 14px;
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.15;
+    font-weight: 800;
+    color: $azul-principal;
+    letter-spacing: -0.2px;
+  }
+
+  p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: $azul-principal;
+  }
+}
+
+/* ===============================
+   SOMENTE COORDENADOR
+   =============================== */
+.eventos-publicados-page--coordenador {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  padding: 0;
+
+  .eventos-publicados-container {
+    background: transparent;
+    box-shadow: none;
+    border: none;
+    padding: 0;
+  }
+}
+
+/* SOMENTE COORDENADOR - bloco branco dos cards */
+.eventos-publicados-page--coordenador {
+  .eventos-publicados-list-wrap {
+    background: #ffffff;
+    border: 1px solid #e6edf7;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
+  }
+
+  .eventos-publicados-list {
+    border-radius: 12px;
+    padding: 14px;
+    gap: 14px;
+  }
+
+  .evento-card {
+    background: #fafafa;
+    border: 1px solid #e6edf7;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(16, 24, 40, 0.03);
+  }
+}
+
+.eventos-publicados-page--coordenador {
+  .eventos-publicados-topo-coordenador {
+    background: #ffffff;
+    border: 1px solid #e6edf7;
+    border-radius: 16px;
+    padding: 18px 18px 16px;
+    box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
+    margin-bottom: 16px;
+  }
+
+  .eventos-publicados-topo-coordenador__header {
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #eef2f6;
+  }
+
+  .eventos-publicados-topo-coordenador__filtros {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .eventos-publicados-topo-coordenador .page-title {
+    margin: 0;
+    font-size: 28px;
+    line-height: 1.15;
+    font-weight: 600;
+    color: $azul-principal;
+    letter-spacing: -0.2px;
+  }
+
+  .eventos-publicados-topo-coordenador .filtros-card {
+    margin-bottom: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+}
+
+@media (max-width: 920px) {
+  .eventos-publicados-page--coordenador .card-bloco.criar-evento-card,
+  .eventos-publicados-page--coordenador
+    .card-bloco.criar-evento-card.filtros-card,
+  .eventos-publicados-page--coordenador .evento-card {
+    padding-left: 14px;
+    padding-right: 14px;
+    border-radius: 14px;
+  }
+
+  .eventos-publicados-page--coordenador .page-title {
+    font-size: 16px;
+  }
+
+  .eventos-publicados-page--coordenador .filtros-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .eventos-publicados-page--coordenador .filtros-pill {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 900px) {
