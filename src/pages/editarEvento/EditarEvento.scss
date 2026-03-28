@@ -1,102 +1,118 @@
-/* EditarEvento.scss */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import "../../styles/index";
 
-@import "../criarEvento/CriarEvento.scss";
+$azul-primario: #334e68;
+$azul-claro: #7fb3d5;
+$cinza-borda: #e2e8f0;
+$fundo-input: #f3f5f7;
+$fundo-focus: #f4f4f4;
+$hover-border: rgba(127, 179, 213, 0.95);
+$hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
+$card-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
-.painel-evento.editar-evento {
-  justify-content: flex-start;
-  align-items: flex-start;
-  margin-top: -12px;
+* {
+  box-sizing: border-box;
 }
 
-.painel-evento.editar-evento .editar-wrapper {
-  width: min(1128px, calc(100% - 10px));
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  padding-top: 8px;
+.painel-evento {
+  @include uiPageShell;
 }
 
-.painel-evento.editar-evento .editar-topbar {
-  width: min(1128px, calc(100% - 10px));
-  margin: 0 auto;
-  padding-top: 0px;
-  padding-bottom: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
+.titulo-sessao {
+  @include titulo;
+  margin: 0 0 16  px;
 }
 
-.painel-evento.editar-evento .btn-voltar {
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-
-  padding: 0px 0;
-
-  color: rgba(51, 78, 104, 0.85);
-
-  font-family: "Inter", sans-serif;
-  font-size: 15px;
+.titulo-evento {
   font-weight: 600;
+}
+
+.campo {
+  margin-bottom: 22px;
+
+  label {
+    display: block;
+    color: $azul-primario;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 10px;
+  }
+}
+
+.input-estilizado,
+.input-data,
+.select-estilizado {
+  width: 100%;
+  border: 1px solid $cinza-borda;
+  border-radius: 6px;
+  background: $fundo-input;
+  color: $azul-primario;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+
+  &::placeholder {
+    color: #cbd5e0;
+  }
 
   &:hover {
-    color: rgba(51, 78, 104, 1);
+    border-color: $hover-border;
+  }
+
+  &:focus {
+    outline: none;
+    background: $fundo-focus;
+    border-color: rgba(127, 179, 213, 0.9);
+    box-shadow: $hover-shadow;
+  }
+}
+
+.input-estilizado[type="text"],
+.input-data,
+.select-estilizado {
+  height: 44px;
+  padding: 0 14px;
+}
+
+textarea.input-estilizado {
+  min-height: 220px;
+  resize: none;
+  padding: 12px 14px;
+}
+
+.input-calendario-wrapper,
+.input-calendario-wrapper .react-datepicker-wrapper,
+.input-calendario-wrapper .react-datepicker__input-container {
+  width: 100%;
+}
+
+.container-btn {
+  display: flex;
+  justify-content: center;
+  margin-top: 18px;
+}
+
+.btn-publicar {
+  margin-top: 50px;
+  margin-left: 25%;
+  width: 380px;
+  max-width: 100%;
+  border: none;
+  border-radius: 6px;
+  background: $azul-claro;
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+
+  &:hover {
+    background: darken($azul-claro, 6%);
+    box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
   }
 
   &:active {
     transform: translateY(0.5px);
   }
-}
-
-.painel-evento.editar-evento .btn-voltar__seta {
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1;
-  text-shadow: 0.3px 0 0 currentColor;
-}
-
-.painel-evento.editar-evento .container-btn {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center; /* botão salvar central */
-  margin-top: 12px;
-}
-
-/* Botão excluir no canto direito */
-.painel-evento.editar-evento .btn-excluir {
-  position: absolute;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-
-  background: transparent;
-  border: 1px solid #d33;
-  color: #d33;
-
-  border-radius: 999px;
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: 0.15s ease;
-
-  &:hover {
-    background: rgba(211, 51, 51, 0.08);
-  }
-
-  &:active {
-    transform: translateY(-50%) scale(0.98);
-  }
-}
-
-.popper-calendario {
-  margin-top: 0px;
 }
 
 .contador-campo {
@@ -107,3 +123,624 @@
   text-align: right;
 }
 
+/* ===============================
+   NOTIFICAÇÕES
+   =============================== */
+
+.opcoes-bolinha {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.item-bolinha {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  transition: background 0.15s ease, transform 0.05s ease;
+
+  span {
+    color: $azul-primario;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  &:hover {
+    background: rgba(127, 179, 213, 0.12);
+  }
+
+  &:active {
+    transform: translateY(0.5px);
+  }
+
+  &:hover .circular-check {
+    border-color: $hover-border;
+  }
+}
+
+.circular-check {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(51, 78, 104, 0.35);
+  background: #fff;
+  flex: 0 0 auto;
+
+  &.active {
+    background: $azul-claro;
+    border-color: $azul-claro;
+  }
+}
+
+/* ===============================
+   DATE INPUT
+   =============================== */
+
+.date-input {
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border: 1px solid $cinza-borda;
+  border-radius: 6px;
+  background: $fundo-input;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    border-color: $hover-border;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $hover-border;
+    box-shadow: $hover-shadow;
+  }
+}
+
+.date-input__icon {
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid $cinza-borda;
+  border-radius: 6px;
+  background: $fundo-input;
+  color: rgba(51, 78, 104, 0.65);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.date-input:hover .date-input__icon {
+  border-color: $hover-border;
+  color: rgba(51, 78, 104, 0.85);
+}
+
+.date-input__placeholder,
+.date-input__value {
+  transition: color 0.15s ease;
+}
+
+.date-input__placeholder {
+  color: #9aa4b2;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.date-input__value {
+  color: $azul-primario;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.date-input:hover .date-input__placeholder {
+  color: rgba(46, 74, 103, 0.75);
+}
+
+/* ===============================
+   CALENDÁRIO
+   =============================== */
+
+.popper-calendario {
+  z-index: 9999;
+}
+
+.calendario-customizado.react-datepicker {
+  border: 0;
+  background: transparent;
+  font-family: "Inter", sans-serif;
+}
+
+.calendario-customizado .react-datepicker__month-container {
+  background: $fundo-input;
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+}
+
+.calendario-customizado .react-datepicker__header {
+  background: transparent;
+  border-bottom: 0;
+  padding: 0;
+}
+
+.calendario-customizado .cal-header.cal-header--figma {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 2px 2px 10px;
+}
+
+.calendario-customizado .cal-title,
+.calendario-customizado .cal-title.cal-title--figma {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2e4a67;
+  letter-spacing: -0.2px;
+}
+
+.calendario-customizado .cal-title.cal-title--figma {
+  justify-self: start;
+  text-align: left;
+  padding-left: 6px;
+}
+
+.calendario-customizado .cal-nav,
+.calendario-customizado .cal-nav.cal-nav--figma {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendario-customizado .cal-nav {
+  width: 28px;
+  height: 28px;
+  color: #9aa4b2;
+  font-size: 22px;
+  line-height: 1;
+  border-radius: 8px;
+}
+
+.calendario-customizado .cal-nav.cal-nav--figma {
+  width: 44px;
+  height: 30px;
+  color: #76a8d9;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 10px;
+}
+
+.calendario-customizado .cal-nav:hover,
+.calendario-customizado .cal-nav.cal-nav--figma:hover {
+  background: rgba(118, 168, 217, 0.16);
+}
+
+.calendario-customizado .react-datepicker__day-names {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0;
+  padding: 8px 4px 6px;
+}
+
+.calendario-customizado .react-datepicker__day-name {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9aa4b2;
+  letter-spacing: 0.12em;
+}
+
+.calendario-customizado .react-datepicker__month {
+  margin: 0;
+  padding: 0 4px 4px;
+}
+
+.calendario-customizado .react-datepicker__week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendario-customizado .react-datepicker__day {
+  margin: 0;
+  width: 36px;
+  height: 34px;
+  line-height: 34px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2e4a67;
+
+  &:hover {
+    background: rgba(127, 179, 213, 0.22);
+    color: #2e4a67;
+  }
+}
+
+.calendario-customizado .react-datepicker__day--outside-month {
+  color: rgba(46, 74, 103, 0.35) !important;
+
+  &:hover {
+    background: rgba(127, 179, 213, 0.14);
+  }
+}
+
+.calendario-customizado .react-datepicker__day--today {
+  box-shadow: inset 0 0 0 1px rgba(46, 74, 103, 0.12);
+  font-weight: 700;
+}
+
+.calendario-customizado .react-datepicker__day--selected {
+  background: #76a8d9 !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+.calendario-customizado .react-datepicker__day--keyboard-selected {
+  background: transparent !important;
+  color: #2e4a67 !important;
+  box-shadow: inset 0 0 0 1px rgba(46, 74, 103, 0.12);
+  border-radius: 8px;
+}
+
+.react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle {
+  display: none;
+}
+
+/* ===============================
+   TURMAS
+   =============================== */
+
+.turmas-toggle {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.turmas-toggle__btn {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid $cinza-borda;
+  background: #fff;
+  color: rgba(51, 78, 104, 0.85);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $hover-border;
+    box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.1);
+  }
+
+  &.is-active {
+    background: rgba(127, 179, 213, 0.18);
+    border-color: rgba(127, 179, 213, 0.75);
+    color: $azul-primario;
+  }
+}
+
+.turmas-select-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.select-wrap {
+  position: relative;
+  flex: 1 1 auto;
+}
+
+.select-arrow {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(51, 78, 104, 0.55);
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.btn-add-turma {
+  height: 44px;
+  padding: 0 14px;
+  border: 1px solid $cinza-borda;
+  border-radius: 6px;
+  background: #fff;
+  color: $azul-primario;
+  font-family: "Inter", sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
+
+  &:hover:not(:disabled) {
+    border-color: $hover-border;
+    box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.12);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0.5px);
+  }
+
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.turmas-chips {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip-turma {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(127, 179, 213, 0.14);
+  border: 1px solid rgba(127, 179, 213, 0.28);
+  border-radius: 999px;
+  padding: 6px 10px;
+}
+
+.chip-text {
+  color: $azul-primario;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.chip-remove {
+  width: 22px;
+  height: 22px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  color: rgba(51, 78, 104, 0.7);
+  border-radius: 999px;
+
+  &:hover {
+    background: rgba(127, 179, 213, 0.18);
+    color: rgba(51, 78, 104, 0.9);
+  }
+}
+
+.turmas-info {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  color: rgba(46, 74, 103, 0.7);
+}
+
+/* ===============================
+   CARD PADRÃO
+   =============================== */
+
+.card-bloco {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0;
+  margin-top: 0;
+}
+
+.titulo-bloco {
+  margin: 0 0 14px;
+  color: $azul-primario;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ===============================
+   SOMENTE COORDENADOR
+   =============================== */
+
+.criar-evento-coordenador-page {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  font-family: "Inter", sans-serif;
+}
+
+.criar-evento-coordenador-page .eventos-wrap--coordenador {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.criar-evento-coordenador-page .criar-evento-card {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #d9e2ec;
+  border-radius: 24px 0 0 24px;
+  box-shadow: $card-shadow;
+  padding: 22px 30px 22px;
+}
+
+.criar-evento-coordenador-page .page-title {
+  margin: 0 0 18px;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: #334e68;
+}
+
+.criar-evento-coordenador-page .section-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #334e68;
+}
+
+.criar-evento-coordenador-page .formulario--coordenador {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.criar-evento-coordenador-page .field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 0;
+
+  label {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #334e68;
+  }
+}
+
+.criar-evento-coordenador-page .input-estilizado[type="text"],
+.criar-evento-coordenador-page .select-estilizado {
+  height: 50px;
+}
+
+.criar-evento-coordenador-page textarea.input-estilizado {
+  min-height: 220px;
+}
+
+.criar-evento-coordenador-page .container-btn {
+  margin-top: 14px;
+}
+
+.criar-evento-coordenador-page .btn-publicar {
+  width: 420px;
+  height: 48px;
+}
+
+@media (max-width: 920px) {
+  .criar-evento-coordenador-page .criar-evento-card {
+    padding: 18px 18px 20px;
+    border-radius: 18px;
+  }
+
+  .criar-evento-coordenador-page .page-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .criar-evento-coordenador-page .eventos-wrap--coordenador {
+    gap: 10px;
+  }
+
+  .btn-publicar,
+  .criar-evento-coordenador-page .btn-publicar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .titulo-sessao {
+    font-size: 24px;
+  }
+
+  .eventos-wrap {
+    @include uiWhiteContainerMobile;
+  }
+}
+
+.editar-topbar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.btn-voltar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #7b8794;
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    color: #52606d;
+  }
+}
+
+.btn-voltar__seta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-arrow {
+  width: 16px;
+  height: 16px;
+}
+
+.container-btn--editar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-excluir {
+  bottom: 1px;
+  height: 0px;
+
+  width: auto;
+  padding: 6px 14px;
+
+  border: 1.5px solid #ff3b30;
+  border-radius: 999px;
+  background: #fff;
+  color: #ff3b30;
+
+  font-size: 12px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 59, 48, 0.05);
+  }
+
+
+  &:active {
+    transform: translateY(0.5px);
+  }
+}
+
+.criar-evento-coordenador-page .btn-excluir {
+  margin-left: 22%;
+  width: 120px;
+  max-width: 100%;
+  height: 40px;
+}
+
+@media (max-width: 920px) {
+  .btn-excluir,
+  .criar-evento-coordenador-page .btn-excluir {
+    width: 100%;
+  }
+}
