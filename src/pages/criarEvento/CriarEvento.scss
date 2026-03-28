@@ -1,29 +1,31 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "../../styles/index";
 
-$azul-primario: #334E68;
-$azul-claro: #7FB3D5;
-$cinza-borda: #E2E8F0;
-$fundo: #F4F4F4;
-$branco: #FFFFFF;
+$azul-primario: #334e68;
+$azul-claro: #7fb3d5;
+$cinza-borda: #e2e8f0;
+$fundo-input: #f3f5f7;
+$fundo-focus: #f4f4f4;
+$hover-border: rgba(127, 179, 213, 0.95);
+$hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
+$card-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
-* { box-sizing: border-box; }
+* {
+  box-sizing: border-box;
+}
 
 .painel-evento {
   @include uiPageShell;
 }
 
-
-
 .titulo-sessao {
- @include titulo;
+  @include titulo;
+  margin: 0 0 16  px;
 }
 
-.titulo-evento{
+.titulo-evento {
   font-weight: 600;
 }
-
 
 .campo {
   margin-bottom: 22px;
@@ -38,90 +40,61 @@ $branco: #FFFFFF;
 }
 
 .input-estilizado,
-.input-data {
+.input-data,
+.select-estilizado {
   width: 100%;
   border: 1px solid $cinza-borda;
   border-radius: 6px;
-
-  background: #F3F5F7;   /* ✅ Figma: #F4F4F4 dentro do campo */
+  background: $fundo-input;
   color: $azul-primario;
-
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 14px;
-  padding: 12px 14px;
 
-  &::placeholder { color: #CBD5E0; }
+  &::placeholder {
+    color: #cbd5e0;
+  }
+
+  &:hover {
+    border-color: $hover-border;
+  }
 
   &:focus {
     outline: none;
-    background: $fundo; /* mantém o mesmo tom ao focar */
-    border-color: rgba(127,179,213,0.9);
-    box-shadow: 0 0 0 3px rgba(127,179,213,0.18);
+    background: $fundo-focus;
+    border-color: rgba(127, 179, 213, 0.9);
+    box-shadow: $hover-shadow;
   }
 }
 
-
-.input-estilizado[type="text"] { height: 44px; }
+.input-estilizado[type="text"],
+.input-data,
+.select-estilizado {
+  height: 44px;
+  padding: 0 14px;
+}
 
 textarea.input-estilizado {
-  min-height: 220px;    /* garante altura igual Figma */
+  min-height: 220px;
   resize: none;
+  padding: 12px 14px;
 }
 
-.opcoes-checkbox {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 6px;
+.input-calendario-wrapper,
+.input-calendario-wrapper .react-datepicker-wrapper,
+.input-calendario-wrapper .react-datepicker__input-container {
+  width: 100%;
 }
-
-.item-check {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-
-  span { color: $azul-primario; font-size: 14px; }
-}
-
-.circular-check {
-  width: 16px;
-  height: 16px;
-  border: 1.5px solid rgba(51,78,104,0.35);
-  border-radius: 50%;
-  position: relative;
-  background: #fff;
-
-  &.active {
-    border-color: $azul-claro;
-
-    &::after {
-      content: "";
-      width: 8px;
-      height: 8px;
-      background: $azul-claro;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
-  }
-}
-
-.input-calendario-wrapper { width: 100%; }
-.input-data { height: 44px; }
 
 .container-btn {
   display: flex;
   justify-content: center;
-  margin-top: 28px;
+  margin-top: 18px;
 }
 
 .btn-publicar {
-  width: 460px;
+  width: 380px;
   max-width: 100%;
-  height: 44px;
+  height: 46px;
   border: none;
   border-radius: 6px;
   background: $azul-claro;
@@ -129,317 +102,35 @@ textarea.input-estilizado {
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
+  transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
 
-  &:hover { background: darken($azul-claro, 6%); }
+  &:hover {
+    background: darken($azul-claro, 6%);
+    box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
+  }
+
+  &:active {
+    transform: translateY(0.5px);
+  }
 }
 
-@media (max-width: 900px) {
-  .titulo-sessao { font-size: 24px; }
-  .btn-publicar { width: 100%; }
+.contador-campo {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(46, 74, 103, 0.65);
+  text-align: right;
 }
-
 
 /* ===============================
-   CALENDÁRIO (react-datepicker)
+   NOTIFICAÇÕES
    =============================== */
-
-.popper-calendario {
-  z-index: 9999;
-}
-
-/* Card do calendário */
-.calendario-customizado.react-datepicker {
-  border: 0;
-  background: transparent;
-  font-family: 'Inter', sans-serif;
-}
-
-/* Container “card” */
-.calendario-customizado .react-datepicker__month-container {
-  background: #F3F5F7;              /* fundo cinza claro do Figma */
-  border-radius: 18px;
-  padding: 14px 14px 12px;
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.10);
-}
-
-/* Header do calendário (mês/ano + setas) */
-.calendario-customizado .react-datepicker__header {
-  background: transparent;
-  border-bottom: 0;
-  padding: 0;
-}
-
-/* nosso header custom */
-.calendario-customizado .cal-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  padding: 2px 0 10px;
-}
-
-.calendario-customizado .cal-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: #2E4A67;                   /* azul do figma */
-  letter-spacing: -0.2px;
-}
-
-.calendario-customizado .cal-nav {
-  width: 28px;
-  height: 28px;
-  border: 0;
-  background: transparent;
-  color: #9AA4B2;
-  font-size: 22px;
-  line-height: 1;
-  cursor: pointer;
-  border-radius: 8px;
-
-  &:hover {
-    background: rgba(118, 168, 217, 0.16);
-    color: #76A8D9;
-  }
-}
-
-/* Linha dos dias da semana (SEG TER ...) */
-.calendario-customizado .react-datepicker__day-names {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin: 0;
-  padding: 8px 4px 6px;
-}
-
-.calendario-customizado .react-datepicker__day-name {
-  margin: 0;
-  font-size: 11px;
-  font-weight: 600;
-  color: #9AA4B2;
-  letter-spacing: 0.12em;
-}
-
-/* Grade do mês */
-.calendario-customizado .react-datepicker__month {
-  margin: 0;
-  padding: 0 4px 4px;
-}
-
-.calendario-customizado .react-datepicker__week {
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-}
-
-/* Células dos dias */
-.calendario-customizado .react-datepicker__day {
-  margin: 0;
-  width: 36px;
-  height: 34px;
-  line-height: 34px;
-  border-radius: 8px;
-  text-align: center;
-
-  font-size: 14px;
-  font-weight: 600;
-  color: #2E4A67;
-
-  &:hover {
-    background: rgba(118, 168, 217, 0.22);
-    color: #2E4A67;
-  }
-}
-
-/* Dias fora do mês */
-.calendario-customizado .react-datepicker__day--outside-month {
-  color: rgba(46, 74, 103, 0.35);
-}
-
-/* Hoje (sem “bolinha”, só leve destaque) */
-.calendario-customizado .react-datepicker__day--today {
-  box-shadow: inset 0 0 0 1px rgba(46, 74, 103, 0.12);
-  font-weight: 700;
-}
-
-/* Dia selecionado (somente quando o usuário clicar) */
-.calendario-customizado .react-datepicker__day--selected {
-  background: #76A8D9 !important;
-  color: #FFFFFF !important;
-  box-shadow: none;
-}
-
-/* "Foco" do teclado (não é seleção) — não deixe azul */
-.calendario-customizado .react-datepicker__day--keyboard-selected {
-  background: transparent !important;
-  color: #2E4A67 !important;
-  box-shadow: inset 0 0 0 1px rgba(46, 74, 103, 0.12);
-  border-radius: 8px;
-}
-
-
-/* Remove triângulos/bordas do popper */
-.react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle {
-  display: none;
-}
-
-
-/* ===== Header igual Figma (mês mais à esquerda + setas azuis nas pontas) ===== */
-
-.calendario-customizado .cal-header.cal-header--figma {
-  display: grid;
-  grid-template-columns: 44px 1fr 44px; /* setas “largas” */
-  align-items: center;
-
-  padding: 2px 2px 10px; /* leve respiro igual ao figma */
-}
-
-.calendario-customizado .cal-title.cal-title--figma {
-  justify-self: start;     /* mês vai pra esquerda */
-  text-align: left;
-
-  font-size: 14px;
-  font-weight: 700;
-  color: #2E4A67;
-  letter-spacing: -0.2px;
-
-  padding-left: 6px;       /* empurra um pouco pra esquerda como no figma */
-}
-
-.calendario-customizado .cal-nav.cal-nav--figma {
-  width: 44px;             /* mais largo */
-  height: 30px;            /* mais “achatado” como no figma */
-  border: 0;
-  background: transparent;
-
-  color: #76A8D9;          /* setas azuis */
-  font-size: 26px;         /* seta maior */
-  font-weight: 700;
-  line-height: 1;
-
-  cursor: pointer;
-  border-radius: 10px;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.calendario-customizado .cal-nav.cal-nav--figma:hover {
-  background: rgba(118, 168, 217, 0.16);
-}
-
-
-/* ===== Corrigir largura do input custom do DatePicker ===== */
-
-.input-calendario-wrapper--direita {
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* wrapper automático do react-datepicker */
-.input-calendario-wrapper--direita
-  .react-datepicker-wrapper,
-.input-calendario-wrapper--direita
-  .react-datepicker__input-container {
-  width: 560px; /* <<< CONTROLE REAL DA LARGURA */
-  max-width: 100%;
-}
-
-/* seu botão custom */
-.input-data--largo {
-  width: 100%;
-}
-
-/* ===== Radios iguais ao print ===== */
-.opcoes-radio {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.radio-item {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  cursor: pointer;
-
-  span {
-    color: $azul-primario;
-    font-size: 14px;
-    font-weight: 500;
-  }
-
-  input[type="radio"] {
-    width: 14px;
-    height: 14px;
-  }
-}
-
-/* ===== Campo data igual ao print (FULL WIDTH) ===== */
-.input-calendario-wrapper {
-  width: 100%;
-}
-
-/* wrappers do react-datepicker ocupando 100% */
-.input-calendario-wrapper .react-datepicker-wrapper,
-.input-calendario-wrapper .react-datepicker__input-container {
-  width: 100%;
-}
-
-/* botão que parece input */
-.date-input {
-  width: 100%;
-  height: 48px;
-
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  border: 1px solid $cinza-borda;
-  border-radius: 6px;
-  background: #fff;
-
-  padding: 0 14px;
-  cursor: pointer;
-  text-align: left;
-
-  &:focus {
-    outline: none;
-    border-color: rgba(127,179,213,0.9);
-    box-shadow: 0 0 0 3px rgba(127,179,213,0.18);
-  }
-}
-
-.date-input__icon {
-  width: 28px;
-  height: 28px;
-
-  display: grid;
-  place-items: center;
-
-  border: 1px solid $cinza-borda;
-  border-radius: 6px;
-  background: #fff;
-
-  color: rgba(51, 78, 104, 0.65);
-}
-
-.date-input__placeholder {
-  color: #9AA4B2;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.date-input__value {
-  color: $azul-primario;
-  font-size: 14px;
-  font-weight: 600;
-}
 
 .opcoes-bolinha {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  margin-top: 6px;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 .item-bolinha {
@@ -447,49 +138,15 @@ textarea.input-estilizado {
   align-items: center;
   gap: 12px;
   cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 8px;
+  transition: background 0.15s ease, transform 0.05s ease;
 
   span {
     color: $azul-primario;
     font-size: 14px;
     font-weight: 500;
   }
-}
-
-.circular-check {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  border: 1.5px solid rgba(51,78,104,0.35);
-  background: #fff;
-  flex: 0 0 auto;
-
-  &.active {
-    background: $azul-claro;     /* <<< bolinha toda preenchida */
-    border-color: $azul-claro;
-  }
-}
-
-/* ===============================
-   HOVERS + PADRÃO VISUAL (FORM)
-   =============================== */
-
-/* cor do hover/foco (mesma linha do botão) */
-$hover-border: rgba(127, 179, 213, 0.95);
-$hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
-
-/* Inputs padrões (titulo/descricao) - hover */
-.input-estilizado:hover {
-  border-color: $hover-border;
-}
-
-/* ===============================
-   NOTIFICAÇÕES (bolinha) - hover em tudo
-   =============================== */
-
-.item-bolinha {
-  padding: 4px 6px;
-  border-radius: 8px;
-  transition: background 0.15s ease, transform 0.05s ease;
 
   &:hover {
     background: rgba(127, 179, 213, 0.12);
@@ -498,24 +155,43 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
   &:active {
     transform: translateY(0.5px);
   }
+
+  &:hover .circular-check {
+    border-color: $hover-border;
+  }
 }
 
-/* bolinha: hover com borda azul */
-.item-bolinha:hover .circular-check {
-  border-color: $hover-border;
+.circular-check {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(51, 78, 104, 0.35);
+  background: #fff;
+  flex: 0 0 auto;
+
+  &.active {
+    background: $azul-claro;
+    border-color: $azul-claro;
+  }
 }
 
 /* ===============================
-   DATE INPUT (Escolha uma data)
-   - fundo igual inputs (#F3F5F7)
-   - hover/foco com borda azul
+   DATE INPUT
    =============================== */
 
 .date-input {
-  background: #F3F5F7; /* <<< igual aos inputs acima */
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
   border: 1px solid $cinza-borda;
-  transition: border-color 0.15s ease, box-shadow 0.15s ease,
-    background 0.15s ease;
+  border-radius: 6px;
+  background: $fundo-input;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
 
   &:hover {
     border-color: $hover-border;
@@ -528,22 +204,38 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
   }
 }
 
-/* ícone (quadradinho) seguindo o estilo do input */
 .date-input__icon {
-  background: #F3F5F7; /* <<< igual ao campo */
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border: 1px solid $cinza-borda;
+  border-radius: 6px;
+  background: $fundo-input;
+  color: rgba(51, 78, 104, 0.65);
   transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
-/* quando hover no campo, o ícone acompanha */
 .date-input:hover .date-input__icon {
   border-color: $hover-border;
   color: rgba(51, 78, 104, 0.85);
 }
 
-/* placeholder e valor com leve transição */
 .date-input__placeholder,
 .date-input__value {
   transition: color 0.15s ease;
+}
+
+.date-input__placeholder {
+  color: #9aa4b2;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.date-input__value {
+  color: $azul-primario;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .date-input:hover .date-input__placeholder {
@@ -551,79 +243,191 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
 }
 
 /* ===============================
-   DatePicker wrapper - garante width 100% sem conflito
+   CALENDÁRIO
    =============================== */
 
-.input-calendario-wrapper {
-  width: 100%;
+.popper-calendario {
+  z-index: 9999;
 }
 
-.input-calendario-wrapper .react-datepicker-wrapper,
-.input-calendario-wrapper .react-datepicker__input-container {
-  width: 100%;
+.calendario-customizado.react-datepicker {
+  border: 0;
+  background: transparent;
+  font-family: "Inter", sans-serif;
 }
 
-/* ===============================
-   Botão Publicar - hover mais evidente
-   =============================== */
+.calendario-customizado .react-datepicker__month-container {
+  background: $fundo-input;
+  border-radius: 18px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.1);
+}
 
-.btn-publicar {
-  transition: background 0.15s ease, transform 0.05s ease, box-shadow 0.15s ease;
+.calendario-customizado .react-datepicker__header {
+  background: transparent;
+  border-bottom: 0;
+  padding: 0;
+}
+
+.calendario-customizado .cal-header.cal-header--figma {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 2px 2px 10px;
+}
+
+.calendario-customizado .cal-title,
+.calendario-customizado .cal-title.cal-title--figma {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2e4a67;
+  letter-spacing: -0.2px;
+}
+
+.calendario-customizado .cal-title.cal-title--figma {
+  justify-self: start;
+  text-align: left;
+  padding-left: 6px;
+}
+
+.calendario-customizado .cal-nav,
+.calendario-customizado .cal-nav.cal-nav--figma {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendario-customizado .cal-nav {
+  width: 28px;
+  height: 28px;
+  color: #9aa4b2;
+  font-size: 22px;
+  line-height: 1;
+  border-radius: 8px;
+}
+
+.calendario-customizado .cal-nav.cal-nav--figma {
+  width: 44px;
+  height: 30px;
+  color: #76a8d9;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 10px;
+}
+
+.calendario-customizado .cal-nav:hover,
+.calendario-customizado .cal-nav.cal-nav--figma:hover {
+  background: rgba(118, 168, 217, 0.16);
+}
+
+.calendario-customizado .react-datepicker__day-names {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin: 0;
+  padding: 8px 4px 6px;
+}
+
+.calendario-customizado .react-datepicker__day-name {
+  margin: 0;
+  font-size: 11px;
+  font-weight: 600;
+  color: #9aa4b2;
+  letter-spacing: 0.12em;
+}
+
+.calendario-customizado .react-datepicker__month {
+  margin: 0;
+  padding: 0 4px 4px;
+}
+
+.calendario-customizado .react-datepicker__week {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.calendario-customizado .react-datepicker__day {
+  margin: 0;
+  width: 36px;
+  height: 34px;
+  line-height: 34px;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #2e4a67;
 
   &:hover {
-    box-shadow: 0 8px 20px rgba(127, 179, 213, 0.25);
-  }
-
-  &:active {
-    transform: translateY(0.5px);
+    background: rgba(127, 179, 213, 0.22);
+    color: #2e4a67;
   }
 }
 
-/* ===============================
-   Calendário (dias) - hover mais suave (mantém seu estilo)
-   =============================== */
-
-.calendario-customizado .react-datepicker__day:hover {
-  background: rgba(127, 179, 213, 0.22);
-}
-
-
-/* ===== Contador abaixo dos campos ===== */
-.contador-campo {
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: rgba(46, 74, 103, 0.65);
-  text-align: right;
-}
-
-/* ===== Aproximar as opções (calendário/destaque) ===== */
-.opcoes-bolinha--compacta {
-  gap: 6px;        /* antes 10px */
-  margin-top: 4px; /* antes 6px */
-
-  .item-bolinha {
-    padding: 2px 6px; /* levemente menor para “aproximar” visualmente */
-  }
-}
-
-/* ===== Calendário: manter padrão visual estável e dias fora do mês cinza ===== */
-/* (dias fora do mês já ficam cinza no seu CSS, mas reforçamos para manter mesmo clicável) */
 .calendario-customizado .react-datepicker__day--outside-month {
   color: rgba(46, 74, 103, 0.35) !important;
+
+  &:hover {
+    background: rgba(127, 179, 213, 0.14);
+  }
 }
 
-/* opcional: se quiser diminuir a “diferença” visual do mês fora */
-.calendario-customizado .react-datepicker__day--outside-month:hover {
-  background: rgba(127, 179, 213, 0.14);
+.calendario-customizado .react-datepicker__day--today {
+  box-shadow: inset 0 0 0 1px rgba(46, 74, 103, 0.12);
+  font-weight: 700;
 }
 
+.calendario-customizado .react-datepicker__day--selected {
+  background: #76a8d9 !important;
+  color: #fff !important;
+  box-shadow: none;
+}
+
+.calendario-customizado .react-datepicker__day--keyboard-selected {
+  background: transparent !important;
+  color: #2e4a67 !important;
+  box-shadow: inset 0 0 0 1px rgba(46, 74, 103, 0.12);
+  border-radius: 8px;
+}
+
+.react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle {
+  display: none;
+}
 
 /* ===============================
-   TURMAS (somente COORDENADOR)
-   - Select igual ao Figma
-   - Multi com "chips"
+   TURMAS
    =============================== */
+
+.turmas-toggle {
+  display: inline-flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.turmas-toggle__btn {
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: 1px solid $cinza-borda;
+  background: #fff;
+  color: rgba(51, 78, 104, 0.85);
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $hover-border;
+    box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.1);
+  }
+
+  &.is-active {
+    background: rgba(127, 179, 213, 0.18);
+    border-color: rgba(127, 179, 213, 0.75);
+    color: $azul-primario;
+  }
+}
 
 .turmas-select-row {
   display: flex;
@@ -634,40 +438,6 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
 .select-wrap {
   position: relative;
   flex: 1 1 auto;
-}
-
-.select-estilizado {
-  width: 100%;
-  height: 44px;
-
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-
-  border: 1px solid $cinza-borda;
-  border-radius: 6px;
-
-  background: #F3F5F7;
-  color: $azul-primario;
-
-  font-family: "Inter", sans-serif;
-  font-size: 14px;
-  font-weight: 500;
-
-  padding: 0 42px 0 14px; /* espaço pra setinha */
-  cursor: pointer;
-
-  transition: border-color 0.15s ease, box-shadow 0.15s ease;
-
-  &:hover {
-    border-color: rgba(127, 179, 213, 0.95);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: rgba(127, 179, 213, 0.95);
-    box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
-  }
 }
 
 .select-arrow {
@@ -685,20 +455,16 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
   padding: 0 14px;
   border: 1px solid $cinza-borda;
   border-radius: 6px;
-
   background: #fff;
   color: $azul-primario;
-
   font-family: "Inter", sans-serif;
   font-size: 14px;
   font-weight: 600;
-
   cursor: pointer;
-
   transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
 
   &:hover:not(:disabled) {
-    border-color: rgba(127, 179, 213, 0.95);
+    border-color: $hover-border;
     box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.12);
   }
 
@@ -723,11 +489,9 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-
   background: rgba(127, 179, 213, 0.14);
   border: 1px solid rgba(127, 179, 213, 0.28);
   border-radius: 999px;
-
   padding: 6px 10px;
 }
 
@@ -740,14 +504,11 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
 .chip-remove {
   width: 22px;
   height: 22px;
-
   border: 0;
   background: transparent;
   cursor: pointer;
-
   display: grid;
   place-items: center;
-
   color: rgba(51, 78, 104, 0.7);
   border-radius: 999px;
 
@@ -757,13 +518,22 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
   }
 }
 
+.turmas-info {
+  margin: 12px 0 6px;
+  font-size: 13px;
+  color: rgba(46, 74, 103, 0.7);
+}
+
+/* ===============================
+   CARD PADRÃO
+   =============================== */
 
 .card-bloco {
   background: transparent;
   box-shadow: none;
   border-radius: 0;
   padding: 0;
-  margin-top: 10px;
+  margin-top: 0;
 }
 
 .titulo-bloco {
@@ -773,52 +543,118 @@ $hover-shadow: 0 0 0 3px rgba(127, 179, 213, 0.18);
   font-weight: 700;
 }
 
-/* seu H1 (já existe), só reforçando margem no card */
-.titulo-sessao {
-  margin: 0 0 16px;
+/* ===============================
+   SOMENTE COORDENADOR
+   =============================== */
+
+.criar-evento-coordenador-page {
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  font-family: "Inter", sans-serif;
 }
 
-/* em telas menores mantém o mesmo padrão */
-@media (max-width: 900px) {
-  .eventos-wrap { @include uiWhiteContainerMobile; }
-  .btn-publicar { width: 100%; }
-  .titulo-sessao { font-size: 24px; }
+.criar-evento-coordenador-page .eventos-wrap--coordenador {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.turmas-toggle {
-  display: inline-flex;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.turmas-toggle__btn {
-  height: 34px;
-  padding: 0 14px;
-  border-radius: 8px;
-  border: 1px solid $cinza-borda;
+.criar-evento-coordenador-page .criar-evento-card {
+  width: 100%;
   background: #fff;
-  color: rgba(51, 78, 104, 0.85);
-  font-weight: 600;
-  font-size: 13px;
-  cursor: pointer;
+  border: 1px solid #d9e2ec;
+  border-radius: 24px;
+  box-shadow: $card-shadow;
+  padding: 22px 30px 22px;
+}
 
-  &:hover {
-    border-color: rgba(127, 179, 213, 0.95);
-    box-shadow: 0 0 0 3px rgba(127, 179, 213, 0.10);
-  }
+.criar-evento-coordenador-page .page-title {
+  margin: 0 0 18px;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: #334e68;
+}
 
-  &.is-active {
-    background: rgba(127, 179, 213, 0.18);
-    border-color: rgba(127, 179, 213, 0.75);
-    color: $azul-primario;
+.criar-evento-coordenador-page .section-title {
+  margin: 0 0 12px;
+  font-size: 18px;
+  line-height: 1.2;
+  font-weight: 700;
+  color: #334e68;
+}
+
+.criar-evento-coordenador-page .formulario--coordenador {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.criar-evento-coordenador-page .field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 0;
+
+  label {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #334e68;
   }
 }
 
-.turmas-info {
-  margin-top: 10px;
-  font-size: 13px;
-  margin-top: 15px;
-  margin-bottom: 15px;
-  color: rgba(46, 74, 103, 0.70);
+.criar-evento-coordenador-page .input-estilizado[type="text"],
+.criar-evento-coordenador-page .select-estilizado {
+  height: 50px;
 }
 
+.criar-evento-coordenador-page textarea.input-estilizado {
+  min-height: 220px;
+}
+
+.criar-evento-coordenador-page .container-btn {
+  margin-top: 14px;
+}
+
+.criar-evento-coordenador-page .btn-publicar {
+  width: 420px;
+  height: 48px;
+}
+
+@media (max-width: 920px) {
+  .criar-evento-coordenador-page .criar-evento-card {
+    padding: 18px 18px 20px;
+    border-radius: 18px;
+  }
+
+  .criar-evento-coordenador-page .page-title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .criar-evento-coordenador-page .eventos-wrap--coordenador {
+    gap: 10px;
+  }
+
+  .btn-publicar,
+  .criar-evento-coordenador-page .btn-publicar {
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .titulo-sessao {
+    font-size: 24px;
+  }
+
+  .eventos-wrap {
+    @include uiWhiteContainerMobile;
+  }
+}

@@ -116,7 +116,13 @@ const CriarEvento = () => {
     setTurmaIds((prev) => prev.filter((x) => x !== id));
   };
 
-  function resolverDisciplinaIds({ isCoordenador, modoTurmas, turmaIds, turmasDisponiveis, disciplinaAtual }) {
+  function resolverDisciplinaIds({
+    isCoordenador,
+    modoTurmas,
+    turmaIds,
+    turmasDisponiveis,
+    disciplinaAtual,
+  }) {
     if (!isCoordenador) {
       return disciplinaAtual ? [Number(disciplinaAtual)] : [];
     }
@@ -343,13 +349,29 @@ const CriarEvento = () => {
   );
 
   return (
-    <div className="painel-evento">
-      <div className="eventos-wrap">
-        <section className="card-bloco">
-          <h1 className="titulo-sessao">Criar novo evento</h1>
+    <div
+      className={`painel-evento ${isCoordenador ? "criar-evento-coordenador-page" : ""}`}
+    >
+      <div
+        className={`eventos-wrap ${isCoordenador ? "eventos-wrap--coordenador" : ""}`}
+      >
+        <section
+          className={`card-bloco ${
+            isCoordenador ? "criar-evento-card criar-evento-card--top" : ""
+          }`}
+        >
+          <h1 className={isCoordenador ? "page-title" : "titulo-sessao"}>
+            Criar novo evento
+          </h1>
 
-          <div className="formulario">
-            <div className="campo">
+          <div
+            className={
+              isCoordenador
+                ? "formulario formulario--coordenador"
+                : "formulario"
+            }
+          >
+            <div className={isCoordenador ? "field" : "campo"}>
               <label className="titulo-evento">Título</label>
               <input
                 type="text"
@@ -369,7 +391,7 @@ const CriarEvento = () => {
               </div>
             </div>
 
-            <div className="campo">
+            <div className={isCoordenador ? "field" : "campo"}>
               <label>Descrição</label>
               <textarea
                 rows="10"
@@ -391,15 +413,13 @@ const CriarEvento = () => {
         </section>
 
         {isCoordenador && (
-          <section className="card-bloco">
-            <h2 className="titulo-bloco">Turmas</h2>
+          <section className="card-bloco criar-evento-card">
+            <h2 className="section-title">Turmas</h2>
 
             <div className="turmas-toggle">
               <button
                 type="button"
-                className={`turmas-toggle__btn ${
-                  modoTurmas === "all" ? "is-active" : ""
-                }`}
+                className={`turmas-toggle__btn ${modoTurmas === "all" ? "is-active" : ""}`}
                 onClick={setAllTurmas}
               >
                 Todas
@@ -407,16 +427,14 @@ const CriarEvento = () => {
 
               <button
                 type="button"
-                className={`turmas-toggle__btn ${
-                  modoTurmas === "some" ? "is-active" : ""
-                }`}
+                className={`turmas-toggle__btn ${modoTurmas === "some" ? "is-active" : ""}`}
                 onClick={setSomeTurmas}
               >
                 Selecionar
               </button>
             </div>
 
-            <div className="campo" style={{ marginBottom: 0 }}>
+            <div className="field" style={{ marginBottom: 0 }}>
               <div className="turmas-select-row">
                 <div className="select-wrap">
                   <select
@@ -482,10 +500,18 @@ const CriarEvento = () => {
           </section>
         )}
 
-        <section className="card-bloco">
-          <div className="campo">
-            <label className="label-notificacao">Tipo de notificação</label>
+        <section
+          className={`card-bloco ${isCoordenador ? "criar-evento-card" : ""}`}
+        >
+          {isCoordenador ? (
+            <h2 className="section-title">Tipo de notificação</h2>
+          ) : (
+            <div className="campo">
+              <label className="label-notificacao">Tipo de notificação</label>
+            </div>
+          )}
 
+          <div className={isCoordenador ? "field" : "campo"}>
             <div className="opcoes-bolinha opcoes-bolinha--compacta">
               <div
                 className="item-bolinha"
@@ -531,7 +557,7 @@ const CriarEvento = () => {
           </div>
 
           {notificacoes.calendario && (
-            <div className="campo">
+            <div className={isCoordenador ? "field" : "campo"}>
               <label>Data do evento</label>
 
               <div className="input-calendario-wrapper">
