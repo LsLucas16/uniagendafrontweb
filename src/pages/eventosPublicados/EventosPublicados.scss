@@ -478,16 +478,16 @@ $azul-caneta: #8e8e93;
   .eventos-publicados-topo-coordenador {
     background: #ffffff;
     border: 1px solid #e6edf7;
-    border-radius: 16px;
-    padding: 18px 18px 16px;
+    border-radius: 24px;
+    padding: 22px 22px 18px;
     box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
     margin-bottom: 16px;
+    width: calc(100% + 10px);
+    margin-left: -5px;
   }
 
   .eventos-publicados-topo-coordenador__header {
     padding-bottom: 14px;
-    margin-bottom: 14px;
-    border-bottom: 1px solid #eef2f6;
   }
 
   .eventos-publicados-topo-coordenador__filtros {
