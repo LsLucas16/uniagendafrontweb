@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import data from "../../data/dados.json";
 import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
 import "./CriarTurma.scss";
+import ImportarAlunos from "../../components/ImportarAlunos/ImportarAlunos";
 
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_TURMA_ALUNOS = "turma_alunos_override";
@@ -450,7 +451,7 @@ export default function CriarTurma() {
       criadaEm: new Date().toISOString(),
     };
 
-      turmaAlunosOverride[String(novoId)] = alunosSelecionados.map((a) =>
+    turmaAlunosOverride[String(novoId)] = alunosSelecionados.map((a) =>
       Number(a.id),
     );
 
@@ -631,16 +632,33 @@ export default function CriarTurma() {
           <div className="section-head">
             <h2 className="section-title">Lista de alunos</h2>
 
-            <button
-              type="button"
+            <ImportarAlunos
+              usuarios={baseUsuarios}
+              faculdadeId={instituicaoIdAtual}
+              idsJaExistentes={alunosSelecionados.map((a) => Number(a.id))}
+              buttonLabel="Importar lista"
               className="btn-import"
-              onClick={() =>
-                Swal.fire("Info", "Função de importação (mock).", "info")
-              }
-            >
-              <Upload size={13} />
-              <span>Importar lista</span>
-            </button>
+              onImportConfirm={(idsNovos) => {
+                const usuariosImportados = baseUsuarios
+                  .filter((u) => idsNovos.includes(Number(u.id)))
+                  .map((u) => ({
+                    id: u.id,
+                    nome: u.nome,
+                    matricula: u.user,
+                    email: u.email || "",
+                  }));
+
+                setAlunosSelecionados((prev) => {
+                  const idsAtuais = new Set(prev.map((a) => Number(a.id)));
+
+                  const novosFormatados = usuariosImportados.filter(
+                    (u) => !idsAtuais.has(Number(u.id)),
+                  );
+
+                  return [...prev, ...novosFormatados];
+                });
+              }}
+            />
           </div>
 
           <div className="search-wrap" ref={searchWrapRef}>

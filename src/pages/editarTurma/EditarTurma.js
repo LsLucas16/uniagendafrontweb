@@ -4,10 +4,10 @@ import { Pencil, Upload, Search, X } from "lucide-react";
 import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
 
-
 import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
 import data from "../../data/dados.json";
 import "./EditarTurma.scss";
+import ImportarAlunos from "../../components/ImportarAlunos/ImportarAlunos";
 
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_TURMA_ALUNOS = "turma_alunos_override";
@@ -123,7 +123,6 @@ export default function EditarTurma() {
   const [editIndex, setEditIndex] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
-
   const searchWrapRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -182,7 +181,10 @@ export default function EditarTurma() {
     window.addEventListener("storage", onStorage);
 
     return () => {
-      window.removeEventListener("disciplinaAtual:changed", onDisciplinaChanged);
+      window.removeEventListener(
+        "disciplinaAtual:changed",
+        onDisciplinaChanged,
+      );
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -463,9 +465,13 @@ export default function EditarTurma() {
       .filter((u) => !jaVinculados.has(Number(u.id)))
       .filter(
         (u) =>
-          String(u.nome || "").toLowerCase().includes(q) ||
+          String(u.nome || "")
+            .toLowerCase()
+            .includes(q) ||
           String(u.id || "").includes(q) ||
-          String(u.user || "").toLowerCase().includes(q),
+          String(u.user || "")
+            .toLowerCase()
+            .includes(q),
       )
       .slice(0, 8);
 
@@ -487,349 +493,6 @@ export default function EditarTurma() {
     map[String(turmaId)] = nextIds;
     setTurmaAlunosOverride(map);
   }
-
-  const handleOpenImport = async () => {
-  if (!fileInputRef.current) return;
-
-  const htmlTutorial = `
-    <div style="text-align:left; color:#334e68;">
-      <div style="
-        border:1px solid #e9edf3;
-        border-radius:12px;
-        padding:14px;
-        background:#f8fbfe;
-        margin-top:8px;
-      ">
-        <div style="font-size:15px; font-weight:700; margin-bottom:10px; color:#2e4a67;">
-          Como importar a lista de alunos
-        </div>
-
-        <ol style="padding-left:18px; margin:0; line-height:1.7;">
-          <li>Crie um arquivo <strong>Excel</strong> (.xlsx ou .xls).</li>
-          <li>Preencha com os <strong>números de matrícula</strong> dos alunos.</li>
-          <li>Informe <strong>uma matrícula por linha</strong> para evitar erros.</li>
-          <li>Ao importar, o sistema vai mostrar quais alunos foram encontrados e quais entrarão na turma.</li>
-        </ol>
-      </div>
-
-      <div style="
-        margin-top:14px;
-        border:1px dashed #cbd5e1;
-        border-radius:12px;
-        padding:14px;
-        background:#fff;
-      ">
-        <div style="font-size:14px; font-weight:700; margin-bottom:8px; color:#2e4a67;">
-          Exemplo do Excel
-        </div>
-
-        <div style="
-          border:1px solid #e9edf3;
-          border-radius:8px;
-          overflow:hidden;
-          font-size:13px;
-        ">
-          <div style="display:grid; grid-template-columns:60px 1fr; background:#eef6fc; font-weight:700;">
-            <div style="padding:8px; border-right:1px solid #e9edf3;">Linha</div>
-            <div style="padding:8px;">Matrícula</div>
-          </div>
-          <div style="display:grid; grid-template-columns:60px 1fr; border-top:1px solid #e9edf3;">
-            <div style="padding:8px; border-right:1px solid #e9edf3;">1</div>
-            <div style="padding:8px;">202610103</div>
-          </div>
-          <div style="display:grid; grid-template-columns:60px 1fr; border-top:1px solid #e9edf3;">
-            <div style="padding:8px; border-right:1px solid #e9edf3;">2</div>
-            <div style="padding:8px;">202610104</div>
-          </div>
-          <div style="display:grid; grid-template-columns:60px 1fr; border-top:1px solid #e9edf3;">
-            <div style="padding:8px; border-right:1px solid #e9edf3;">3</div>
-            <div style="padding:8px;">202610105</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-
-  const result = await Swal.fire({
-    icon: "info",
-    title: "Tutorial de importação",
-    html: htmlTutorial,
-    width: 760,
-    showCancelButton: true,
-    confirmButtonText: "Continuar",
-    cancelButtonText: "Cancelar",
-    confirmButtonColor: "#76a9da",
-    cancelButtonColor: "#d9dee5",
-    background: "#ffffff",
-    color: "#334e68",
-    customClass: {
-      popup: "swal-import-popup",
-      title: "swal-import-title",
-      confirmButton: "swal-import-confirm",
-      cancelButton: "swal-import-cancel",
-    },
-  });
-
-  if (!result.isConfirmed) return;
-
-  fileInputRef.current.value = "";
-  fileInputRef.current.click();
-};
-
-  const handleImportLista = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (!turmaId || !user) {
-      await Swal.fire({
-        icon: "warning",
-        title: "Turma não identificada",
-        text: "Selecione uma turma antes de importar a lista.",
-        confirmButtonColor: "#76a9da",
-      });
-      return;
-    }
-
-    try {
-      const buffer = await file.arrayBuffer();
-      const workbook = XLSX.read(buffer, { type: "array" });
-
-      const firstSheetName = workbook.SheetNames?.[0];
-      if (!firstSheetName) {
-        await Swal.fire({
-          icon: "warning",
-          title: "Arquivo vazio",
-          text: "Não foi encontrada nenhuma aba no arquivo enviado.",
-          confirmButtonColor: "#76a9da",
-        });
-        return;
-      }
-
-      const worksheet = workbook.Sheets[firstSheetName];
-
-      const rows = XLSX.utils.sheet_to_json(worksheet, {
-        header: 1,
-        raw: false,
-        defval: "",
-      });
-
-      const matriculasLidas = rows
-        .flat()
-        .map((cell) => normalizeMatricula(cell))
-        .filter(Boolean);
-
-      if (!matriculasLidas.length) {
-        await Swal.fire({
-          icon: "warning",
-          title: "Nenhuma matrícula encontrada",
-          text: "O arquivo não possui dados válidos para importação.",
-          confirmButtonColor: "#76a9da",
-        });
-        return;
-      }
-
-      const matriculasUnicas = Array.from(new Set(matriculasLidas));
-
-      const usuariosDaFaculdade = baseUsuarios.filter(
-        (u) => Number(u.faculdadeId) === Number(user.faculdadeId),
-      );
-
-      const mapaPorMatricula = new Map(
-        usuariosDaFaculdade.map((u) => [getUsuarioMatricula(u), u]),
-      );
-
-      const encontrados = [];
-      const naoEncontrados = [];
-
-      matriculasUnicas.forEach((matricula) => {
-        const usuarioEncontrado = mapaPorMatricula.get(matricula);
-
-        if (usuarioEncontrado) {
-          encontrados.push(usuarioEncontrado);
-        } else {
-          naoEncontrados.push(matricula);
-        }
-      });
-
-      const encontradosUnicos = encontrados.filter(
-        (item, index, arr) =>
-          arr.findIndex((x) => Number(x.id) === Number(item.id)) === index,
-      );
-
-      const novosIds = encontradosUnicos.map((u) => Number(u.id));
-      const idsJaNaTurma = new Set(alunosIds.map(Number));
-
-      const realmenteNovos = novosIds.filter(
-        (id) => !idsJaNaTurma.has(Number(id)),
-      );
-      const jaExistiam = novosIds.filter((id) => idsJaNaTurma.has(Number(id)));
-
-      const htmlEncontrados =
-        encontradosUnicos.length > 0
-          ? `
-            <div style="text-align:left; margin-top:12px;">
-              <div style="font-weight:700; color:#2e4a67; margin-bottom:8px;">
-                Identificados na faculdade (${encontradosUnicos.length})
-              </div>
-              <div style="
-                max-height:160px;
-                overflow:auto;
-                border:1px solid #e9edf3;
-                border-radius:8px;
-                padding:10px 12px;
-                background:#f8fbfe;
-                font-size:13px;
-                color:#334e68;
-              ">
-                ${encontradosUnicos
-                  .map(
-                    (u) =>
-                      `<div style="margin-bottom:6px;"><strong>${u.nome}</strong> — ${getUsuarioMatricula(u)}</div>`,
-                  )
-                  .join("")}
-              </div>
-            </div>
-          `
-          : "";
-
-      const htmlNaoEncontrados =
-        naoEncontrados.length > 0
-          ? `
-            <div style="text-align:left; margin-top:14px;">
-              <div style="font-weight:700; color:#2e4a67; margin-bottom:8px;">
-                Matrículas não identificadas (${naoEncontrados.length})
-              </div>
-              <div style="
-                max-height:120px;
-                overflow:auto;
-                border:1px solid #e9edf3;
-                border-radius:8px;
-                padding:10px 12px;
-                background:#fff;
-                font-size:13px;
-                color:#667085;
-              ">
-                ${naoEncontrados
-                  .map(
-                    (matricula) =>
-                      `<div style="margin-bottom:6px;">${matricula}</div>`,
-                  )
-                  .join("")}
-              </div>
-            </div>
-          `
-          : "";
-
-      const htmlResumo = `
-        <div style="text-align:left;">
-          <div style="
-            display:grid;
-            grid-template-columns:1fr 1fr;
-            gap:10px;
-            margin-top:8px;
-          ">
-            <div style="
-              border:1px solid #e9edf3;
-              border-radius:10px;
-              padding:12px;
-              background:#f8fbfe;
-            ">
-              <div style="font-size:12px; color:#667085;">Lidas no arquivo</div>
-              <div style="font-size:20px; font-weight:700; color:#2e4a67;">${matriculasUnicas.length}</div>
-            </div>
-
-            <div style="
-              border:1px solid #e9edf3;
-              border-radius:10px;
-              padding:12px;
-              background:#f8fbfe;
-            ">
-              <div style="font-size:12px; color:#667085;">Encontradas</div>
-              <div style="font-size:20px; font-weight:700; color:#2e4a67;">${encontradosUnicos.length}</div>
-            </div>
-
-            <div style="
-              border:1px solid #e9edf3;
-              border-radius:10px;
-              padding:12px;
-              background:#f8fbfe;
-            ">
-              <div style="font-size:12px; color:#667085;">Novos para adicionar</div>
-              <div style="font-size:20px; font-weight:700; color:#2e4a67;">${realmenteNovos.length}</div>
-            </div>
-
-            <div style="
-              border:1px solid #e9edf3;
-              border-radius:10px;
-              padding:12px;
-              background:#f8fbfe;
-            ">
-              <div style="font-size:12px; color:#667085;">Já estavam na turma</div>
-              <div style="font-size:20px; font-weight:700; color:#2e4a67;">${jaExistiam.length}</div>
-            </div>
-          </div>
-
-          ${htmlEncontrados}
-          ${htmlNaoEncontrados}
-        </div>
-      `;
-
-      const result = await Swal.fire({
-        icon: "info",
-        title: "Conferir importação",
-        html: htmlResumo,
-        width: 760,
-        showCancelButton: true,
-        confirmButtonText: "Finalizar importação",
-        cancelButtonText: "Cancelar",
-        confirmButtonColor: "#76a9da",
-        cancelButtonColor: "#d9dee5",
-        background: "#ffffff",
-        color: "#334e68",
-        customClass: {
-          popup: "swal-import-popup",
-          title: "swal-import-title",
-          confirmButton: "swal-import-confirm",
-          cancelButton: "swal-import-cancel",
-        },
-      });
-
-      if (!result.isConfirmed) return;
-
-      if (!realmenteNovos.length) {
-        await Swal.fire({
-          icon: "info",
-          title: "Nada para importar",
-          text: "Todos os identificados já estavam vinculados à turma.",
-          confirmButtonColor: "#76a9da",
-        });
-        return;
-      }
-
-      const next = Array.from(
-        new Set([...alunosIds, ...realmenteNovos].map(Number)),
-      );
-
-      setAlunosIds(next);
-      persistAlunos(next);
-
-      await Swal.fire({
-        icon: "success",
-        title: "Importação concluída",
-        text: `${realmenteNovos.length} aluno(s) foram adicionados à turma com sucesso.`,
-        confirmButtonColor: "#76a9da",
-      });
-    } catch (error) {
-      console.error(error);
-
-      await Swal.fire({
-        icon: "error",
-        title: "Erro ao importar",
-        text: "Não foi possível ler o arquivo Excel. Verifique se ele está no formato esperado.",
-        confirmButtonColor: "#76a9da",
-      });
-    }
-  };
 
   const handleSalvarTopo = () => {
     const nomeCompleto = buildNomeCompleto(nome, complemento);
@@ -1204,23 +867,21 @@ export default function EditarTurma() {
         <div className="section-head">
           <h2>Lista de Alunos</h2>
 
-          <button
-            type="button"
+          <ImportarAlunos
+            usuarios={baseUsuarios}
+            faculdadeId={user?.faculdadeId}
+            idsJaExistentes={alunosIds}
+            buttonLabel="Importar lista"
             className="btn-importar"
-            onClick={handleOpenImport}
-          >
-            <Upload size={14} />
-            Importar lista
-          </button>
+            onImportConfirm={(idsNovos) => {
+              const next = Array.from(
+                new Set([...alunosIds, ...idsNovos].map(Number)),
+              );
+              setAlunosIds(next);
+              persistAlunos(next);
+            }}
+          />
         </div>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".xlsx,.xls"
-          style={{ display: "none" }}
-          onChange={handleImportLista}
-        />
 
         <div className="subsection">
           <p className="sub-title">Adicione alunos</p>
