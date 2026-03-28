@@ -704,8 +704,17 @@ textarea.input-estilizado {
 }
 
 .btn-excluir {
-  bottom: 1px;
-  height: 0px;
+  width: auto;
+  padding: 6px 14px;
+  border: 1.5px solid #ff3b30;
+  border-radius: 999px;
+  background: #fff;
+  color: #ff3b30;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 25%;
+
 
   width: auto;
   padding: 6px 14px;
