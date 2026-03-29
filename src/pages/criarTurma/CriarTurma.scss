@@ -58,7 +58,7 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 }
 
 .section-title {
-  margin: 16px 0 16px;
+  margin: 24px 0 16px;
   font-size: 18px;
   line-height: 1.2;
   font-weight: 700;
@@ -145,7 +145,7 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 500;
   color: $ct-text;
   cursor: pointer;
@@ -591,5 +591,26 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
     min-width: 140px;
     height: 34px;
     padding: 0 16px;
+  }
+}
+
+//=====Coordenador======
+.criar-turma-card--coordenador {
+  padding-top: 18px; 
+
+  .page-title {
+    margin: 0 0 18px;
+  }
+
+  .section-title {
+    margin: 12px 0 14px;
+  }
+
+  .grid-2 {
+    margin-top: 0;
+  }
+
+  .tipo-area {
+    margin-top: 14px;
   }
 }

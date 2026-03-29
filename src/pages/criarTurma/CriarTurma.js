@@ -521,7 +521,11 @@ export default function CriarTurma() {
   return (
     <div className="painel-evento criar-turma-page">
       <div className="eventos-wrap">
-        <section className="criar-turma-card criar-turma-card--top">
+        <section
+          className={`criar-turma-card criar-turma-card--top ${
+            user?.tipo === "coordenador" ? "criar-turma-card--coordenador" : ""
+          }`}
+        >
           <h1 className="page-title">Criar Nova Turma</h1>
           <h2 className="section-title">Informações da Turma</h2>
 

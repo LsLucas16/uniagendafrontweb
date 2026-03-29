@@ -31,12 +31,15 @@ export default function EditarResponsavelModal({
   const isAdd = !initialValue;
 
   const responsavelTravado =
-  !!bloquearResponsavel &&
-  (
-    initialValue?.cargo === "Coordenador" ||
+    !!bloquearResponsavel &&
+    (initialValue?.cargo === "Coordenador" ||
+      initialValue?.fixo === true ||
+      initialValue?.removivel === false);
+
+  const permissoesTravadas =
+    String(initialValue?.cargo || "").toLowerCase() === "coordenador" ||
     initialValue?.fixo === true ||
-    initialValue?.removivel === false
-  );
+    initialValue?.coordenadorPadrao === true;
 
   useEffect(() => {
     if (!open) return;
@@ -116,26 +119,28 @@ export default function EditarResponsavelModal({
 
   // ✅ ao selecionar, só preenche userId e nome (NÃO sugere cargo nem contato)
   const pickUser = (o) => {
-  if (responsavelTravado) return;
+    if (responsavelTravado) return;
 
-  setDraft((prev) => ({
-    ...prev,
-    userId: o.user,
-    nome: o.nome,
-  }));
-  setQueryUser(o.nome);
-  setDropdownOpen(false);
-};
+    setDraft((prev) => ({
+      ...prev,
+      userId: o.user,
+      nome: o.nome,
+    }));
+    setQueryUser(o.nome);
+    setDropdownOpen(false);
+  };
 
- const clearUser = () => {
-  if (responsavelTravado) return;
+  const clearUser = () => {
+    if (responsavelTravado) return;
 
-  setDraft((prev) => ({ ...prev, userId: "", nome: "" }));
-  setQueryUser("");
-  setDropdownOpen(false);
-};
+    setDraft((prev) => ({ ...prev, userId: "", nome: "" }));
+    setQueryUser("");
+    setDropdownOpen(false);
+  };
 
   const togglePerm = (key) => {
+    if (permissoesTravadas) return;
+
     setDraft((prev) => ({
       ...prev,
       permissoes: { ...prev.permissoes, [key]: !prev.permissoes[key] },
@@ -143,12 +148,12 @@ export default function EditarResponsavelModal({
   };
 
   const handleChangeCargo = (e) => {
-  if (responsavelTravado) return;
+    if (responsavelTravado) return;
 
-  const value = e.target.value;
-  setDraft((prev) => ({ ...prev, cargo: value }));
-  setErrors((prev) => ({ ...prev, cargo: undefined }));
-};
+    const value = e.target.value;
+    setDraft((prev) => ({ ...prev, cargo: value }));
+    setErrors((prev) => ({ ...prev, cargo: undefined }));
+  };
 
   const validate = () => {
     const next = {};
@@ -296,25 +301,25 @@ export default function EditarResponsavelModal({
           </div>
 
           {/* CARGO (DIGITÁVEL) */}
-         <div className="erm__field">
-  <label>Cargo</label>
+          <div className="erm__field">
+            <label>Cargo</label>
 
-  <div className="erm__inputWrap">
-    <input
-      type="text"
-      value={draft.cargo}
-      onChange={handleChangeCargo}
-      placeholder="Digite o cargo"
-      aria-invalid={!!errors.cargo}
-      disabled={responsavelTravado}
-      readOnly={responsavelTravado}
-    />
-  </div>
+            <div className="erm__inputWrap">
+              <input
+                type="text"
+                value={draft.cargo}
+                onChange={handleChangeCargo}
+                placeholder="Digite o cargo"
+                aria-invalid={!!errors.cargo}
+                disabled={responsavelTravado}
+                readOnly={responsavelTravado}
+              />
+            </div>
 
-  {errors.cargo ? (
-    <div className="erm__fieldError">{errors.cargo}</div>
-  ) : null}
-</div>
+            {errors.cargo ? (
+              <div className="erm__fieldError">{errors.cargo}</div>
+            ) : null}
+          </div>
 
           {/* CONTATO */}
           <div className="erm__field">
@@ -347,31 +352,40 @@ export default function EditarResponsavelModal({
             </div>
 
             <div className="erm__checks">
-              <label className="erm__check">
+              <label
+                className={`erm__check ${permissoesTravadas ? "is-disabled" : ""}`}
+              >
                 <input
                   type="checkbox"
                   checked={!!draft.permissoes.eventos}
                   onChange={() => togglePerm("eventos")}
+                  disabled={permissoesTravadas}
                 />
                 <span className="erm__checkBox" aria-hidden="true" />
                 <span>Pode criar e editar eventos</span>
               </label>
 
-              <label className="erm__check">
+              <label
+                className={`erm__check ${permissoesTravadas ? "is-disabled" : ""}`}
+              >
                 <input
                   type="checkbox"
                   checked={!!draft.permissoes.responsaveis}
                   onChange={() => togglePerm("responsaveis")}
+                  disabled={permissoesTravadas}
                 />
                 <span className="erm__checkBox" aria-hidden="true" />
                 <span>Pode gerenciar responsáveis</span>
               </label>
 
-              <label className="erm__check">
+              <label
+                className={`erm__check ${permissoesTravadas ? "is-disabled" : ""}`}
+              >
                 <input
                   type="checkbox"
                   checked={!!draft.permissoes.alunos}
                   onChange={() => togglePerm("alunos")}
+                  disabled={permissoesTravadas}
                 />
                 <span className="erm__checkBox" aria-hidden="true" />
                 <span>Pode editar lista de alunos</span>
@@ -381,7 +395,7 @@ export default function EditarResponsavelModal({
         </div>
 
         <div className="erm__footer">
-         {!!draft.userId && !!onRemove && !bloquearRemocao && (
+          {!!draft.userId && !!onRemove && !bloquearRemocao && (
             <button
               type="button"
               className="erm__btn erm__btn--dangerGhost"
