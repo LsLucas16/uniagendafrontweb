@@ -713,6 +713,11 @@ const EditarEvento = () => {
             </div>
           )}
 
+          <div
+            className={
+              isCoordenador ? "container-btn" : "container-btn--editar"
+            }
+          >
             <button className="btn-publicar" onClick={handleSalvar}>
               Salvar alterações
             </button>
@@ -724,6 +729,7 @@ const EditarEvento = () => {
             >
               Excluir evento
             </button>
+          </div>
         </section>
       </div>
     </div>
