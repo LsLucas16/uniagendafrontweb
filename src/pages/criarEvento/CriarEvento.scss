@@ -16,15 +16,16 @@ $card-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .painel-evento {
   @include uiPageShell;
+  gap: 0;
 }
 
 .titulo-sessao {
   @include titulo;
-  margin: 24px 0 20px;
+  margin: 0 0 24px;
 }
 
 .formulario {
-  margin-top: 10px;
+  margin-top: 30px;
 }
 
 .titulo-evento {

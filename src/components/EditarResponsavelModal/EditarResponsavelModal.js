@@ -4,7 +4,7 @@ import { X, Search } from "lucide-react";
 
 const defaultPerms = {
   eventos: true,
-  responsaveis: false,
+  responsaveis: true,
   alunos: true,
 };
 
@@ -47,9 +47,13 @@ export default function EditarResponsavelModal({
     const iv = initialValue || {};
     const isAdd = !initialValue;
 
+    const cargoAtual = String(iv.cargo || "")
+      .trim()
+      .toLowerCase();
+    const isCoordenador = cargoAtual === "coordenador";
+
     const next = {
       userId: iv.userId ?? "",
-      // ✅ ao adicionar novo: NÃO autopreenche nome
       nome: isAdd ? "" : (iv.nome ?? ""),
       cargo: iv.cargo ?? "",
       contato: iv.contato ?? "",
@@ -59,10 +63,16 @@ export default function EditarResponsavelModal({
             responsaveis: true,
             alunos: true,
           }
-        : {
-            ...defaultPerms,
-            ...(iv.permissoes || {}),
-          },
+        : isCoordenador
+          ? {
+              eventos: true,
+              responsaveis: true,
+              alunos: true,
+            }
+          : {
+              ...defaultPerms,
+              ...(iv.permissoes || {}),
+            },
     };
 
     setDraft(next);

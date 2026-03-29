@@ -13,7 +13,16 @@ const STORAGE_USUARIOS_DISCIPLINAS = "usuarios_disciplinas_override";
 
 const defaultPerms = {
   eventos: true,
-  responsaveis: false,
+  responsaveis: true,
+  alunos: true,
+};
+
+const isCoordenadorCargo = (cargo = "") =>
+  String(cargo).trim().toLowerCase() === "coordenador";
+
+const allPerms = {
+  eventos: true,
+  responsaveis: true,
   alunos: true,
 };
 
@@ -265,14 +274,22 @@ export default function CriarTurma() {
         ? responsaveis[editIndex]
         : null;
 
+    const cargoNormalizado = String(
+      payload.cargo ?? currentItem?.cargo ?? "",
+    ).trim();
+
     const normalized = {
       userId: payload.userId ?? currentItem?.userId ?? "",
       nome: payload.nome ?? "",
-      cargo: payload.cargo ?? "",
+      cargo: cargoNormalizado,
       contato: payload.contato ?? "",
-      permissoes: { ...defaultPerms, ...(payload.permissoes || {}) },
-      fixo: currentItem?.fixo ?? false,
-      coordenadorPadrao: currentItem?.coordenadorPadrao ?? false,
+      permissoes: isCoordenadorCargo(cargoNormalizado)
+        ? { ...allPerms }
+        : { ...defaultPerms, ...(payload.permissoes || {}) },
+      fixo: isCoordenadorCargo(cargoNormalizado) || currentItem?.fixo === true,
+      coordenadorPadrao:
+        isCoordenadorCargo(cargoNormalizado) ||
+        currentItem?.coordenadorPadrao === true,
     };
 
     if (modalMode === "add") {
@@ -440,10 +457,14 @@ export default function CriarTurma() {
         nome: r.nome ?? "",
         cargo: r.cargo ?? "",
         contato: r.contato ?? "",
-        permissoes: { ...defaultPerms, ...(r.permissoes || {}) },
-        fixo: !!r.fixo,
-        removivel: r.fixo ? false : true,
-        coordenadorPadrao: !!r.coordenadorPadrao,
+        permissoes: isCoordenadorCargo(r.cargo)
+          ? { ...allPerms }
+          : { ...defaultPerms, ...(r.permissoes || {}) },
+        fixo: isCoordenadorCargo(r.cargo) ? true : !!r.fixo,
+        removivel: isCoordenadorCargo(r.cargo) ? false : !r.fixo,
+        coordenadorPadrao: isCoordenadorCargo(r.cargo)
+          ? true
+          : !!r.coordenadorPadrao,
         criadoPorTurma: !!r.coordenadorPadrao,
       })),
 
@@ -512,7 +533,11 @@ export default function CriarTurma() {
       nome: user.nome ?? "",
       cargo: "Coordenador",
       contato: user.email || user.telefone || "",
-      permissoes: { ...defaultPerms },
+      permissoes: {
+        eventos: true,
+        responsaveis: true,
+        alunos: true,
+      },
       fixo: true,
       coordenadorPadrao: true,
     };

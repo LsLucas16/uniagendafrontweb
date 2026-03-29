@@ -6,25 +6,21 @@ $azul-caneta: #8e8e93;
 
 .eventos-publicados-page {
   @include uiPageShell;
+  gap: 0;
 
-  .eventos-publicados-header {
-    margin-bottom: 14px;
+.eventos-publicados-header {
+  margin-bottom: 24px;
 
-    h1 {
-      margin: 0;
-      font-size: 28px;
-      line-height: 1.15;
-      font-weight: 700;
-      color: $azul-principal;
-      letter-spacing: -0.2px;
-    }
-
-    p {
-      margin: 6px 0 0;
-      font-size: 14px;
-      color: $azul-principal;
-    }
+  h1 {
+    @include titulo;
   }
+
+  p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: $azul-principal;
+  }
+}
 
   .filtros-card {
     background: #ffffff;

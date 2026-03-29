@@ -18,11 +18,18 @@ $cinza-botao: #8d99a8;
   background: transparent;
 }
 
-/* PROFESSOR E RESPONSÁVEL */
 .editar-turma-page--padrao {
   @include uiPageShell;
-  gap: 0; /* evita “descer” o conteúdo */
-  padding-top: 34px; /* mesmo topo visual do padrão */
+  gap: 0;
+}
+
+.page-header {
+  margin: 0 0 24px;
+  padding: 0;
+
+  h1 {
+    @include titulo;
+  }
 }
 
 /* COORDENADOR */
