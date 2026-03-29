@@ -58,7 +58,7 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 }
 
 .section-title {
-  margin: 0 0 16px;
+  margin: 16px 0 16px;
   font-size: 18px;
   line-height: 1.2;
   font-weight: 700;
@@ -145,7 +145,7 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 500;
   color: $ct-text;
   cursor: pointer;
