@@ -27,7 +27,7 @@ $vc-outside-bg: #f3f4f6;
   width: 100%;
   background: $vc-card-bg;
   border: 1px solid $vc-border;
-  border-radius: 14px;
+  border-radius: 20px 0 0 20px;
   box-shadow: $vc-shadow;
 }
 
@@ -137,12 +137,12 @@ $vc-outside-bg: #f3f4f6;
 
 .calendar-cell {
   position: relative;
-  min-height: 64px;
-  height: 64px;
-  padding: 10px 12px 8px;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 18px 18px 14px;
   border: 0;
-  border-right: 1px solid $vc-grid-line;
-  border-bottom: 1px solid $vc-grid-line;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
   background: #fff;
   text-align: left;
   font-family: inherit;
@@ -158,20 +158,20 @@ $vc-outside-bg: #f3f4f6;
   }
 
   .day-number {
-    font-size: 14px;
+    font-size: 22px;
     line-height: 1;
-    font-weight: 700;
-    color: $vc-blue-dark;
+    font-weight: 600;
+    color: #33506f;
   }
 
   .events-badge {
     position: absolute;
-    left: 12px;
-    top: 46px;
-    font-size: 13px;
+    left: 18px;
+    bottom: 14px;
+    font-size: 16px;
     line-height: 1;
-    font-weight: 500;
-    color: $vc-blue;
+    font-weight: 600;
+    color: #76a9da;
   }
 
   &.is-clickable {
@@ -184,12 +184,31 @@ $vc-outside-bg: #f3f4f6;
   }
 
   &.is-outside {
-    background: $vc-outside-bg;
+    background: #f5f5f5;
 
     .day-number {
-      color: $vc-blue-dark;
+      color: #33506f;
       font-weight: 600;
     }
+  }
+}
+
+/* SOMENTE COORDENADOR */
+.ver-calendario-page {
+  .calendar-header {
+    margin-bottom: 22px;
+  }
+
+  .calendar-weekdays {
+    padding: 0 6px;
+  }
+
+  .weekday {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 0 0 12px;
   }
 }
 
@@ -210,12 +229,10 @@ $vc-outside-bg: #f3f4f6;
   border-bottom-right-radius: 12px;
 }
 
-/* quando a continuidade começa no meio da linha final */
 .calendar-cell.is-outside.is-last-row:not(.is-first-col):not(.is-last-col) {
   border-radius: 0;
 }
 
-/* borda branca visual como no figma */
 .calendar-cell::before {
   content: "";
   position: absolute;
@@ -230,8 +247,6 @@ $vc-outside-bg: #f3f4f6;
   }
 
   .calendar-cell {
-    min-height: 58px;
-    height: 58px;
     padding: 8px 10px 6px;
 
     .events-badge {
@@ -261,7 +276,6 @@ $vc-outside-bg: #f3f4f6;
 
   .weekday {
     font-size: 10px;
-    padding: 0 4px 8px;
   }
 
   .calendar-grid,
@@ -269,9 +283,17 @@ $vc-outside-bg: #f3f4f6;
     padding: 0;
   }
 
+  .ver-calendario-page.is-coordenador {
+    .calendar-weekdays {
+      padding: 0 6px;
+    }
+
+    .weekday {
+      padding: 0 0 8px;
+    }
+  }
+
   .calendar-cell {
-    min-height: 52px;
-    height: 52px;
     padding: 6px 8px;
 
     .day-number {
