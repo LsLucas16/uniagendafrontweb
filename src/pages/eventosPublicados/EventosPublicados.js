@@ -441,7 +441,7 @@ export default function EventosPublicados() {
   const topoCoordenador = (
     <section className="card-bloco criar-evento-card eventos-publicados-topo-coordenador">
       <div className="eventos-publicados-topo-coordenador__header">
-        <h1 className="page-title">Eventos Publicados</h1>
+        <h1 className="page-title">Eventos publicados</h1>
       </div>
 
       <div className="eventos-publicados-topo-coordenador__filtros">
@@ -488,7 +488,7 @@ export default function EventosPublicados() {
 
   const topoDefault = (
     <header className="eventos-publicados-header">
-      <h1>Eventos Publicados</h1>
+      <h1>Eventos publicados</h1>
       <p>Consulte, gerencie e acompanhe todos os eventos já publicados</p>
     </header>
   );

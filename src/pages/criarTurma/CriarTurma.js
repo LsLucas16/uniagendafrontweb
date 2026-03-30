@@ -551,7 +551,7 @@ export default function CriarTurma() {
             user?.tipo === "coordenador" ? "criar-turma-card--coordenador" : ""
           }`}
         >
-          <h1 className="page-title">Criar Nova Turma</h1>
+          <h1 className="page-title">Criar nova turma</h1>
           <h2 className="section-title">Informações da Turma</h2>
 
           <div className="grid-2">

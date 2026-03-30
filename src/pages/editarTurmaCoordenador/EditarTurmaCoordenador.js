@@ -296,7 +296,7 @@ export default function EditarTurmaCoordenador() {
 
     await Swal.fire({
       title: "Turma excluída",
-      text: "A alteração foi salva no navegador.",
+      text: "Turma excluída com sucesso!",
       icon: "success",
       confirmButtonColor: "#3b82f6",
     });
@@ -306,7 +306,7 @@ export default function EditarTurmaCoordenador() {
     <div className="editar-turmas-coord">
       <div className="editar-turmas-coord__card">
         <header className="editar-turmas-coord__header">
-          <h1>Editar Turmas</h1>
+          <h1>Editar turmas</h1>
           <p>Visualize, edite ou exclua turmas existentes.</p>
         </header>
 
