@@ -17,6 +17,7 @@ import CriarTurma from "./pages/criarTurma/CriarTurma";
 import VerCalendario from "./pages/verCalendario/VerCalendario";
 import DetalheCalendario from "./pages/detalheCalendario/DetalheCalendario";
 import DetalheCalendarioAluno from "./pages/detalheCalendarioAluno/DetalheCalendarioAluno";
+import BaixarApp from "./pages/baixeApp/BaixarApp";
 
 function DashboardPage() {
   const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
@@ -74,6 +75,7 @@ function App() {
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="/baixar-app" element={<BaixarApp/>} />
       </Routes>
     </Router>
   );
