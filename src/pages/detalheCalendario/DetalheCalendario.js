@@ -107,7 +107,7 @@ function getBarColor(evento, disciplinas = []) {
 
   if (ids.length > 0) {
     const primeiraDisciplina = disciplinas.find(
-      (d) => Number(d.id) === Number(ids[0])
+      (d) => Number(d.id) === Number(ids[0]),
     );
 
     if (primeiraDisciplina?.cor) {
@@ -164,11 +164,11 @@ export default function DetalheCalendario() {
         return sameDay(dataEvento, dataSelecionada);
       })
       .map((evento) => ({
-  ...evento,
-  criadorNome: getCriadorNome(evento.criadoPorId, usuarios),
-  disciplinasEvento: getDisciplinasDoEvento(evento, disciplinas),
-  barColor: getBarColor(evento, disciplinas),
-}))
+        ...evento,
+        criadorNome: getCriadorNome(evento.criadoPorId, usuarios),
+        disciplinasEvento: getDisciplinasDoEvento(evento, disciplinas),
+        barColor: getBarColor(evento, disciplinas),
+      }))
       .filter((evento) => {
         if (!termo) return true;
 
@@ -177,13 +177,17 @@ export default function DetalheCalendario() {
           norm(evento.descricao).includes(termo) ||
           norm(evento.criadorNome).includes(termo) ||
           evento.disciplinasEvento.some((disciplina) =>
-  norm(disciplina.nome).includes(termo)
-)
+            norm(disciplina.nome).includes(termo),
+          )
         );
       })
       .sort((a, b) => {
-        const dateA = new Date(a.ultimaAtualizacao || a.dataEvento || 0).getTime();
-        const dateB = new Date(b.ultimaAtualizacao || b.dataEvento || 0).getTime();
+        const dateA = new Date(
+          a.ultimaAtualizacao || a.dataEvento || 0,
+        ).getTime();
+        const dateB = new Date(
+          b.ultimaAtualizacao || b.dataEvento || 0,
+        ).getTime();
         return dateB - dateA;
       });
   }, [eventos, usuarios, disciplinas, dataSelecionada, busca]);
@@ -201,7 +205,8 @@ export default function DetalheCalendario() {
             className="detalhe-calendario-back"
             onClick={() => navigate("/ver-calendario")}
           >
-            ← Voltar
+            <span className="detalhe-calendario-back__icon">←</span>
+            <span>Voltar</span>
           </button>
 
           <h2>{formatHeaderDate(dataSelecionada)}</h2>
@@ -220,23 +225,28 @@ export default function DetalheCalendario() {
                   <div className="detalhe-evento-card__top">
                     <h3>{evento.titulo}</h3>
 
-                   <div className="detalhe-evento-card__disciplinas">
-  {evento.disciplinasEvento.map((disciplina, index) => (
-    <span key={disciplina.id} className="detalhe-evento-card__disciplina-item">
-      <span className="detalhe-evento-card__disciplina">
-        {disciplina.nome}
-      </span>
-      {index < evento.disciplinasEvento.length - 1 && (
-        <span className="detalhe-evento-card__disciplina-separador">  </span>
-      )}
-    </span>
-  ))}
-</div>
+                    <div className="detalhe-evento-card__disciplinas">
+                      {evento.disciplinasEvento.map((disciplina, index) => (
+                        <span
+                          key={disciplina.id}
+                          className="detalhe-evento-card__disciplina-item"
+                        >
+                          <span className="detalhe-evento-card__disciplina">
+                            {disciplina.nome}
+                          </span>
+                          {index < evento.disciplinasEvento.length - 1 && (
+                            <span className="detalhe-evento-card__disciplina-separador">
+                              {" "}
+                            </span>
+                          )}
+                        </span>
+                      ))}
+                    </div>
                   </div>
 
                   <div className="detalhe-evento-card__autor">
-  <strong>Criado por:</strong> {evento.criadorNome}
-</div>
+                    <strong>Criado por:</strong> {evento.criadorNome}
+                  </div>
 
                   <p className="detalhe-evento-card__descricao">
                     {evento.descricao}

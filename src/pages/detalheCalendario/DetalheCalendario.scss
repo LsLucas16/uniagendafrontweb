@@ -62,16 +62,39 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 }
 
 .detalhe-calendario-back {
-  border: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+
+  border: none;
   background: transparent;
-  padding: 0;
-  font-size: 11px;
-  font-weight: 500;
-  color: $dc-autor;
+
+  font-size: 14px;
+  font-weight: 400;
+  color: $dc-disciplina; // azul padrão do sistema
+
   cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+
+  transition: all 0.15s ease;
+
+  &__icon {
+    font-size: 16px;
+    line-height: 1;
+    transition: transform 0.15s ease;
+  }
 
   &:hover {
-    opacity: 0.85;
+    background: rgba(118, 169, 218, 0.08); // leve azul no hover
+  }
+
+  &:hover .detalhe-calendario-back__icon {
+    transform: translateX(-2px); // animação suave
+  }
+
+  &:active {
+    transform: translateY(0.5px);
   }
 }
 
@@ -116,7 +139,7 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
   h3 {
     margin: 0;
-    font-size: 12px;
+    font-size: 14px;
     line-height: 1.25;
     font-weight: 600;
     color: $dc-title;
@@ -139,7 +162,7 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .detalhe-evento-card__disciplina {
   display: inline;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.2;
   font-weight: 500;
   color: $dc-disciplina;
@@ -157,7 +180,7 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .detalhe-evento-card__autor {
   margin-bottom: 12px;
-  font-size: 9px;
+  font-size: 12px;
   line-height: 1.2;
   font-weight: 400;
   color: $dc-autor;
@@ -170,7 +193,7 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .detalhe-evento-card__descricao {
   margin: 0;
-  font-size: 11px;
+  font-size: 14px;
   line-height: 1.35;
   font-weight: 400;
   color: $dc-text;
@@ -181,7 +204,7 @@ $dc-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
   padding: 24px 12px;
   text-align: center;
   color: $dc-muted;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 @media (max-width: 768px) {
