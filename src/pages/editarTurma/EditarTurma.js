@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Pencil, Upload, Search, X } from "lucide-react";
 import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
+import { ArrowLeft } from "lucide-react";
 
 import EditarResponsavelModal from "../../components/EditarResponsavelModal/EditarResponsavelModal";
 import data from "../../data/dados.json";
@@ -642,7 +643,8 @@ export default function EditarTurma() {
             className="btn-voltar-coordenador"
             onClick={() => navigate("/editar-turma-coordenador")}
           >
-            ← Voltar
+            <ArrowLeft size={16} strokeWidth={3} />
+            <span>Voltar</span>
           </button>
         )}
 
@@ -665,7 +667,8 @@ export default function EditarTurma() {
             className="btn-voltar-coordenador"
             onClick={() => navigate("/editar-turma-coordenador")}
           >
-            ← Voltar
+            <ArrowLeft size={16} strokeWidth={3} />
+            <span>Voltar</span>
           </button>
         )}
 
@@ -700,7 +703,8 @@ export default function EditarTurma() {
             className="btn-voltar-coordenador"
             onClick={() => navigate("/editar-turma-coordenador")}
           >
-            ← Voltar
+            <ArrowLeft size={16} strokeWidth={3} />
+            <span>Voltar</span>
           </button>
         )}
 
@@ -728,7 +732,8 @@ export default function EditarTurma() {
           className="btn-voltar-coordenador"
           onClick={() => navigate("/editar-turma-coordenador")}
         >
-          ← Voltar
+          <ArrowLeft size={16} strokeWidth={3} />
+          <span>Voltar</span>
         </button>
       )}
 

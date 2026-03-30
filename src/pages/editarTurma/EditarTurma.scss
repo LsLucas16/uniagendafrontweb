@@ -40,17 +40,21 @@ $cinza-botao: #8d99a8;
 .btn-voltar-coordenador {
   border: 0;
   background: transparent;
-  padding: 0 2px;
-  margin: 0 0 -2px;
+  padding: 0;
+  margin-left: 10px;
   color: #7c8796;
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+
   display: inline-flex;
   align-items: center;
-  gap: 7px;
-  align-self: flex-start;
-  line-height: 1;
+  gap: 1px;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
 
   &:hover {
     color: $azul-texto;
