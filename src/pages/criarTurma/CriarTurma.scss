@@ -591,10 +591,11 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 //=====Coordenador======
 .criar-turma-card--coordenador {
-  padding-top: 18px; 
+  padding-top: 22px;
 
   .page-title {
-    margin: 0 0 18px;
+    @include tituloCoordenador;
+    margin-bottom: 40px;
   }
 
   .section-title {

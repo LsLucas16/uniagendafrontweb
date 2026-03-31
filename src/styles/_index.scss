@@ -43,6 +43,16 @@ $ui-card-shadow: 0 8px 18px rgba(16, 24, 40, 0.05);
   color: #334e68;
 }
 
+@mixin tituloCoordenador {
+  margin: 10px 0 18px;
+  font-family: "Inter", sans-serif;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+  color: #334e68;
+}
+
 @mixin uiPageTitleMobile {
   font-size: 22px;
   margin-bottom: 16px;

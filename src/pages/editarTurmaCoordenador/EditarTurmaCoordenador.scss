@@ -1,31 +1,46 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
 @import "../../styles/index";
 
-$azul-primario: #334e68;
+$azul-primario: #2E4A67;
 $azul-claro: #7fb3d5;
 $cinza-borda: #e2e8f0;
 $fundo-input: #f3f5f7;
-$texto-suave: #7b8794;
+$texto-suave: #8E8E93;
 
 .editar-turmas-coord {
-  @include uiPageShell;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+  font-family: "Inter", sans-serif;
 
   &__card {
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 24px 0 0 24px;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
+    padding: 22px 30px 30px;
+    overflow: hidden;
+    box-sizing: border-box;
   }
 
   &__header {
-    margin-bottom: 22px;
+    margin: 0 0 18px;
+    padding: 0;
 
     h1 {
-      @include titulo;
-      margin: 0;
+      @include tituloCoordenador;
     }
 
     p {
       margin: 4px 0 0;
       font-size: 13px;
-      color: #9aa5b1;
+      color: $texto-suave;
       line-height: 1.35;
     }
   }
@@ -157,7 +172,7 @@ $texto-suave: #7b8794;
     flex-wrap: wrap;
     gap: 14px;
     font-size: 12px;
-    color: #98a2b3;
+    color: $azul-primario;
     line-height: 1.4;
 
     strong {
@@ -166,54 +181,49 @@ $texto-suave: #7b8794;
     }
   }
 
-&__right {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 26px;
-  flex-shrink: 0;
-  min-width: 180px;
-  align-self: center;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 16px;
+  &__right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+    flex-shrink: 0;
+    min-width: 180px;
+    align-self: center;
 
-  @media (max-width: 720px) {
-    justify-content: space-between;
-    width: 100%;
-    min-width: 0;
+    @media (max-width: 720px) {
+      justify-content: space-between;
+      width: 100%;
+      min-width: 0;
+    }
   }
-}
 
   &__students {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  min-width: 92px;
-  color: #9aa5b1;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1;
-  white-space: nowrap;
-  align-self: center;
-  margin-right: 100%;
-
-
-  svg {
-    color: #9aa5b1;
-    width: 16px;
-    height: 16px;
-    flex: 0 0 auto;
-  }
-
-  span {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-width: 92px;
+    color: #9aa5b1;
+    font-size: 13px;
+    font-weight: 500;
     line-height: 1;
+    white-space: nowrap;
+    align-self: center;
+    margin-right: 0;
+
+    svg {
+      color: #9aa5b1;
+      width: 16px;
+      height: 16px;
+      flex: 0 0 auto;
+    }
+
+    span {
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
+    }
   }
-}
 
   &__actions {
     display: flex;
@@ -259,3 +269,19 @@ $texto-suave: #7b8794;
   }
 }
 
+@media (max-width: 920px) {
+  .editar-turmas-coord {
+    &__card {
+      padding: 18px 18px 24px;
+      border-radius: 18px;
+    }
+
+    &__header {
+      margin-bottom: 16px;
+
+      h1 {
+        font-size: 24px;
+      }
+    }
+  }
+}

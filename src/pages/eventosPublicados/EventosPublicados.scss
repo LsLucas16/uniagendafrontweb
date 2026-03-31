@@ -433,32 +433,71 @@ $azul-caneta: #8e8e93;
    SOMENTE COORDENADOR
    =============================== */
 .eventos-publicados-page--coordenador {
-  background: transparent;
-  box-shadow: none;
-  border: none;
+  width: 100%;
   padding: 0;
+  background: transparent;
+  border: 0;
+  box-shadow: none;
 
   .eventos-publicados-container {
-    background: transparent;
-    box-shadow: none;
-    border: none;
+    width: 100%;
     padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
   }
-}
 
-/* SOMENTE COORDENADOR - bloco branco dos cards */
-.eventos-publicados-page--coordenador {
+  /* bloco do topo igual ao Criar Evento */
+  .eventos-publicados-topo-coordenador {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid #d9e2ec;
+    border-radius: 24px 0 0 24px;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
+    padding: 22px 30px 30px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+
+  .eventos-publicados-topo-coordenador__header {
+    padding: 0;
+    margin: 0 0 18px;
+  }
+
+  .eventos-publicados-topo-coordenador .page-title {
+   @include tituloCoordenador;
+  }
+
+  .eventos-publicados-topo-coordenador__filtros {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .eventos-publicados-topo-coordenador .filtros-card {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+  }
+
+  /* bloco branco da lista seguindo o mesmo padrão visual */
   .eventos-publicados-list-wrap {
+    width: 100%;
     background: #ffffff;
-    border: 1px solid #e6edf7;
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
+    border: 1px solid #d9e2ec;
+    border-radius: 24px 0 0 24px;
+    padding: 22px 30px 30px;
+    box-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
+    overflow: hidden;
   }
 
   .eventos-publicados-list {
-    border-radius: 12px;
-    padding: 14px;
+    width: 100%;
+    padding: 0;
     gap: 14px;
   }
 
@@ -470,42 +509,33 @@ $azul-caneta: #8e8e93;
   }
 }
 
-.eventos-publicados-page--coordenador {
-  .eventos-publicados-topo-coordenador {
-    background: #ffffff;
-    border: 1px solid #e6edf7;
-    border-radius: 20px;
-    padding: 22px 22px 18px;
-    box-shadow: 0 8px 14px rgba(16, 24, 40, 0.04);
-    margin-bottom: 16px;
-    width: min(1128px, calc(100% - 10px));
-  }
+@media (max-width: 920px) {
+  .eventos-publicados-page--coordenador {
+    .eventos-publicados-topo-coordenador,
+    .eventos-publicados-list-wrap {
+      padding: 18px 18px 24px;
+      border-radius: 18px;
+    }
 
-  .eventos-publicados-topo-coordenador__header {
-    padding-bottom: 14px;
-  }
+    .eventos-publicados-topo-coordenador .page-title {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
 
-  .eventos-publicados-topo-coordenador__filtros {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+    .filtros-top {
+      flex-direction: column;
+      align-items: stretch;
+    }
 
-  .eventos-publicados-topo-coordenador .page-title {
-    margin: 0;
-    font-size: 26px;
-    line-height: 1.15;
-    font-weight: 700;
-    color: $azul-principal;
-    letter-spacing: -0.2px;
-  }
+    .filtros-pill {
+      justify-content: center;
+    }
 
-  .eventos-publicados-topo-coordenador .filtros-card {
-    margin-bottom: 0;
-    padding: 0;
-    background: transparent;
-    border: 0;
-    box-shadow: none;
+    .evento-card {
+      padding-left: 14px;
+      padding-right: 14px;
+      border-radius: 14px;
+    }
   }
 }
 

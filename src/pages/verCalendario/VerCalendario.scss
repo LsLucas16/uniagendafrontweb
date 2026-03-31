@@ -20,7 +20,7 @@ $vc-outside-bg: #f3f4f6;
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   font-family: "Inter", sans-serif;
 }
 
@@ -28,21 +28,25 @@ $vc-outside-bg: #f3f4f6;
   width: 100%;
   background: $vc-card-bg;
   border: 1px solid $vc-border;
-  border-radius: 20px 0 0 20px;
+  border-radius: 24px 0 0 24px;
   box-shadow: $vc-shadow;
+  overflow: hidden;
 }
 
 .ver-calendario-card--title {
-  padding: 18px 20px;
+  padding: 30px 30px 0;
 }
 
 .page-title {
-  @include titulo;
-  margin: 5px 0;
+  margin: 0 0 35px;
+  font-size: 26px;
+  line-height: 1.15;
+  font-weight: 700;
+  color: #334e68;
 }
 
 .ver-calendario-card--calendar {
-  padding: 18px 12px 18px;
+  padding: 0 30px 30px;
 }
 
 .calendar-header {
@@ -50,7 +54,7 @@ $vc-outside-bg: #f3f4f6;
   align-items: center;
   justify-content: flex-start;
   margin-bottom: 14px;
-  padding: 0 8px;
+  padding: 20px 8px;
 }
 
 .calendar-header__nav {
