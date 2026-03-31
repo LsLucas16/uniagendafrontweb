@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import dados from "../../data/dados.json";
 import "./DashboardAluno.scss";
 import chevronIcon from "../../assets/ic_chevron.svg";
+import AvisoDestaque from "../../components/AvisoDestaque/AvisoDestaque";
 
 const STORAGE_EVENTOS = "eventos_override";
 const STORAGE_TURMAS = "turmas_override";
@@ -285,111 +286,117 @@ export default function DashboardAluno() {
   }
 
   return (
-    <div className="ver-calendario-aluno">
-      <div className="ver-calendario-aluno__header">
-        <div className="ver-calendario-aluno__titleWrap">
-          <button
-            type="button"
-            className={`ver-calendario-aluno__navBtn ${
-              isMesAtualReal ? "is-disabled" : ""
-            }`}
-            onClick={handlePrevMonth}
-            aria-label="Mês anterior"
-            disabled={isMesAtualReal}
-          >
-            <img src={chevronIcon} alt="" className="mes_anterior" />
-          </button>
+    <>
+      <AvisoDestaque
+        usuario={usuarioLogado}
+        disciplinasBase={disciplinasBase}
+      />
+      <div className="ver-calendario-aluno">
+        <div className="ver-calendario-aluno__header">
+          <div className="ver-calendario-aluno__titleWrap">
+            <button
+              type="button"
+              className={`ver-calendario-aluno__navBtn ${
+                isMesAtualReal ? "is-disabled" : ""
+              }`}
+              onClick={handlePrevMonth}
+              aria-label="Mês anterior"
+              disabled={isMesAtualReal}
+            >
+              <img src={chevronIcon} alt="" className="mes_anterior" />
+            </button>
 
-          <h1 className="ver-calendario-aluno__title">
-            {MESES[mesAtual.getMonth()]} {mesAtual.getFullYear()}
-          </h1>
+            <h1 className="ver-calendario-aluno__title">
+              {MESES[mesAtual.getMonth()]} {mesAtual.getFullYear()}
+            </h1>
 
-          <button
-            type="button"
-            className="ver-calendario-aluno__navBtn"
-            onClick={handleNextMonth}
-            aria-label="Próximo mês"
-          >
-            <img src={chevronIcon} alt="" />
-          </button>
+            <button
+              type="button"
+              className="ver-calendario-aluno__navBtn"
+              onClick={handleNextMonth}
+              aria-label="Próximo mês"
+            >
+              <img src={chevronIcon} alt="" />
+            </button>
+          </div>
+
+          {isResponsavel && (
+            <button
+              type="button"
+              className="ver-calendario-aluno__plus"
+              aria-label="Adicionar"
+              onClick={() => navigate("/criar-evento")}
+            >
+              +
+            </button>
+          )}
         </div>
 
-        {isResponsavel && (
-          <button
-            type="button"
-            className="ver-calendario-aluno__plus"
-            aria-label="Adicionar"
-            onClick={() => navigate("/criar-evento")}
-          >
-            +
-          </button>
-        )}
+        <div className="ver-calendario-aluno__weekdays">
+          {DIAS_SEMANA.map((dia) => (
+            <div key={dia} className="ver-calendario-aluno__weekday">
+              {dia}
+            </div>
+          ))}
+        </div>
+
+        <div className="ver-calendario-aluno__grid">
+          {dias.map((dia) => {
+            const key = toDateKey(dia);
+            const info = eventosPorData.get(key);
+
+            const foraDoMes = !sameMonth(dia, mesAtual);
+            const passado = isPastDay(dia);
+
+            const dots = info?.dots || [];
+            const visibleDots = dots.slice(0, 4);
+            const extraCount = dots.length > 4 ? dots.length - 4 : 0;
+
+            const canClick = !passado && (info?.eventos?.length || 0) > 0;
+
+            return (
+              <button
+                key={key}
+                type="button"
+                className={[
+                  "ver-calendario-aluno__cell",
+                  foraDoMes ? "is-outside" : "",
+                  passado ? "is-past" : "",
+                  canClick ? "is-clickable" : "",
+                  dots.length ? "has-events" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                onClick={() => handleDayClick(dia, canClick)}
+                disabled={!canClick}
+              >
+                <span className="ver-calendario-aluno__dayNumber">
+                  {dia.getDate()}
+                </span>
+
+                {dots.length > 0 && (
+                  <div className="ver-calendario-aluno__dots">
+                    {visibleDots.map((dot) => (
+                      <span
+                        key={`${key}-${dot.disciplinaId}`}
+                        className="ver-calendario-aluno__dot"
+                        style={{ backgroundColor: dot.cor }}
+                        title={dot.nome}
+                      />
+                    ))}
+
+                    {extraCount > 0 && (
+                      <span className="ver-calendario-aluno__more">
+                        +{extraCount}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
       </div>
-
-      <div className="ver-calendario-aluno__weekdays">
-        {DIAS_SEMANA.map((dia) => (
-          <div key={dia} className="ver-calendario-aluno__weekday">
-            {dia}
-          </div>
-        ))}
-      </div>
-
-      <div className="ver-calendario-aluno__grid">
-        {dias.map((dia) => {
-          const key = toDateKey(dia);
-          const info = eventosPorData.get(key);
-
-          const foraDoMes = !sameMonth(dia, mesAtual);
-          const passado = isPastDay(dia);
-
-          const dots = info?.dots || [];
-          const visibleDots = dots.slice(0, 4);
-          const extraCount = dots.length > 4 ? dots.length - 4 : 0;
-
-          const canClick = !passado && (info?.eventos?.length || 0) > 0;
-
-          return (
-            <button
-              key={key}
-              type="button"
-              className={[
-                "ver-calendario-aluno__cell",
-                foraDoMes ? "is-outside" : "",
-                passado ? "is-past" : "",
-                canClick ? "is-clickable" : "",
-                dots.length ? "has-events" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-              onClick={() => handleDayClick(dia, canClick)}
-              disabled={!canClick}
-            >
-              <span className="ver-calendario-aluno__dayNumber">
-                {dia.getDate()}
-              </span>
-
-              {dots.length > 0 && (
-                <div className="ver-calendario-aluno__dots">
-                  {visibleDots.map((dot) => (
-                    <span
-                      key={`${key}-${dot.disciplinaId}`}
-                      className="ver-calendario-aluno__dot"
-                      style={{ backgroundColor: dot.cor }}
-                      title={dot.nome}
-                    />
-                  ))}
-
-                  {extraCount > 0 && (
-                    <span className="ver-calendario-aluno__more">
-                      +{extraCount}
-                    </span>
-                  )}
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
-    </div>
+    </>
   );
 }
