@@ -595,6 +595,11 @@ textarea.input-estilizado {
   @include tituloCoordenador;
 }
 
+.criar-evento-coordenador-page .criar-evento-card--top .page-title {
+  @include tituloCoordenador;
+  position: relative;
+}
+
 .criar-evento-coordenador-page .section-title {
   margin: 0 0 12px;
   font-size: 18px;
