@@ -158,28 +158,36 @@ export default function EditarResponsavelModal({
   };
 
   const handleChangeCargo = (e) => {
-    if (responsavelTravado) return;
-
     const value = e.target.value;
+
     setDraft((prev) => ({ ...prev, cargo: value }));
     setErrors((prev) => ({ ...prev, cargo: undefined }));
   };
 
   const validate = () => {
-    const next = {};
+  const next = {};
 
-    const contatoTrim = String(draft.contato || "").trim();
-    const cargoTrim = String(draft.cargo || "").trim();
+  const nomeTrim = String(draft.nome || "").trim();
+  const cargoTrim = String(draft.cargo || "").trim();
+  const contatoTrim = String(draft.contato || "").trim();
 
-    // ✅ REGRA NOVA (invertida):
-    // Se contato estiver preenchido -> cargo obrigatório
-    if (contatoTrim && !cargoTrim) {
-      next.cargo = "Cargo é obrigatório quando houver contato.";
-    }
+  if (!draft.userId || !nomeTrim) {
+    next.nome = "Selecione um responsável.";
+  }
 
-    setErrors(next);
-    return Object.keys(next).length === 0;
-  };
+  // ao adicionar novo, cargo precisa ser preenchido
+  if (isAdd && !cargoTrim) {
+    next.cargo = "Preencha o cargo antes de salvar.";
+  }
+
+  // mantém sua regra atual
+  if (contatoTrim && !cargoTrim) {
+    next.cargo = "Cargo é obrigatório quando houver contato.";
+  }
+
+  setErrors(next);
+  return Object.keys(next).length === 0;
+};
 
   const save = () => {
     if (!draft.userId) return;
@@ -321,8 +329,6 @@ export default function EditarResponsavelModal({
                 onChange={handleChangeCargo}
                 placeholder="Digite o cargo"
                 aria-invalid={!!errors.cargo}
-                disabled={responsavelTravado}
-                readOnly={responsavelTravado}
               />
             </div>
 

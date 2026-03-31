@@ -531,7 +531,7 @@ export default function CriarTurma() {
     return {
       userId: user.id ?? "",
       nome: user.nome ?? "",
-      cargo: "Coordenador",
+      cargo: "",
       contato: user.email || user.telefone || "",
       permissoes: {
         eventos: true,
