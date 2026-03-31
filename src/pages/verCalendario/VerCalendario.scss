@@ -1,4 +1,5 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import "../../styles/index";
 
 $vc-title: #334e68;
 $vc-text: #486581;
@@ -36,11 +37,8 @@ $vc-outside-bg: #f3f4f6;
 }
 
 .page-title {
+  @include titulo;
   margin: 5px 0;
-  font-size: 24px;
-  line-height: 1.15;
-  font-weight: 700;
-  color: $vc-title;
 }
 
 .ver-calendario-card--calendar {

@@ -50,11 +50,6 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
 
 .page-title {
   @include titulo;
-  margin: 0 0 28px;
-  font-size: 26px;
-  line-height: 1.15;
-  font-weight: 700;
-  color: $ct-title;
 }
 
 .section-title {
@@ -70,7 +65,7 @@ $ct-shadow: 0 2px 8px rgba(16, 24, 40, 0.05);
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 
   .section-title {
     margin-bottom: 0;
