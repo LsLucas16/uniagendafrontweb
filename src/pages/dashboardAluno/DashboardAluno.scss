@@ -26,7 +26,8 @@ $radius-card: 24px;
 }
 
 .ver-calendario-aluno {
-  width: min(100%, 920px);
+  width: 100%;
+  max-width: 100%;
   background: $card-bg;
   border: 1px solid $card-border;
   border-radius: $radius-card;
@@ -145,9 +146,9 @@ $radius-card: 24px;
 
 .ver-calendario-aluno__grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  width: 100%;
   background: #fff;
-
   aspect-ratio: 7 / 4.6;
 }
 

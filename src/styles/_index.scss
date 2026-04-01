@@ -4,17 +4,15 @@ $ui-card-border: #e9eef6;
 $ui-card-shadow: 0 8px 18px rgba(16, 24, 40, 0.05);
 
 @mixin uiPageShell {
-  width: min(1128px, calc(100% - 10px));
+  width: 100%;
   margin: 0;
   background: #fff;
-
-  /* esquerda arredondada e direita reta */
   border-radius: 20px 0 0 20px;
-
   border: 1px solid #e9edf3;
   box-shadow: 0 4px 4px rgba(0, 0, 0, 0.04);
   padding: 34px 42px;
   align-self: flex-start;
+  box-sizing: border-box;
 }
 
 @mixin uiWhiteContainer {
