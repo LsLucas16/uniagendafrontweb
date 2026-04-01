@@ -91,11 +91,13 @@ const MenuLateral = () => {
   }, [user, dataVersion]);
 
   useEffect(() => {
-    localStorage.setItem(
-      "menuAlunoSecundariasVisiveis",
-      String(mostrarSecundarias),
-    );
-  }, [mostrarSecundarias]);
+  localStorage.setItem(
+    "menuAlunoSecundariasVisiveis",
+    String(mostrarSecundarias),
+  );
+
+  window.dispatchEvent(new Event("menuAlunoSecundarias:changed"));
+}, [mostrarSecundarias]);
 
   function safeJsonParse(value, fallback) {
     try {
@@ -354,6 +356,7 @@ const MenuLateral = () => {
       null
     );
   };
+  
 
  const CORES_PRESET = [
   "#76A8D9",

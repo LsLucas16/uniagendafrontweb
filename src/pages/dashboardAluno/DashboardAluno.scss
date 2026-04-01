@@ -3,20 +3,27 @@
 $font-family: "Inter", "Segoe UI", sans-serif;
 
 $card-bg: #ffffff;
-$card-border: #e8eaee;
-$card-shadow: 0 2px 10px rgba(16, 24, 40, 0.06);
+$card-border: #e8edf3;
+$card-shadow: 0 2px 8px rgba(16, 24, 40, 0.04);
 
-$title-color: #314e6e;
-$weekday-color: #7a7f87;
-$day-color: #2e4d73;
-$outside-color: #c9cdd4;
-$past-color: #c9cdd4;
-$grid-line: #eceef2;
+$title-color: #334e68;
+$weekday-color: #6b7280;
+$day-color: #334e68;
+$outside-day-color: #bcc6d0;
+$past-day-color: #c9d1d9;
 
-$blue-btn: #6fa6d9;
-$blue-btn-hover: #6299cd;
+$grid-line: #e8eaee;
+$hover-bg: #f8fbff;
 
-$radius-card: 22px;
+$blue-btn: #76a9da;
+$blue-btn-hover: #679dcc;
+$blue-soft: #7da2c7;
+
+$radius-card: 24px;
+
+* {
+  box-sizing: border-box;
+}
 
 .ver-calendario-aluno {
   width: min(100%, 920px);
@@ -24,40 +31,87 @@ $radius-card: 22px;
   border: 1px solid $card-border;
   border-radius: $radius-card;
   box-shadow: $card-shadow;
-  padding: 16px 16px 18px;
+  padding: 20px 20px 24px;
+  font-family: $font-family;
 }
 
+/* =========================
+   HEADER
+========================= */
 .ver-calendario-aluno__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 12px;
+  margin-bottom: 24px;
+  padding: 2px 2px 0;
 }
 
 .ver-calendario-aluno__titleWrap {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 
 .ver-calendario-aluno__title {
   margin: 0;
-  font-size: 16px;
+  font-size: 24px;
+  line-height: 1.1;
   font-weight: 700;
   color: $title-color;
-  line-height: 1;
 }
 
 .ver-calendario-aluno__navBtn,
 .ver-calendario-aluno__plus {
-  border: none;
+  border: 0;
+  outline: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: $blue-btn;
-  color: #ffffff;
+  transition: background 0.18s ease, opacity 0.18s ease, transform 0.18s ease;
+}
+
+.ver-calendario-aluno__navBtn {
+  width: 22px;
+  height: 22px;
+  background: transparent;
   cursor: pointer;
-  transition: background 0.15s ease, opacity 0.15s ease, transform 0.15s ease;
+  padding: 0;
+
+  &:hover {
+    opacity: 0.85;
+  }
+
+  &:disabled,
+  &.is-disabled {
+    opacity: 0.35;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  img,
+  svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    object-fit: contain;
+  }
+}
+
+.mes_anterior {
+  transform: rotate(180deg);
+}
+
+.ver-calendario-aluno__plus {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  background: $blue-btn;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(118, 169, 218, 0.28);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 1;
 
   &:hover {
     background: $blue-btn-hover;
@@ -68,110 +122,89 @@ $radius-card: 22px;
   }
 }
 
-.ver-calendario-aluno__navBtn {
-  width: 18px;
-  height: 18px;
-  background: transparent;
-  color: #7da2c7;
-  padding: 0;
-  border-radius: 50%;
-
-  &:hover {
-    background: transparent;
-    color: #5e89b3;
-  }
-
-  &.is-disabled,
-  &:disabled {
-    color: #d4dbe3;
-    cursor: default;
-    pointer-events: none;
-  }
-
-  img {
-    width: 20px;
-    height: 20px;
-    display: block;
-  }
-}
-
-.mes_anterior {
-  transform: rotate(180deg);
-}
-
-.ver-calendario-aluno__plus {
-  width: 28px;
-  height: 28px;
-  border-radius: 7px;
-  font-size: 20px;
-  font-weight: 400;
-  line-height: 1;
-  box-shadow: 0 3px 6px rgba(74, 144, 217, 0.22);
-}
-
+/* =========================
+   WEEKDAYS
+========================= */
 .ver-calendario-aluno__weekdays {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  margin-bottom: 4px;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-bottom: 10px;
 }
 
 .ver-calendario-aluno__weekday {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
   text-align: center;
-  font-size: 11px;
+  font-size: 13px;
+  line-height: 1.2;
   font-weight: 600;
   color: $weekday-color;
-  padding: 6px 0 8px;
 }
 
+/* =========================
+   GRID
+========================= */
 .ver-calendario-aluno__grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  background: #fff;
 }
 
+/* =========================
+   CELL
+========================= */
 .ver-calendario-aluno__cell {
   position: relative;
-  min-height: 72px;
-  border: none;
-  border-top: 1px solid $grid-line;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  min-height: 0;
+  height: auto;
+
+  border: 0;
   border-right: 1px solid $grid-line;
-  background: #ffffff;
-  padding: 10px 8px 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
+  border-bottom: 1px solid $grid-line;
+  border-radius: 0;
+  background: #fff;
+
+  padding: 0;
+
+  display: block;
+  text-align: left;
+  font-family: inherit;
+  appearance: none;
+  outline: none;
   cursor: default;
+  overflow: hidden;
 
   &:nth-child(7n) {
     border-right: 0;
   }
 
   &:hover {
-    background: #ffffff;
+    background: #fff;
   }
 
   &.is-clickable {
     cursor: pointer;
+    transition: background 0.18s ease;
   }
 
   &.is-clickable:hover {
-    background: #f8fbff;
+    background: $hover-bg;
   }
 
   &.is-outside {
-    background: #f3f3f3;
-  }
-
-  &.is-outside.is-clickable:hover {
-    background: #eceff3;
-  }
-
-  &.is-past .ver-calendario-aluno__dayNumber {
-    color: $past-color;
+    background: #fff;
   }
 
   &.is-outside .ver-calendario-aluno__dayNumber {
-    color: $outside-color;
+    color: $outside-day-color;
+  }
+
+  &.is-past .ver-calendario-aluno__dayNumber {
+    color: $past-day-color;
   }
 
   &:disabled {
@@ -179,32 +212,166 @@ $radius-card: 22px;
   }
 }
 
+/* =========================
+   DAY NUMBER
+========================= */
 .ver-calendario-aluno__dayNumber {
-  font-size: 14px;
-  font-weight: 700;
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  display: inline-block;
+  margin: 0;
+  font-size: 19px;
   line-height: 1;
+  font-weight: 600;
   color: $day-color;
 }
 
+/* =========================
+   DOTS
+========================= */
 .ver-calendario-aluno__dots {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin-top: auto;
-  padding-top: 10px;
+  gap: 7px;
+  min-height: 15px;
+  max-width: calc(100% - 24px);
   flex-wrap: nowrap;
 }
 
 .ver-calendario-aluno__dot {
-  width: 9px;
-  height: 9px;
+  width: 14px;
+  height: 14px;
+  min-width: 14px;
   border-radius: 50%;
-  flex: 0 0 9px;
+  flex: 0 0 14px;
 }
 
 .ver-calendario-aluno__more {
-  font-size: 10px;
-  font-weight: 700;
-  color: #6b7280;
+  font-size: 13px;
   line-height: 1;
+  font-weight: 600;
+  color: #5d6980;
+  white-space: nowrap;
+}
+
+/* =========================
+   RESPONSIVO
+========================= */
+@media (max-width: 920px) {
+  .ver-calendario-aluno {
+    padding: 18px 18px 22px;
+  }
+
+  .ver-calendario-aluno__header {
+    margin-bottom: 20px;
+  }
+
+  .ver-calendario-aluno__title {
+    font-size: 22px;
+  }
+
+  .ver-calendario-aluno__weekday {
+    font-size: 12px;
+  }
+
+  .ver-calendario-aluno__dayNumber {
+    top: 10px;
+    left: 10px;
+    font-size: 17px;
+  }
+
+  .ver-calendario-aluno__dots {
+    left: 10px;
+    bottom: 10px;
+    gap: 6px;
+    min-height: 12px;
+    max-width: calc(100% - 20px);
+  }
+
+  .ver-calendario-aluno__dot {
+    width: 11px;
+    height: 11px;
+    min-width: 11px;
+    flex-basis: 11px;
+  }
+
+  .ver-calendario-aluno__more {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .ver-calendario-aluno {
+    padding: 14px 14px 18px;
+    border-radius: 20px;
+  }
+
+  .ver-calendario-aluno__header {
+    margin-bottom: 16px;
+  }
+
+  .ver-calendario-aluno__titleWrap {
+    gap: 8px;
+  }
+
+  .ver-calendario-aluno__title {
+    font-size: 18px;
+  }
+
+  .ver-calendario-aluno__navBtn {
+    width: 18px;
+    height: 18px;
+
+    img,
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  .ver-calendario-aluno__plus {
+    width: 34px;
+    height: 34px;
+    font-size: 20px;
+    border-radius: 6px;
+  }
+
+  .ver-calendario-aluno__weekdays {
+    margin-bottom: 6px;
+  }
+
+  .ver-calendario-aluno__weekday {
+    min-height: 24px;
+    font-size: 10px;
+  }
+
+  .ver-calendario-aluno__dayNumber {
+    top: 8px;
+    left: 8px;
+    font-size: 13px;
+  }
+
+  .ver-calendario-aluno__dots {
+    left: 8px;
+    bottom: 8px;
+    gap: 4px;
+    min-height: 8px;
+    max-width: calc(100% - 16px);
+  }
+
+  .ver-calendario-aluno__dot {
+    width: 8px;
+    height: 8px;
+    min-width: 8px;
+    flex-basis: 8px;
+  }
+
+  .ver-calendario-aluno__more {
+    font-size: 10px;
+  }
 }

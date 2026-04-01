@@ -112,31 +112,55 @@ export default function DashboardAluno() {
   const [dataVersion, setDataVersion] = useState(0);
 
   useEffect(() => {
-    const bump = () => setDataVersion((v) => v + 1);
+  const bump = () => setDataVersion((v) => v + 1);
 
-    const onStorage = (e) => {
-      if (!e.key) {
-        bump();
-        return;
-      }
+  const syncMostrarSecundarias = () => {
+    setMostrarSecundarias(
+      localStorage.getItem("menuAlunoSecundariasVisiveis") === "true",
+    );
+    bump();
+  };
 
-      if (
-        e.key === STORAGE_TURMAS ||
-        e.key === STORAGE_EVENTOS ||
-        e.key === STORAGE_USUARIO
-      ) {
-        bump();
-      }
-    };
+  const onStorage = (e) => {
+    if (!e.key) {
+      bump();
+      return;
+    }
 
-    window.addEventListener("app:data-changed", bump);
-    window.addEventListener("storage", onStorage);
+    if (
+      e.key === STORAGE_TURMAS ||
+      e.key === STORAGE_EVENTOS ||
+      e.key === STORAGE_USUARIO
+    ) {
+      bump();
+    }
 
-    return () => {
-      window.removeEventListener("app:data-changed", bump);
-      window.removeEventListener("storage", onStorage);
-    };
-  }, []);
+    if (e.key === "menuAlunoSecundariasVisiveis") {
+      syncMostrarSecundarias();
+    }
+  };
+
+  window.addEventListener("app:data-changed", bump);
+  window.addEventListener("storage", onStorage);
+  window.addEventListener(
+    "menuAlunoSecundarias:changed",
+    syncMostrarSecundarias,
+  );
+
+  return () => {
+    window.removeEventListener("app:data-changed", bump);
+    window.removeEventListener("storage", onStorage);
+    window.removeEventListener(
+      "menuAlunoSecundarias:changed",
+      syncMostrarSecundarias,
+    );
+  };
+}, []);
+
+  const [mostrarSecundarias, setMostrarSecundarias] = useState(() => {
+    const salvo = localStorage.getItem("menuAlunoSecundariasVisiveis");
+    return salvo === "true";
+  });
 
   const usuarioLogado = useMemo(() => getUsuarioLogado(), [dataVersion]);
 
@@ -205,62 +229,92 @@ export default function DashboardAluno() {
   }, [disciplinasBase, alunoId]);
 
   const eventosDoAluno = useMemo(() => {
-    return eventosBase.filter((evento) => {
-      if (!evento?.calendario) return false;
+  return eventosBase.filter((evento) => {
+    if (!evento?.calendario) return false;
 
-      const ids = Array.isArray(evento?.disciplinaIds)
-        ? evento.disciplinaIds
-        : [];
+    const ids = Array.isArray(evento?.disciplinaIds)
+      ? evento.disciplinaIds
+      : [];
 
-      return ids.some((id) => disciplinaIdsDoAluno.has(Number(id)));
+    const idsDoAlunoNoEvento = ids.filter((id) =>
+      disciplinaIdsDoAluno.has(Number(id)),
+    );
+
+    if (!idsDoAlunoNoEvento.length) return false;
+
+    const idsVisiveis = idsDoAlunoNoEvento.filter((id) => {
+      const disciplina = disciplinaMap.get(Number(id));
+      const isSecundaria =
+        String(disciplina?.tipo || "").toLowerCase() === "secundaria";
+
+      return mostrarSecundarias || !isSecundaria;
     });
-  }, [eventosBase, disciplinaIdsDoAluno]);
+
+    return idsVisiveis.length > 0;
+  });
+}, [
+  eventosBase,
+  disciplinaIdsDoAluno,
+  disciplinaMap,
+  mostrarSecundarias,
+]);
 
   const eventosPorData = useMemo(() => {
-    const map = new Map();
+  const map = new Map();
 
-    eventosDoAluno.forEach((evento) => {
-      const data = parseLocalDate(evento.dataEvento);
-      if (!data) return;
+  eventosDoAluno.forEach((evento) => {
+    const data = parseLocalDate(evento.dataEvento);
+    if (!data) return;
 
-      const key = toDateKey(data);
+    const key = toDateKey(data);
 
-      if (!map.has(key)) {
-        map.set(key, {
-          eventos: [],
-          dots: [],
+    if (!map.has(key)) {
+      map.set(key, {
+        eventos: [],
+        dots: [],
+      });
+    }
+
+    const current = map.get(key);
+    current.eventos.push(evento);
+
+    const ids = Array.isArray(evento.disciplinaIds)
+      ? evento.disciplinaIds
+      : [];
+
+    ids.forEach((disciplinaId) => {
+      const disciplinaIdNum = Number(disciplinaId);
+
+      if (!disciplinaIdsDoAluno.has(disciplinaIdNum)) return;
+
+      const disciplina = disciplinaMap.get(disciplinaIdNum);
+      if (!disciplina) return;
+
+      const isSecundaria =
+        String(disciplina?.tipo || "").toLowerCase() === "secundaria";
+
+      if (!mostrarSecundarias && isSecundaria) return;
+
+      if (
+        !current.dots.some((item) => item.disciplinaId === disciplinaIdNum)
+      ) {
+        current.dots.push({
+          disciplinaId: disciplinaIdNum,
+          cor: getCorDisciplinaParaUsuario(disciplina, alunoId),
+          nome: disciplina.nome,
         });
       }
-
-      const current = map.get(key);
-      current.eventos.push(evento);
-
-      const ids = Array.isArray(evento.disciplinaIds)
-        ? evento.disciplinaIds
-        : [];
-
-      ids.forEach((disciplinaId) => {
-        const disciplinaIdNum = Number(disciplinaId);
-
-        if (!disciplinaIdsDoAluno.has(disciplinaIdNum)) return;
-
-        const disciplina = disciplinaMap.get(disciplinaIdNum);
-        if (!disciplina) return;
-
-        if (
-          !current.dots.some((item) => item.disciplinaId === disciplinaIdNum)
-        ) {
-          current.dots.push({
-            disciplinaId: disciplinaIdNum,
-            cor: getCorDisciplinaParaUsuario(disciplina, alunoId),
-            nome: disciplina.nome,
-          });
-        }
-      });
     });
+  });
 
-    return map;
-  }, [eventosDoAluno, disciplinaIdsDoAluno, disciplinaMap, alunoId]);
+  return map;
+}, [
+  eventosDoAluno,
+  disciplinaIdsDoAluno,
+  disciplinaMap,
+  alunoId,
+  mostrarSecundarias,
+]);
 
   const dias = useMemo(() => {
     const start = getCalendarStart(mesAtual);
