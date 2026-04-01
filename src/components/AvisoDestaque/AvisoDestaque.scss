@@ -198,10 +198,17 @@ $ad-white: #ffffff;
     stroke-width: 2.1;
   }
 
-  &:hover {
-    background: rgba(55, 87, 122, 0.06);
-    box-shadow: 0 6px 18px rgba(51, 78, 104, 0.08);
+ &:hover {
+  background: #37577a; // cor principal (mesma da borda)
+  color: #ffffff;
+  border-color: #37577a;
+
+  svg {
+    stroke: #ffffff;
   }
+
+  box-shadow: 0 8px 22px rgba(55, 87, 122, 0.18);
+}
 
   &:active {
     transform: translateY(1px);
