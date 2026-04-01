@@ -3,7 +3,12 @@ import data from "../data/dados.json";
 export const STORAGE_USUARIOS = "usuarios_override";
 export const STORAGE_TURMAS = "turmas_override";
 export const STORAGE_USUARIOS_DISCIPLINAS = "usuarios_disciplinas_override";
-export const STORAGE_EVENTOS = "eventos_override";
+export const STORAGE_DISCIPLINAS_KEYS = [
+  "turmas_override",
+  "disciplinas_override",
+  "disciplinas",
+  "turmas",
+];
 
 export function safeJsonParse(value, fallback) {
   try {
@@ -53,7 +58,7 @@ export function getDisciplinasMescladas() {
 }
 
 export function getEventosMesclados() {
-  const overrides = readStorageObject(STORAGE_EVENTOS);
+  const overrides = readStorageObject("eventos_override");
   return mergeById(data.eventos || [], overrides);
 }
 

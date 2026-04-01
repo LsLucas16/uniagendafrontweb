@@ -338,21 +338,16 @@ export default function CalendarioAlunoLateral() {
   const [openKey, setOpenKey] = useState(firstOpenKey);
 
   useEffect(() => {
-    if (!grupos.length) {
-      setOpenKey(null);
-      return;
-    }
+  if (!grupos.length) {
+    setOpenKey(null);
+    return;
+  }
 
-    if (openKey === null) {
-      setOpenKey(grupos[0].key);
-      return;
-    }
-
-    const stillExists = grupos.some((grupo) => grupo.key === openKey);
-    if (!stillExists) {
-      setOpenKey(grupos[0].key);
-    }
-  }, [grupos, openKey]);
+  // só corrige se o grupo aberto deixou de existir
+  if (openKey && !grupos.some((g) => g.key === openKey)) {
+    setOpenKey(null);
+  }
+}, [grupos]);
 
   function toggleGroup(key) {
     setOpenKey((prev) => (prev === key ? null : key));

@@ -5,7 +5,12 @@ import "./DashboardAluno.scss";
 import chevronIcon from "../../assets/ic_chevron.svg";
 import AvisoDestaque from "../../components/AvisoDestaque/AvisoDestaque";
 
-const STORAGE_EVENTOS = "eventos_override";
+const STORAGE_DISCIPLINAS_KEYS = [
+  "turmas_override",
+  "disciplinas_override",
+  "disciplinas",
+  "turmas",
+];
 const STORAGE_TURMAS = "turmas_override";
 const STORAGE_USUARIO = "usuario";
 
@@ -129,7 +134,7 @@ export default function DashboardAluno() {
 
     if (
       e.key === STORAGE_TURMAS ||
-      e.key === STORAGE_EVENTOS ||
+      e.key === STORAGE_DISCIPLINAS_KEYS ||
       e.key === STORAGE_USUARIO
     ) {
       bump();
@@ -179,10 +184,35 @@ export default function DashboardAluno() {
     [dataVersion],
   );
 
-  const eventosStorage = useMemo(
-    () => getStorageArray(STORAGE_EVENTOS, []),
-    [dataVersion],
-  );
+ const STORAGE_EVENTOS_KEYS = [
+  "eventos_override",
+  "eventos",
+  "eventosStore",
+  "uniagenda_eventos",
+];
+
+function getAllStorageArrays(keys) {
+  const all = [];
+
+  keys.forEach((key) => {
+    const raw = localStorage.getItem(key);
+    if (!raw) return;
+
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) {
+        all.push(...parsed);
+      }
+    } catch {}
+  });
+
+  return all;
+}
+
+const eventosStorage = useMemo(
+  () => getAllStorageArrays(STORAGE_EVENTOS_KEYS),
+  [dataVersion],
+);
 
   const disciplinasBase = useMemo(() => {
     const mapa = new Map();
@@ -198,9 +228,25 @@ export default function DashboardAluno() {
     return Array.from(mapa.values());
   }, [disciplinasJson, turmasOverride]);
 
+  function getMergedEventos(jsonList, storageList) {
+  const map = new Map();
+
+  (Array.isArray(jsonList) ? jsonList : []).forEach((item) => {
+    if (!item || item.id == null) return;
+    map.set(Number(item.id), item);
+  });
+
+  (Array.isArray(storageList) ? storageList : []).forEach((item) => {
+    if (!item || item.id == null) return;
+    map.set(Number(item.id), item);
+  });
+
+  return Array.from(map.values());
+}
+
   const eventosBase = useMemo(() => {
-    return eventosStorage.length ? eventosStorage : eventosJson;
-  }, [eventosStorage, eventosJson]);
+  return getMergedEventos(eventosJson, eventosStorage);
+}, [eventosJson, eventosStorage]);
 
   const hoje = new Date();
   const primeiroDiaMesAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -228,14 +274,24 @@ export default function DashboardAluno() {
     );
   }, [disciplinasBase, alunoId]);
 
+  function normalizarIds(evento) {
+  if (Array.isArray(evento?.disciplinaIds)) {
+    return evento.disciplinaIds.map(Number);
+  }
+
+  if (evento?.disciplinaId) {
+    return [Number(evento.disciplinaId)];
+  }
+
+  return [];
+}
+
   const eventosDoAluno = useMemo(() => {
   return eventosBase.filter((evento) => {
     if (!evento?.calendario) return false;
 
-    const ids = Array.isArray(evento?.disciplinaIds)
-      ? evento.disciplinaIds
-      : [];
-
+    const ids = normalizarIds(evento);
+    
     const idsDoAlunoNoEvento = ids.filter((id) =>
       disciplinaIdsDoAluno.has(Number(id)),
     );
