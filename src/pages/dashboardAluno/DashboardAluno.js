@@ -127,23 +127,23 @@ export default function DashboardAluno() {
   };
 
   const onStorage = (e) => {
-    if (!e.key) {
-      bump();
-      return;
-    }
+  if (!e.key) {
+    bump();
+    return;
+  }
 
-    if (
-      e.key === STORAGE_TURMAS ||
-      e.key === STORAGE_DISCIPLINAS_KEYS ||
-      e.key === STORAGE_USUARIO
-    ) {
-      bump();
-    }
+  if (
+    e.key === STORAGE_TURMAS ||
+    e.key === STORAGE_USUARIO ||
+    STORAGE_EVENTOS_KEYS.includes(e.key)
+  ) {
+    bump();
+  }
 
-    if (e.key === "menuAlunoSecundariasVisiveis") {
-      syncMostrarSecundarias();
-    }
-  };
+  if (e.key === "menuAlunoSecundariasVisiveis") {
+    syncMostrarSecundarias();
+  }
+};
 
   window.addEventListener("app:data-changed", bump);
   window.addEventListener("storage", onStorage);
@@ -200,8 +200,14 @@ function getAllStorageArrays(keys) {
 
     try {
       const parsed = JSON.parse(raw);
+
       if (Array.isArray(parsed)) {
         all.push(...parsed);
+        return;
+      }
+
+      if (parsed && typeof parsed === "object") {
+        all.push(...Object.values(parsed));
       }
     } catch {}
   });
@@ -291,7 +297,7 @@ const eventosStorage = useMemo(
     if (!evento?.calendario) return false;
 
     const ids = normalizarIds(evento);
-    
+
     const idsDoAlunoNoEvento = ids.filter((id) =>
       disciplinaIdsDoAluno.has(Number(id)),
     );
@@ -334,9 +340,7 @@ const eventosStorage = useMemo(
     const current = map.get(key);
     current.eventos.push(evento);
 
-    const ids = Array.isArray(evento.disciplinaIds)
-      ? evento.disciplinaIds
-      : [];
+    const ids = normalizarIds(evento);
 
     ids.forEach((disciplinaId) => {
       const disciplinaIdNum = Number(disciplinaId);
