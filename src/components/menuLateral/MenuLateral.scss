@@ -622,3 +622,118 @@
     }
   }
 }
+
+.menuLateral {
+  &__colorPopover {
+    border-left: 1px solid #cfd6de;
+    border-right: 1px solid #cfd6de;
+    border-bottom: 1px solid #cfd6de;
+    background: #f8fbff;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+  }
+
+  &__colorHeader {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2e4a67;
+  }
+
+  &__colorGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+
+  &__colorSwatch {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+
+    &:hover {
+      transform: scale(1.06);
+      box-shadow: 0 6px 16px rgba(16, 24, 40, 0.12);
+    }
+
+    &.is-active {
+      border-color: #2e4a67;
+      box-shadow: 0 0 0 3px rgba(118, 168, 217, 0.22);
+      transform: scale(1.03);
+    }
+  }
+
+  &__colorPreviewWrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  &__colorPreview {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    display: inline-block;
+  }
+
+  &__colorHex {
+    font-size: 12px;
+    font-weight: 600;
+    color: #4d647c;
+    text-transform: uppercase;
+  }
+
+  &__colorActions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+
+  &__colorBtn {
+    min-width: 88px;
+    height: 36px;
+    border: none;
+    border-radius: 10px;
+    padding: 0 14px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+      transform 0.15s ease,
+      box-shadow 0.15s ease,
+      background 0.15s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+
+    &--ghost {
+      background: #e8eef5;
+      color: #2e4a67;
+
+      &:hover {
+        background: #dde6ef;
+      }
+    }
+
+    &--primary {
+      background: #76a8d9;
+      color: #fff;
+
+      &:hover {
+        background: #679bce;
+        box-shadow: 0 8px 18px rgba(118, 168, 217, 0.28);
+      }
+    }
+  }
+}
