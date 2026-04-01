@@ -143,33 +143,27 @@ $radius-card: 24px;
   color: $weekday-color;
 }
 
-/* =========================
-   GRID
-========================= */
 .ver-calendario-aluno__grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
+  grid-template-columns: repeat(7, 1fr);
   background: #fff;
+
+  aspect-ratio: 7 / 4.6;
 }
 
-/* =========================
-   CELL
-========================= */
 .ver-calendario-aluno__cell {
   position: relative;
   width: 100%;
-  aspect-ratio: 1 / 1;
+  height: 100%;
   min-height: 0;
-  height: auto;
+  aspect-ratio: auto;
 
   border: 0;
   border-right: 1px solid $grid-line;
   border-bottom: 1px solid $grid-line;
   border-radius: 0;
   background: #fff;
-
   padding: 0;
-
   display: block;
   text-align: left;
   font-family: inherit;
@@ -182,33 +176,8 @@ $radius-card: 24px;
     border-right: 0;
   }
 
-  &:hover {
-    background: #fff;
-  }
-
-  &.is-clickable {
-    cursor: pointer;
-    transition: background 0.18s ease;
-  }
-
-  &.is-clickable:hover {
-    background: $hover-bg;
-  }
-
-  &.is-outside {
-    background: #fff;
-  }
-
-  &.is-outside .ver-calendario-aluno__dayNumber {
-    color: $outside-day-color;
-  }
-
-  &.is-past .ver-calendario-aluno__dayNumber {
-    color: $past-day-color;
-  }
-
-  &:disabled {
-    opacity: 1;
+   &.is-outside {
+    background: #f5f7fa; 
   }
 }
 
