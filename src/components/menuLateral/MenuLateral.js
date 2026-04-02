@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import "./MenuLateral.scss";
 import {
@@ -29,6 +29,7 @@ const MenuLateral = () => {
   const [paletaAbertaId, setPaletaAbertaId] = useState(null);
   const [corTemporaria, setCorTemporaria] = useState("#76A8D9");
   const [dataVersion, setDataVersion] = useState(0);
+  const colorInputRef = useRef(null);
   const [disciplinaAtualId, setDisciplinaAtualId] = useState(
     () => localStorage.getItem("disciplinaAtualId") || "",
   );
@@ -39,6 +40,12 @@ const MenuLateral = () => {
   });
 
   const isActive = (path) => location.pathname === path;
+
+  const abrirSeletorCor = () => {
+  if (colorInputRef.current) {
+    colorInputRef.current.click();
+  }
+};
 
   useEffect(() => {
     const bump = () => setDataVersion((v) => v + 1);
@@ -91,13 +98,13 @@ const MenuLateral = () => {
   }, [user, dataVersion]);
 
   useEffect(() => {
-  localStorage.setItem(
-    "menuAlunoSecundariasVisiveis",
-    String(mostrarSecundarias),
-  );
+    localStorage.setItem(
+      "menuAlunoSecundariasVisiveis",
+      String(mostrarSecundarias),
+    );
 
-  window.dispatchEvent(new Event("menuAlunoSecundarias:changed"));
-}, [mostrarSecundarias]);
+    window.dispatchEvent(new Event("menuAlunoSecundarias:changed"));
+  }, [mostrarSecundarias]);
 
   function safeJsonParse(value, fallback) {
     try {
@@ -356,152 +363,181 @@ const MenuLateral = () => {
       null
     );
   };
-  
 
- const CORES_PRESET = [
-  "#76A8D9",
-  "#5B8DEF",
-  "#4CAF50",
-  "#F59E0B",
-  "#EF4444",
-  "#A855F7",
-  "#EC4899",
-  "#14B8A6",
-  "#334E68",
-  "#8B5E3C",
-];
+  const CORES_PRESET = [
+    "#76A8D9",
+    "#5B8DEF",
+    "#4CAF50",
+    "#F59E0B",
+    "#EF4444",
+    "#A855F7",
+    "#EC4899",
+    "#14B8A6",
+    "#334E68",
+    "#8B5E3C",
+  ];
 
-const renderDisciplinaAluno = (disc) => {
-  const open = disciplinaAbertaId === disc.id;
-  const paletaAberta = paletaAbertaId === disc.id;
-  const professorPrincipal = getProfessorPrincipal(disc);
-  const corAtual = getCorDisciplinaUsuario(disc);
+  const renderDisciplinaAluno = (disc) => {
+    const open = disciplinaAbertaId === disc.id;
+    const paletaAberta = paletaAbertaId === disc.id;
+    const professorPrincipal = getProfessorPrincipal(disc);
+    const corAtual = getCorDisciplinaUsuario(disc);
 
-  return (
+    return (
+      <div
+        key={disc.id}
+        className={`menuLateral__materiaWrap ${open ? "open" : ""}`}
+        style={{ "--discColor": corAtual }}
+      >
+        <div className={`menuLateral__materiaItem ${open ? "open" : ""}`}>
+          <button
+            type="button"
+            className="menuLateral__dotBtn"
+            onClick={(e) => {
+              e.stopPropagation();
+              setPaletaAbertaId((prev) => {
+                const vaiAbrir = prev !== disc.id;
+                if (vaiAbrir) setCorTemporaria(corAtual);
+                return vaiAbrir ? disc.id : null;
+              });
+            }}
+            aria-label="Alterar cor da turma"
+            title="Alterar cor da turma"
+          >
+            <span className="menuLateral__dot" />
+          </button>
+
+          <button
+            type="button"
+            className="menuLateral__materiaMain"
+            onClick={() => setDisciplinaAbertaId(open ? null : disc.id)}
+          >
+            <span className="menuLateral__materiaTitle">
+              {getTituloCurto(disc.nome)}
+            </span>
+            <span className="menuLateral__materiaToggle">
+              {open ? "–" : "+"}
+            </span>
+          </button>
+        </div>
+
+        {paletaAberta && (
+  <>
+    <button
+      type="button"
+      className="menuLateral__colorBackdrop"
+      onClick={() => setPaletaAbertaId(null)}
+      aria-label="Fechar seletor de cor"
+    />
+
     <div
-      key={disc.id}
-      className={`menuLateral__materiaWrap ${open ? "open" : ""}`}
-      style={{ "--discColor": corAtual }}
+      className="menuLateral__colorModal"
+      onClick={(e) => e.stopPropagation()}
     >
-      <div className={`menuLateral__materiaItem ${open ? "open" : ""}`}>
-        <button
-          type="button"
-          className="menuLateral__dotBtn"
-          onClick={(e) => {
-            e.stopPropagation();
-            setPaletaAbertaId((prev) => {
-              const vaiAbrir = prev !== disc.id;
-              if (vaiAbrir) setCorTemporaria(corAtual);
-              return vaiAbrir ? disc.id : null;
-            });
-          }}
-          aria-label="Alterar cor da turma"
-          title="Alterar cor da turma"
-        >
-          <span className="menuLateral__dot" />
-        </button>
-
-        <button
-          type="button"
-          className="menuLateral__materiaMain"
-          onClick={() => setDisciplinaAbertaId(open ? null : disc.id)}
-        >
-          <span className="menuLateral__materiaTitle">
-            {getTituloCurto(disc.nome)}
-          </span>
-          <span className="menuLateral__materiaToggle">
-            {open ? "–" : "+"}
-          </span>
-        </button>
+      <div className="menuLateral__colorModalHeader">
+        <span className="menuLateral__colorModalTitle">
+          Selecione sua cor favorita
+        </span>
       </div>
 
-      {paletaAberta && (
-        <div
-          className="menuLateral__colorPopover"
-          onClick={(e) => e.stopPropagation()}
+      <div className="menuLateral__colorModalBody">
+        <input
+          ref={colorInputRef}
+          type="color"
+          value={corTemporaria}
+          onChange={(e) => setCorTemporaria(e.target.value.toUpperCase())}
+          className="menuLateral__colorNativeInput"
+        />
+
+        <button
+          type="button"
+          className="menuLateral__colorPickerTrigger"
+          onClick={abrirSeletorCor}
         >
-          <div className="menuLateral__colorHeader">Escolha uma cor</div>
+          <span
+            className="menuLateral__colorPickerPreview"
+            style={{ backgroundColor: corTemporaria }}
+          />
+          <span className="menuLateral__colorPickerText">
+            Escolher cor
+          </span>
+        </button>
 
-          <div className="menuLateral__colorGrid">
-            {CORES_PRESET.map((cor) => {
-              const ativa =
-                String(cor).toUpperCase() === String(corTemporaria).toUpperCase();
-
-              return (
-                <button
-                  key={cor}
-                  type="button"
-                  className={`menuLateral__colorSwatch ${ativa ? "is-active" : ""}`}
-                  style={{ backgroundColor: cor }}
-                  onClick={() => setCorTemporaria(cor)}
-                  aria-label={`Selecionar cor ${cor}`}
-                  title={cor}
-                />
-              );
-            })}
-          </div>
-
-          <div className="menuLateral__colorPreviewWrap">
-            <span
-              className="menuLateral__colorPreview"
-              style={{ backgroundColor: corTemporaria }}
-            />
-            <span className="menuLateral__colorHex">
-              {String(corTemporaria || "").toUpperCase()}
-            </span>
-          </div>
-
-          <div className="menuLateral__colorActions">
-            <button
-              type="button"
-              className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
-              onClick={() => setPaletaAbertaId(null)}
-            >
-              Cancelar
-            </button>
-
-            <button
-              type="button"
-              className="menuLateral__colorBtn menuLateral__colorBtn--primary"
-              onClick={() => {
-                salvarCorDisciplinaUsuario(disc.id, corTemporaria);
-                setPaletaAbertaId(null);
-              }}
-            >
-              Salvar
-            </button>
+        <div className="menuLateral__colorInfo">
+          <span
+            className="menuLateral__colorPreviewLarge"
+            style={{ backgroundColor: corTemporaria }}
+          />
+          <div className="menuLateral__colorInfoTexts">
+            <strong>{String(corTemporaria).toUpperCase()}</strong>
+            <span>Cor da turma</span>
           </div>
         </div>
-      )}
+      </div>
 
-      {open && (
-        <div className="menuLateral__materiaDetails">
-          <div className="menuLateral__detailsTitle">
-            {String(disc.nome || "")}
-          </div>
+      <div className="menuLateral__colorModalActions">
+        <button
+          type="button"
+          className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
+          onClick={() => {
+            resetarCorDisciplinaUsuario(disc.id);
+            setPaletaAbertaId(null);
+          }}
+        >
+          Resetar
+        </button>
 
-          <div className="menuLateral__detailsLine">
-            <strong>Professor:</strong>{" "}
-            <span className="menuLateral__detailsValue">
-              {professorPrincipal?.nome || "—"}
-              <br />
-              {professorPrincipal?.contato || "—"}
-            </span>
-          </div>
+        <button
+          type="button"
+          className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
+          onClick={() => setPaletaAbertaId(null)}
+        >
+          Cancelar
+        </button>
 
-          <div className="menuLateral__detailsLine">
-            <strong>Aluno:</strong>{" "}
-            <span className="menuLateral__detailsValue">
-              {user.nome || "—"}
-              <br />
-              {user.contato || "—"}
-            </span>
-          </div>
-        </div>
-      )}
+        <button
+          type="button"
+          className="menuLateral__colorBtn menuLateral__colorBtn--primary"
+          onClick={() => {
+            salvarCorDisciplinaUsuario(disc.id, corTemporaria);
+            setPaletaAbertaId(null);
+          }}
+        >
+          Salvar cor
+        </button>
+      </div>
     </div>
-  );
-};
+  </>
+)}
+
+        {open && (
+          <div className="menuLateral__materiaDetails">
+            <div className="menuLateral__detailsTitle">
+              {String(disc.nome || "")}
+            </div>
+
+            <div className="menuLateral__detailsLine">
+              <strong>Professor:</strong>{" "}
+              <span className="menuLateral__detailsValue">
+                {professorPrincipal?.nome || "—"}
+                <br />
+                {professorPrincipal?.contato || "—"}
+              </span>
+            </div>
+
+            <div className="menuLateral__detailsLine">
+              <strong>Aluno:</strong>{" "}
+              <span className="menuLateral__detailsValue">
+                {user.nome || "—"}
+                <br />
+                {user.contato || "—"}
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <aside className="menuLateral">
