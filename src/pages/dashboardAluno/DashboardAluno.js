@@ -117,50 +117,50 @@ export default function DashboardAluno() {
   const [dataVersion, setDataVersion] = useState(0);
 
   useEffect(() => {
-  const bump = () => setDataVersion((v) => v + 1);
+    const bump = () => setDataVersion((v) => v + 1);
 
-  const syncMostrarSecundarias = () => {
-    setMostrarSecundarias(
-      localStorage.getItem("menuAlunoSecundariasVisiveis") === "true",
-    );
-    bump();
-  };
+    const syncMostrarSecundarias = () => {
+      setMostrarSecundarias(
+        localStorage.getItem("menuAlunoSecundariasVisiveis") === "true",
+      );
+      bump();
+    };
 
-  const onStorage = (e) => {
-  if (!e.key) {
-    bump();
-    return;
-  }
+    const onStorage = (e) => {
+      if (!e.key) {
+        bump();
+        return;
+      }
 
-  if (
-    e.key === STORAGE_TURMAS ||
-    e.key === STORAGE_USUARIO ||
-    STORAGE_EVENTOS_KEYS.includes(e.key)
-  ) {
-    bump();
-  }
+      if (
+        e.key === STORAGE_TURMAS ||
+        e.key === STORAGE_USUARIO ||
+        STORAGE_EVENTOS_KEYS.includes(e.key)
+      ) {
+        bump();
+      }
 
-  if (e.key === "menuAlunoSecundariasVisiveis") {
-    syncMostrarSecundarias();
-  }
-};
+      if (e.key === "menuAlunoSecundariasVisiveis") {
+        syncMostrarSecundarias();
+      }
+    };
 
-  window.addEventListener("app:data-changed", bump);
-  window.addEventListener("storage", onStorage);
-  window.addEventListener(
-    "menuAlunoSecundarias:changed",
-    syncMostrarSecundarias,
-  );
-
-  return () => {
-    window.removeEventListener("app:data-changed", bump);
-    window.removeEventListener("storage", onStorage);
-    window.removeEventListener(
+    window.addEventListener("app:data-changed", bump);
+    window.addEventListener("storage", onStorage);
+    window.addEventListener(
       "menuAlunoSecundarias:changed",
       syncMostrarSecundarias,
     );
-  };
-}, []);
+
+    return () => {
+      window.removeEventListener("app:data-changed", bump);
+      window.removeEventListener("storage", onStorage);
+      window.removeEventListener(
+        "menuAlunoSecundarias:changed",
+        syncMostrarSecundarias,
+      );
+    };
+  }, []);
 
   const [mostrarSecundarias, setMostrarSecundarias] = useState(() => {
     const salvo = localStorage.getItem("menuAlunoSecundariasVisiveis");
@@ -184,41 +184,41 @@ export default function DashboardAluno() {
     [dataVersion],
   );
 
- const STORAGE_EVENTOS_KEYS = [
-  "eventos_override",
-  "eventos",
-  "eventosStore",
-  "uniagenda_eventos",
-];
+  const STORAGE_EVENTOS_KEYS = [
+    "eventos_override",
+    "eventos",
+    "eventosStore",
+    "uniagenda_eventos",
+  ];
 
-function getAllStorageArrays(keys) {
-  const all = [];
+  function getAllStorageArrays(keys) {
+    const all = [];
 
-  keys.forEach((key) => {
-    const raw = localStorage.getItem(key);
-    if (!raw) return;
+    keys.forEach((key) => {
+      const raw = localStorage.getItem(key);
+      if (!raw) return;
 
-    try {
-      const parsed = JSON.parse(raw);
+      try {
+        const parsed = JSON.parse(raw);
 
-      if (Array.isArray(parsed)) {
-        all.push(...parsed);
-        return;
-      }
+        if (Array.isArray(parsed)) {
+          all.push(...parsed);
+          return;
+        }
 
-      if (parsed && typeof parsed === "object") {
-        all.push(...Object.values(parsed));
-      }
-    } catch {}
-  });
+        if (parsed && typeof parsed === "object") {
+          all.push(...Object.values(parsed));
+        }
+      } catch {}
+    });
 
-  return all;
-}
+    return all;
+  }
 
-const eventosStorage = useMemo(
-  () => getAllStorageArrays(STORAGE_EVENTOS_KEYS),
-  [dataVersion],
-);
+  const eventosStorage = useMemo(
+    () => getAllStorageArrays(STORAGE_EVENTOS_KEYS),
+    [dataVersion],
+  );
 
   const disciplinasBase = useMemo(() => {
     const mapa = new Map();
@@ -235,24 +235,24 @@ const eventosStorage = useMemo(
   }, [disciplinasJson, turmasOverride]);
 
   function getMergedEventos(jsonList, storageList) {
-  const map = new Map();
+    const map = new Map();
 
-  (Array.isArray(jsonList) ? jsonList : []).forEach((item) => {
-    if (!item || item.id == null) return;
-    map.set(Number(item.id), item);
-  });
+    (Array.isArray(jsonList) ? jsonList : []).forEach((item) => {
+      if (!item || item.id == null) return;
+      map.set(Number(item.id), item);
+    });
 
-  (Array.isArray(storageList) ? storageList : []).forEach((item) => {
-    if (!item || item.id == null) return;
-    map.set(Number(item.id), item);
-  });
+    (Array.isArray(storageList) ? storageList : []).forEach((item) => {
+      if (!item || item.id == null) return;
+      map.set(Number(item.id), item);
+    });
 
-  return Array.from(map.values());
-}
+    return Array.from(map.values());
+  }
 
   const eventosBase = useMemo(() => {
-  return getMergedEventos(eventosJson, eventosStorage);
-}, [eventosJson, eventosStorage]);
+    return getMergedEventos(eventosJson, eventosStorage);
+  }, [eventosJson, eventosStorage]);
 
   const hoje = new Date();
   const primeiroDiaMesAtual = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
@@ -281,100 +281,95 @@ const eventosStorage = useMemo(
   }, [disciplinasBase, alunoId]);
 
   function normalizarIds(evento) {
-  if (Array.isArray(evento?.disciplinaIds)) {
-    return evento.disciplinaIds.map(Number);
-  }
-
-  if (evento?.disciplinaId) {
-    return [Number(evento.disciplinaId)];
-  }
-
-  return [];
-}
-
-  const eventosDoAluno = useMemo(() => {
-  return eventosBase.filter((evento) => {
-    if (!evento?.calendario) return false;
-
-    const ids = normalizarIds(evento);
-
-    const idsDoAlunoNoEvento = ids.filter((id) =>
-      disciplinaIdsDoAluno.has(Number(id)),
-    );
-
-    if (!idsDoAlunoNoEvento.length) return false;
-
-    const idsVisiveis = idsDoAlunoNoEvento.filter((id) => {
-      const disciplina = disciplinaMap.get(Number(id));
-      const isSecundaria =
-        String(disciplina?.tipo || "").toLowerCase() === "secundaria";
-
-      return mostrarSecundarias || !isSecundaria;
-    });
-
-    return idsVisiveis.length > 0;
-  });
-}, [
-  eventosBase,
-  disciplinaIdsDoAluno,
-  disciplinaMap,
-  mostrarSecundarias,
-]);
-
-  const eventosPorData = useMemo(() => {
-  const map = new Map();
-
-  eventosDoAluno.forEach((evento) => {
-    const data = parseLocalDate(evento.dataEvento);
-    if (!data) return;
-
-    const key = toDateKey(data);
-
-    if (!map.has(key)) {
-      map.set(key, {
-        eventos: [],
-        dots: [],
-      });
+    if (Array.isArray(evento?.disciplinaIds)) {
+      return evento.disciplinaIds.map(Number);
     }
 
-    const current = map.get(key);
-    current.eventos.push(evento);
+    if (evento?.disciplinaId) {
+      return [Number(evento.disciplinaId)];
+    }
 
-    const ids = normalizarIds(evento);
+    return [];
+  }
 
-    ids.forEach((disciplinaId) => {
-      const disciplinaIdNum = Number(disciplinaId);
+  const eventosDoAluno = useMemo(() => {
+    return eventosBase.filter((evento) => {
+      if (!evento?.calendario) return false;
 
-      if (!disciplinaIdsDoAluno.has(disciplinaIdNum)) return;
+      const ids = normalizarIds(evento);
 
-      const disciplina = disciplinaMap.get(disciplinaIdNum);
-      if (!disciplina) return;
+      const idsDoAlunoNoEvento = ids.filter((id) =>
+        disciplinaIdsDoAluno.has(Number(id)),
+      );
 
-      const isSecundaria =
-        String(disciplina?.tipo || "").toLowerCase() === "secundaria";
+      if (!idsDoAlunoNoEvento.length) return false;
 
-      if (!mostrarSecundarias && isSecundaria) return;
+      const idsVisiveis = idsDoAlunoNoEvento.filter((id) => {
+        const disciplina = disciplinaMap.get(Number(id));
+        const isSecundaria =
+          String(disciplina?.tipo || "").toLowerCase() === "secundaria";
 
-      if (
-        !current.dots.some((item) => item.disciplinaId === disciplinaIdNum)
-      ) {
-        current.dots.push({
-          disciplinaId: disciplinaIdNum,
-          cor: getCorDisciplinaParaUsuario(disciplina, alunoId),
-          nome: disciplina.nome,
+        return mostrarSecundarias || !isSecundaria;
+      });
+
+      return idsVisiveis.length > 0;
+    });
+  }, [eventosBase, disciplinaIdsDoAluno, disciplinaMap, mostrarSecundarias]);
+
+  const eventosPorData = useMemo(() => {
+    const map = new Map();
+
+    eventosDoAluno.forEach((evento) => {
+      const data = parseLocalDate(evento.dataEvento);
+      if (!data) return;
+
+      const key = toDateKey(data);
+
+      if (!map.has(key)) {
+        map.set(key, {
+          eventos: [],
+          dots: [],
         });
       }
-    });
-  });
 
-  return map;
-}, [
-  eventosDoAluno,
-  disciplinaIdsDoAluno,
-  disciplinaMap,
-  alunoId,
-  mostrarSecundarias,
-]);
+      const current = map.get(key);
+      current.eventos.push(evento);
+
+      const ids = normalizarIds(evento);
+
+      ids.forEach((disciplinaId) => {
+        const disciplinaIdNum = Number(disciplinaId);
+
+        if (!disciplinaIdsDoAluno.has(disciplinaIdNum)) return;
+
+        const disciplina = disciplinaMap.get(disciplinaIdNum);
+        if (!disciplina) return;
+
+        const isSecundaria =
+          String(disciplina?.tipo || "").toLowerCase() === "secundaria";
+
+        if (!mostrarSecundarias && isSecundaria) return;
+
+        if (
+          !current.dots.some((item) => item.disciplinaId === disciplinaIdNum)
+        ) {
+          current.dots.push({
+            disciplinaId: disciplinaIdNum,
+            cor: getCorDisciplinaParaUsuario(disciplina, alunoId),
+            nome: disciplina.nome,
+          });
+        }
+      });
+    });
+
+    return map;
+  }, [
+    eventosDoAluno,
+    disciplinaIdsDoAluno,
+    disciplinaMap,
+    alunoId,
+    mostrarSecundarias,
+  ]);
 
   const dias = useMemo(() => {
     const start = getCalendarStart(mesAtual);
@@ -493,14 +488,16 @@ const eventosStorage = useMemo(
                     {visibleDots.map((dot) => (
                       <span
                         key={`${key}-${dot.disciplinaId}`}
-                        className="ver-calendario-aluno__dot"
+                        className={`ver-calendario-aluno__dot ${passado ? "is-past" : ""}`}
                         style={{ backgroundColor: dot.cor }}
                         title={dot.nome}
                       />
                     ))}
 
                     {extraCount > 0 && (
-                      <span className="ver-calendario-aluno__more">
+                      <span
+                        className={`ver-calendario-aluno__more ${passado ? "is-past" : ""}`}
+                      >
                         +{extraCount}
                       </span>
                     )}

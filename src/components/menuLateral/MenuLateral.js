@@ -36,16 +36,24 @@ const MenuLateral = () => {
 
   const [mostrarSecundarias, setMostrarSecundarias] = useState(() => {
     const salvo = localStorage.getItem("menuAlunoSecundariasVisiveis");
-    return salvo === null ? false : salvo === "true";
+    return salvo === null ? true : salvo === "true";
   });
 
   const isActive = (path) => location.pathname === path;
 
   const abrirSeletorCor = () => {
-  if (colorInputRef.current) {
-    colorInputRef.current.click();
-  }
-};
+    if (colorInputRef.current) {
+      colorInputRef.current.click();
+    }
+  };
+
+  useEffect(() => {
+    const salvo = localStorage.getItem("menuAlunoSecundariasVisiveis");
+
+    if (salvo === null) {
+      localStorage.setItem("menuAlunoSecundariasVisiveis", "true");
+    }
+  }, []);
 
   useEffect(() => {
     const bump = () => setDataVersion((v) => v + 1);
@@ -422,93 +430,95 @@ const MenuLateral = () => {
         </div>
 
         {paletaAberta && (
-  <>
-    <button
-      type="button"
-      className="menuLateral__colorBackdrop"
-      onClick={() => setPaletaAbertaId(null)}
-      aria-label="Fechar seletor de cor"
-    />
+          <>
+            <button
+              type="button"
+              className="menuLateral__colorBackdrop"
+              onClick={() => setPaletaAbertaId(null)}
+              aria-label="Fechar seletor de cor"
+            />
 
-    <div
-      className="menuLateral__colorModal"
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div className="menuLateral__colorModalHeader">
-        <span className="menuLateral__colorModalTitle">
-          Selecione sua cor favorita
-        </span>
-      </div>
+            <div
+              className="menuLateral__colorModal"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="menuLateral__colorModalHeader">
+                <span className="menuLateral__colorModalTitle">
+                  Selecione sua cor favorita
+                </span>
+              </div>
 
-      <div className="menuLateral__colorModalBody">
-        <input
-          ref={colorInputRef}
-          type="color"
-          value={corTemporaria}
-          onChange={(e) => setCorTemporaria(e.target.value.toUpperCase())}
-          className="menuLateral__colorNativeInput"
-        />
+              <div className="menuLateral__colorModalBody">
+                <input
+                  ref={colorInputRef}
+                  type="color"
+                  value={corTemporaria}
+                  onChange={(e) =>
+                    setCorTemporaria(e.target.value.toUpperCase())
+                  }
+                  className="menuLateral__colorNativeInput"
+                />
 
-        <button
-          type="button"
-          className="menuLateral__colorPickerTrigger"
-          onClick={abrirSeletorCor}
-        >
-          <span
-            className="menuLateral__colorPickerPreview"
-            style={{ backgroundColor: corTemporaria }}
-          />
-          <span className="menuLateral__colorPickerText">
-            Escolher cor
-          </span>
-        </button>
+                <button
+                  type="button"
+                  className="menuLateral__colorPickerTrigger"
+                  onClick={abrirSeletorCor}
+                >
+                  <span
+                    className="menuLateral__colorPickerPreview"
+                    style={{ backgroundColor: corTemporaria }}
+                  />
+                  <span className="menuLateral__colorPickerText">
+                    Escolher cor
+                  </span>
+                </button>
 
-        <div className="menuLateral__colorInfo">
-          <span
-            className="menuLateral__colorPreviewLarge"
-            style={{ backgroundColor: corTemporaria }}
-          />
-          <div className="menuLateral__colorInfoTexts">
-            <strong>{String(corTemporaria).toUpperCase()}</strong>
-            <span>Cor da turma</span>
-          </div>
-        </div>
-      </div>
+                <div className="menuLateral__colorInfo">
+                  <span
+                    className="menuLateral__colorPreviewLarge"
+                    style={{ backgroundColor: corTemporaria }}
+                  />
+                  <div className="menuLateral__colorInfoTexts">
+                    <strong>{String(corTemporaria).toUpperCase()}</strong>
+                    <span>Cor da turma</span>
+                  </div>
+                </div>
+              </div>
 
-      <div className="menuLateral__colorModalActions">
-        <button
-          type="button"
-          className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
-          onClick={() => {
-            resetarCorDisciplinaUsuario(disc.id);
-            setPaletaAbertaId(null);
-          }}
-        >
-          Resetar
-        </button>
+              <div className="menuLateral__colorModalActions">
+                <button
+                  type="button"
+                  className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
+                  onClick={() => {
+                    resetarCorDisciplinaUsuario(disc.id);
+                    setPaletaAbertaId(null);
+                  }}
+                >
+                  Resetar
+                </button>
 
-        <button
-          type="button"
-          className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
-          onClick={() => setPaletaAbertaId(null)}
-        >
-          Cancelar
-        </button>
+                <button
+                  type="button"
+                  className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
+                  onClick={() => setPaletaAbertaId(null)}
+                >
+                  Cancelar
+                </button>
 
-        <button
-          type="button"
-          className="menuLateral__colorBtn menuLateral__colorBtn--primary"
-          onClick={() => {
-            salvarCorDisciplinaUsuario(disc.id, corTemporaria);
-            setPaletaAbertaId(null);
-          }}
-        >
-          Salvar cor
-        </button>
-      </div>
-    </div>
-  </>
-)}
+                <button
+                  type="button"
+                  className="menuLateral__colorBtn menuLateral__colorBtn--primary"
+                  onClick={() => {
+                    salvarCorDisciplinaUsuario(disc.id, corTemporaria);
+                    setPaletaAbertaId(null);
+                  }}
+                >
+                  Salvar cor
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
         {open && (
           <div className="menuLateral__materiaDetails">
