@@ -33,23 +33,33 @@ function safeParse(value, fallback) {
   }
 }
 
-function readFirstStorageArray(keys) {
-  for (const key of keys) {
+function readAllStorageArrays(keys) {
+  const result = [];
+
+  keys.forEach((key) => {
     const raw = localStorage.getItem(key);
-    if (!raw) continue;
+    if (!raw) return;
+
     const parsed = safeParse(raw, null);
-    if (Array.isArray(parsed)) return parsed;
-  }
-  return [];
+    if (Array.isArray(parsed)) {
+      result.push(...parsed);
+    }
+  });
+
+  return result;
 }
 
 function readLoggedUser() {
   for (const key of STORAGE_USUARIO_KEYS) {
     const raw = localStorage.getItem(key);
     if (!raw) continue;
+
     const parsed = safeParse(raw, null);
-    if (parsed && typeof parsed === "object") return parsed;
+    if (parsed && typeof parsed === "object") {
+      return parsed;
+    }
   }
+
   return null;
 }
 
@@ -93,14 +103,27 @@ function toDateKey(date) {
 function formatGroupLabel(date, today) {
   if (!date) return "";
   if (date.getTime() === today.getTime()) return "Hoje";
+
   const dd = String(date.getDate()).padStart(2, "0");
   const mm = String(date.getMonth() + 1).padStart(2, "0");
   return `${dd}/${mm}`;
 }
 
+function normalizarDisciplinaIds(evento) {
+  if (Array.isArray(evento?.disciplinaIds)) {
+    return evento.disciplinaIds.map(Number).filter(Boolean);
+  }
+
+  if (evento?.disciplinaId != null) {
+    return [Number(evento.disciplinaId)].filter(Boolean);
+  }
+
+  return [];
+}
+
 function getMergedDisciplinas() {
   const jsonList = Array.isArray(dados?.disciplinas) ? dados.disciplinas : [];
-  const storageList = readFirstStorageArray(STORAGE_DISCIPLINAS_KEYS);
+  const storageList = readAllStorageArrays(STORAGE_DISCIPLINAS_KEYS);
 
   const map = new Map();
 
@@ -111,7 +134,14 @@ function getMergedDisciplinas() {
 
   storageList.forEach((item) => {
     if (!item || item.id == null) return;
-    map.set(Number(item.id), item);
+
+    const id = Number(item.id);
+    const anterior = map.get(id) || {};
+
+    map.set(id, {
+      ...anterior,
+      ...item,
+    });
   });
 
   return Array.from(map.values());
@@ -119,7 +149,7 @@ function getMergedDisciplinas() {
 
 function getMergedEventos() {
   const jsonList = Array.isArray(dados?.eventos) ? dados.eventos : [];
-  const storageList = readFirstStorageArray(STORAGE_EVENTOS_KEYS);
+  const storageList = readAllStorageArrays(STORAGE_EVENTOS_KEYS);
 
   const map = new Map();
 
@@ -130,7 +160,14 @@ function getMergedEventos() {
 
   storageList.forEach((item) => {
     if (!item || item.id == null) return;
-    map.set(Number(item.id), item);
+
+    const id = Number(item.id);
+    const anterior = map.get(id) || {};
+
+    map.set(id, {
+      ...anterior,
+      ...item,
+    });
   });
 
   return Array.from(map.values());
@@ -162,6 +199,7 @@ function getAlunoDisciplinas(alunoId, disciplinas) {
     const alunoIds = Array.isArray(disciplina?.alunoIds)
       ? disciplina.alunoIds.map(Number)
       : [];
+
     return alunoIds.includes(Number(alunoId));
   });
 }
@@ -171,17 +209,16 @@ function getEventoDisciplinaPrincipal(
   disciplinasMap,
   disciplinaIdsDoAluno,
 ) {
-  const ids = Array.isArray(evento?.disciplinaIds) ? evento.disciplinaIds : [];
+  const ids = normalizarDisciplinaIds(evento);
 
   for (const id of ids) {
-    const idNum = Number(id);
-    if (!disciplinaIdsDoAluno.has(idNum)) continue;
-    const disciplina = disciplinasMap.get(idNum);
+    if (!disciplinaIdsDoAluno.has(id)) continue;
+    const disciplina = disciplinasMap.get(id);
     if (disciplina) return disciplina;
   }
 
   for (const id of ids) {
-    const disciplina = disciplinasMap.get(Number(id));
+    const disciplina = disciplinasMap.get(id);
     if (disciplina) return disciplina;
   }
 
@@ -196,6 +233,7 @@ function groupEventosByDate(eventos, today) {
     if (!date || date < today) return;
 
     const key = toDateKey(date);
+
     if (!grouped[key]) {
       grouped[key] = {
         key,
@@ -218,16 +256,15 @@ function clampDescription(text, max = 58) {
 
 function getCorDisciplinaParaUsuario(disciplina, usuarioId) {
   const userId = String(usuarioId || "");
-  return (
-    disciplina?.coresPorUsuario?.[userId] ||
-    disciplina?.cor ||
-    "#E4B84C"
-  );
+
+  return disciplina?.coresPorUsuario?.[userId] || disciplina?.cor || "#E4B84C";
 }
 
 export default function CalendarioAlunoLateral() {
   const [dataVersion, setDataVersion] = useState(0);
-  const today = startOfToday();
+  const [openKeys, setOpenKeys] = useState([]);
+
+  const today = useMemo(() => startOfToday(), []);
 
   useEffect(() => {
     const bump = () => setDataVersion((v) => v + 1);
@@ -248,10 +285,14 @@ export default function CalendarioAlunoLateral() {
     };
 
     window.addEventListener("app:data-changed", bump);
+    window.addEventListener("eventos:changed", bump);
+    window.addEventListener("disciplinaAtual:changed", bump);
     window.addEventListener("storage", onStorage);
 
     return () => {
       window.removeEventListener("app:data-changed", bump);
+      window.removeEventListener("eventos:changed", bump);
+      window.removeEventListener("disciplinaAtual:changed", bump);
       window.removeEventListener("storage", onStorage);
     };
   }, []);
@@ -279,9 +320,12 @@ export default function CalendarioAlunoLateral() {
 
   const disciplinasMap = useMemo(() => {
     const map = new Map();
+
     disciplinas.forEach((disciplina) => {
+      if (disciplina?.id == null) return;
       map.set(Number(disciplina.id), disciplina);
     });
+
     return map;
   }, [disciplinas]);
 
@@ -295,15 +339,15 @@ export default function CalendarioAlunoLateral() {
         const data = parseDateOnly(evento?.dataEvento);
         if (!data || data < today) return false;
 
-        const ids = Array.isArray(evento?.disciplinaIds)
-          ? evento.disciplinaIds.map(Number)
-          : [];
+        const ids = normalizarDisciplinaIds(evento);
+        if (!ids.length) return false;
 
         return ids.some((id) => disciplinaIdsDoAluno.has(id));
       })
       .sort((a, b) => {
         const da = parseDateOnly(a?.dataEvento)?.getTime() || 0;
         const db = parseDateOnly(b?.dataEvento)?.getTime() || 0;
+
         if (da !== db) return da - db;
 
         const ua = new Date(a?.ultimaAtualizacao || 0).getTime() || 0;
@@ -334,23 +378,28 @@ export default function CalendarioAlunoLateral() {
     }));
   }, [eventosDoAluno, today, disciplinasMap, disciplinaIdsDoAluno, alunoId]);
 
-  const firstOpenKey = grupos[0]?.key || null;
-  const [openKey, setOpenKey] = useState(firstOpenKey);
-
   useEffect(() => {
-  if (!grupos.length) {
-    setOpenKey(null);
-    return;
-  }
+    const keysValidas = new Set(grupos.map((grupo) => grupo.key));
 
-  // só corrige se o grupo aberto deixou de existir
-  if (openKey && !grupos.some((g) => g.key === openKey)) {
-    setOpenKey(null);
-  }
-}, [grupos]);
+    setOpenKeys((prev) => prev.filter((key) => keysValidas.has(key)));
+  }, [grupos]);
 
   function toggleGroup(key) {
-    setOpenKey((prev) => (prev === key ? null : key));
+    setOpenKeys((prev) => {
+      if (prev.includes(key)) {
+        return prev.filter((item) => item !== key);
+      }
+
+      return [...prev, key];
+    });
+  }
+
+  function abrirTodos() {
+    setOpenKeys(grupos.map((grupo) => grupo.key));
+  }
+
+  function fecharTodos() {
+    setOpenKeys([]);
   }
 
   if (!isAluno) return null;
@@ -363,7 +412,7 @@ export default function CalendarioAlunoLateral() {
         </div>
       ) : (
         grupos.map((grupo) => {
-          const isOpen = openKey === grupo.key;
+          const isOpen = openKeys.includes(grupo.key);
 
           return (
             <section
@@ -401,7 +450,7 @@ export default function CalendarioAlunoLateral() {
                 <div className="calendario-aluno-lateral__list">
                   {grupo.eventos.map((evento) => (
                     <article
-                      key={evento.id}
+                      key={`${grupo.key}-${evento.id}`}
                       className="calendario-aluno-lateral__card"
                       style={{
                         "--bar-color": evento.disciplinaCor,

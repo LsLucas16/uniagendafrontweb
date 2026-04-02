@@ -214,15 +214,16 @@ $radius-card: 24px;
 }
 
 .ver-calendario-aluno__dot {
-  width: 14px;
-  height: 14px;
-  min-width: 14px;
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
   border-radius: 50%;
-  flex: 0 0 14px;
+  flex: 0 0 15px;
 }
 
 .ver-calendario-aluno__more {
-  font-size: 13px;
+  margin-left: -5px;
+  font-size: 14px;
   line-height: 1;
   font-weight: 600;
   color: #5d6980;
