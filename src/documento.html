@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Documentação - UniAgenda</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background: #f4f6f9;
+        color: #333;
+      }
+
+      header {
+        background: #1e293b;
+        color: #fff;
+        padding: 20px;
+        text-align: center;
+      }
+
+      main {
+        max-width: 1100px;
+        margin: auto;
+        padding: 20px;
+      }
+
+      section {
+        background: #fff;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+
+      h1 {
+        color: #fff;
+      }
+
+      h2,
+      h3 {
+        color: #1e293b;
+      }
+
+      code {
+        background: #eee;
+        padding: 2px 6px;
+        border-radius: 4px;
+      }
+
+      pre {
+        background: #0f172a;
+        color: #e2e8f0;
+        padding: 15px;
+        border-radius: 8px;
+        overflow-x: auto;
+      }
+
+      ul {
+        line-height: 1.6;
+      }
+
+      .tag {
+        display: inline-block;
+        background: #e2e8f0;
+        padding: 4px 8px;
+        border-radius: 6px;
+        margin: 2px;
+        font-size: 12px;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+        }
+
+        header {
+          background: #fff !important;
+          color: #000 !important;
+          border-bottom: 2px solid #000;
+        }
+
+        h1 {
+          color: #000;
+        }
+
+        section {
+          box-shadow: none;
+          border: 1px solid #ddd;
+          page-break-inside: avoid;
+        }
+
+        main {
+          max-width: 100%;
+          padding: 0;
+        }
+
+        pre {
+          background: #f4f4f4;
+          color: #000;
+          border: 1px solid #ccc;
+        }
+
+        .tag {
+          border: 1px solid #ccc;
+          background: none;
+        }
+
+        /* quebra de página mais organizada */
+        section {
+          page-break-before: auto;
+          page-break-after: auto;
+        }
+
+        h2 {
+          page-break-after: avoid;
+        }
+
+        /* remove margens padrão do navegador */
+        @page {
+          margin: 20mm;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <h1>📅 UniAgenda</h1>
+      <p>Documentação Técnica do Sistema</p>
+    </header>
+
+    <main>
+      <section>
+        <h2>📌 Visão Geral</h2>
+        <p>
+          O <strong>UniAgenda</strong> é um sistema web desenvolvido em React
+          para gerenciamento de eventos acadêmicos. Ele permite que diferentes
+          perfis de usuários (alunos, responsáveis, professores e coordenadores)
+          interajam com calendários, eventos e turmas de forma organizada.
+        </p>
+      </section>
+
+      <section>
+        <h2>🚀 Tecnologias e Bibliotecas Utilizadas</h2>
+
+        <h3>📚 Principais Bibliotecas</h3>
+
+        <ul>
+          <li>
+            <strong>react</strong> → Biblioteca principal para construção da
+            interface do sistema (SPA - Single Page Application)
+          </li>
+
+          <li>
+            <strong>react-dom</strong> → Responsável por renderizar os
+            componentes React no navegador
+          </li>
+
+          <li>
+            <strong>react-router-dom</strong> → Gerenciamento de rotas e
+            navegação entre páginas
+          </li>
+
+          <li>
+            <strong>@supabase/supabase-js</strong> → Integração com backend
+            (banco de dados, autenticação e APIs)
+          </li>
+
+          <li>
+            <strong>sass</strong> → Pré-processador CSS para organização e
+            reutilização de estilos
+          </li>
+
+          <li>
+            <strong>sweetalert2</strong> → Exibição de alertas e modais
+            estilizados (ex: sucesso, erro, confirmação)
+          </li>
+
+          <li>
+            <strong>date-fns</strong> → Manipulação e formatação de datas
+            (utilizado no calendário)
+          </li>
+
+          <li>
+            <strong>react-datepicker</strong> → Componente de seleção de datas
+            para formulários
+          </li>
+
+          <li>
+            <strong>lucide-react</strong> → Biblioteca de ícones utilizada na
+            interface
+          </li>
+
+          <li>
+            <strong>xlsx</strong> → Leitura e exportação de arquivos Excel (ex:
+            importação de alunos)
+          </li>
+        </ul>
+
+        <h3>🧪 Bibliotecas de Teste</h3>
+
+        <ul>
+          <li>
+            <strong>@testing-library/react</strong> → Testes de componentes
+            React
+          </li>
+          <li>
+            <strong>@testing-library/jest-dom</strong> → Extensões para testes
+            com DOM
+          </li>
+          <li>
+            <strong>@testing-library/user-event</strong> → Simulação de
+            interações do usuário
+          </li>
+        </ul>
+
+        <h3>⚙️ Ferramentas de Build</h3>
+
+        <ul>
+          <li>
+            <strong>react-scripts</strong> → Scripts de build, execução e testes
+            do projeto
+          </li>
+          <li>
+            <strong>dotenv</strong> → Gerenciamento de variáveis de ambiente
+          </li>
+          <li>
+            <strong>web-vitals</strong> → Monitoramento de performance da
+            aplicação
+          </li>
+        </ul>
+
+        <p style="margin-top: 10px">
+          Essas tecnologias foram escolhidas visando performance, escalabilidade
+          e facilidade de manutenção do sistema.
+        </p>
+      </section>
+
+      <section>
+        <h2>🧱 Arquitetura do Projeto</h2>
+        <p>
+          O projeto segue uma estrutura modular baseada em React, separando
+          responsabilidades por pastas:
+        </p>
+
+        <ul>
+          <li>
+            <strong>components</strong> → Componentes reutilizáveis (menu,
+            layout, calendário)
+          </li>
+          <li><strong>pages</strong> → Páginas principais do sistema</li>
+          <li><strong>data</strong> → Dados estáticos (JSON)</li>
+          <li>
+            <strong>utils</strong> → Funções auxiliares (ex: localStorage)
+          </li>
+          <li>
+            <strong>services</strong> → Integrações externas (ex: Supabase)
+          </li>
+          <li><strong>styles</strong> → Estilos globais</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>📁 Estrutura de Pastas</h2>
+
+        <pre>
+src/
+ ├── components/
+ │   ├── CalendarioLateralAluno/
+ │   ├── MenuLateral/
+ │   ├── Layout.js
+ │
+ ├── pages/
+ │   ├── login/
+ │   ├── dashboard/
+ │   ├── dashboardAluno/
+ │   ├── criarEvento/
+ │   ├── editarEvento/
+ │   ├── editarTurma/
+ │   ├── listaAlunos/
+ │   ├── verCalendario/
+ │   ├── detalheCalendarioAluno/
+ │
+ ├── data/
+ │   └── dados.json
+ │
+ ├── utils/
+ │   └── storageData.js
+</pre
+        >
+      </section>
+
+      <section>
+        <h2>🚀 Tecnologias Utilizadas</h2>
+
+        <div class="tag">React</div>
+        <div class="tag">React Router</div>
+        <div class="tag">SCSS</div>
+        <div class="tag">Supabase</div>
+        <div class="tag">SweetAlert2</div>
+        <div class="tag">Date-fns</div>
+
+        <p style="margin-top: 10px">
+          O sistema utiliza React para interface, React Router para navegação, e
+          Supabase como backend (quando aplicável).
+        </p>
+      </section>
+
+      <section>
+        <h2>🔐 Controle de Acesso</h2>
+
+        <p>O sistema possui controle de acesso baseado em tipo de usuário:</p>
+
+        <ul>
+          <li>
+            <strong>PrivateRoute</strong> → Protege rotas para usuários logados
+          </li>
+          <li><strong>RoleRoute</strong> → Restringe acesso por perfil</li>
+        </ul>
+
+        <p>Tipos de usuários:</p>
+        <ul>
+          <li>Aluno</li>
+          <li>Responsável</li>
+          <li>Professor</li>
+          <li>Coordenador</li>
+        </ul>
+      </section>
+
+      <section>
+        <h2>🧭 Rotas do Sistema</h2>
+
+        <pre>
+/ → Login
+
+/dashboard → Dashboard principal
+
+/detalhe-calendario-aluno/:data
+(Acesso: aluno/responsável)
+
+/criar-evento
+/eventos
+/eventos/:id/editar
+(Acesso: professor/coordenador)
+
+/nova-turma
+/ver-calendario
+(Acesso: coordenador)
+</pre
+        >
+      </section>
+
+      <section>
+        <h2>🧠 Lógica de Dashboard</h2>
+
+        <pre>
+function DashboardPage() {
+  const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+  const tipo = String(usuario?.tipo || "").toLowerCase();
+
+  if (tipo === "aluno" || tipo === "responsavel") {
+    return &lt;DashboardAluno /&gt;;
+  }
+
+  return &lt;Dashboard /&gt;;
+}
+</pre
+        >
+
+        <p>
+          O sistema identifica automaticamente o tipo de usuário logado e
+          direciona para o dashboard correto.
+        </p>
+      </section>
+
+      <section>
+        <h2>💾 Armazenamento de Dados</h2>
+
+        <p>Os dados podem vir de duas fontes:</p>
+
+        <ul>
+          <li><strong>JSON local</strong> → Dados fixos iniciais</li>
+          <li><strong>LocalStorage</strong> → Eventos criados dinamicamente</li>
+        </ul>
+
+        <p>
+          Existe uma lógica de unificação desses dados para exibição no
+          calendário.
+        </p>
+      </section>
+
+      <section>
+        <h2>📅 Calendário</h2>
+
+        <p>O sistema possui diferentes visualizações de calendário:</p>
+
+        <ul>
+          <li>Calendário lateral (resumo)</li>
+          <li>Calendário completo</li>
+          <li>Detalhes por dia</li>
+        </ul>
+
+        <p>Eventos passados, atuais e futuros possuem diferenciação visual.</p>
+      </section>
+
+      <section>
+        <h2>📦 Scripts do Projeto</h2>
+
+        <pre>
+npm start → Inicia o projeto
+npm run build → Gera versão de produção
+npm test → Executa testes
+</pre
+        >
+      </section>
+    </main>
+  </body>
+</html>

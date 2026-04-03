@@ -1,70 +1,268 @@
-# Getting Started with Create React App
+# 📅 UniAgenda
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Sistema web para gerenciamento de eventos acadêmicos, desenvolvido em React.
+Permite que alunos, responsáveis, professores e coordenadores interajam com calendários e eventos de forma organizada.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 📌 Visão Geral
 
-### `npm start`
+O **UniAgenda** centraliza eventos acadêmicos em uma interface intuitiva, com controle de acesso por tipo de usuário e visualizações específicas para cada perfil.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🚀 Tecnologias Utilizadas
 
-### `npm test`
+### Frontend
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* React
+* React Router DOM
+* SCSS
 
-### `npm run build`
+### Backend / Serviços
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+* Supabase
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Bibliotecas
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+* SweetAlert2
+* date-fns
+* react-datepicker
+* lucide-react
+* xlsx
 
-### `npm run eject`
+### Testes
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+* Testing Library (React / Jest DOM / User Event)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## 🧱 Arquitetura do Projeto
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+src/
+ ├── components/
+ ├── pages/
+ ├── data/
+ ├── utils/
+ ├── services/
+ ├── styles/
+```
 
-## Learn More
+### Principais responsabilidades:
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+* **components** → elementos reutilizáveis
+* **pages** → telas do sistema
+* **data** → dados estáticos (JSON)
+* **utils** → funções auxiliares
+* **services** → integrações externas
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## 📁 dados.json (Base de Dados Inicial)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+O arquivo `src/data/dados.json` contém os dados iniciais do sistema, como:
 
-### Analyzing the Bundle Size
+* Eventos acadêmicos
+* Turmas
+* Relações com alunos/professores
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### Exemplo de estrutura:
 
-### Making a Progressive Web App
+```json
+{
+  "eventos": [
+    {
+      "id": 1,
+      "titulo": "Prova de Matemática",
+      "data": "2026-04-10",
+      "disciplinaId": 3
+    }
+  ]
+}
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Esse JSON funciona como **fonte primária inicial**, sendo complementado pelos dados dinâmicos do usuário.
 
-### Advanced Configuration
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## 💾 Fonte de Dados
 
-### Deployment
+Os eventos utilizados no sistema vêm de duas origens:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+* **JSON local** → dados iniciais fixos (`dados.json`)
+* **LocalStorage** → eventos criados dinamicamente
 
-### `npm run build` fails to minify
+### 🔄 Merge de dados
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Existe uma lógica que unifica essas fontes antes da renderização.
+
+Exemplo conceitual:
+
+```js
+function getMergedEventos() {
+  const eventosJson = dados.eventos || [];
+  const eventosStorage = getEventosStorage();
+
+  return [...eventosJson, ...eventosStorage];
+}
+```
+
+---
+
+## ⚙️ Principais Funções
+
+### 📌 Normalização de IDs
+
+```js
+function normalizarIds(evento) {
+  if (Array.isArray(evento?.disciplinaIds)) {
+    return evento.disciplinaIds;
+  }
+
+  if (evento?.disciplinaId) {
+    return [evento.disciplinaId];
+  }
+
+  return [];
+}
+```
+
+**Objetivo:**
+Garantir consistência no formato dos dados (array sempre).
+
+---
+
+### 📌 Leitura de eventos do LocalStorage
+
+```js
+function getEventosStorage() {
+  const keys = ["eventos_override", "eventos", "eventosStore"];
+
+  let eventos = [];
+
+  keys.forEach((key) => {
+    const data = JSON.parse(localStorage.getItem(key) || "[]");
+    eventos = [...eventos, ...data];
+  });
+
+  return eventos;
+}
+```
+
+**Objetivo:**
+Unificar múltiplas fontes de storage.
+
+---
+
+### 📌 Identificação do tipo de usuário
+
+```js
+const usuario = JSON.parse(localStorage.getItem("usuario") || "null");
+const tipo = String(usuario?.tipo || "").toLowerCase();
+```
+
+**Resultado:**
+
+* aluno / responsável → DashboardAluno
+* professor / coordenador → Dashboard padrão
+
+---
+
+## 🔐 Controle de Acesso
+
+* **PrivateRoute** → exige autenticação
+* **RoleRoute** → restringe por perfil
+
+### Tipos de usuários:
+
+* Aluno
+* Responsável
+* Professor
+* Coordenador
+
+---
+
+## 🧭 Rotas Principais
+
+```
+/ → Login
+
+/dashboard → Dashboard principal
+
+/detalhe-calendario-aluno/:data
+(Acesso: aluno/responsável)
+
+/criar-evento
+/eventos
+/eventos/:id/editar
+(Acesso: professor/coordenador)
+
+/nova-turma
+/ver-calendario
+(Acesso: coordenador)
+```
+
+---
+
+## 📅 Funcionalidades do Calendário
+
+* Calendário lateral (resumo)
+* Calendário completo
+* Visualização por dia
+
+### Diferenciação visual:
+
+* Eventos passados
+* Eventos atuais
+* Eventos futuros
+
+---
+
+## ⚙️ Como Rodar o Projeto
+
+### 1. Clonar repositório
+
+```bash
+git clone <url-do-repo>
+```
+
+### 2. Instalar dependências
+
+```bash
+npm install
+```
+
+### 3. Rodar o projeto
+
+```bash
+npm start
+```
+
+---
+
+## 📦 Scripts Disponíveis
+
+```bash
+npm start      # ambiente de desenvolvimento
+npm run build  # build de produção
+npm test       # testes
+```
+
+---
+
+## 🌐 Deploy
+
+(Adicionar link do sistema, se houver)
+
+---
+
+## 📄 Licença
+
+(Definir: MIT, privada, etc.)
+
+---
+
+## 👨‍💻 Autor
+
+Projeto desenvolvido por **Danilo Braga**
