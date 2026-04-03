@@ -107,7 +107,7 @@ function toDateKey(date) {
 
 function formatHeaderDate(date) {
   return `${String(date.getDate()).padStart(2, "0")}/${String(
-    date.getMonth() + 1
+    date.getMonth() + 1,
   ).padStart(2, "0")} - ${DIAS[date.getDay()]}`;
 }
 
@@ -125,14 +125,23 @@ function normalizarIdsEvento(evento) {
     return evento.disciplinaIds.map(Number).filter(Boolean);
   }
 
-  if (evento?.disciplinaId !== undefined && evento?.disciplinaId !== null && evento?.disciplinaId !== "") {
+  if (
+    evento?.disciplinaId !== undefined &&
+    evento?.disciplinaId !== null &&
+    evento?.disciplinaId !== ""
+  ) {
     return [Number(evento.disciplinaId)].filter(Boolean);
   }
 
   return [];
 }
 
-function eventoPertenceAoAluno(evento, disciplinaIdsDoAluno, disciplinasBase, usuarioLogado) {
+function eventoPertenceAoAluno(
+  evento,
+  disciplinaIdsDoAluno,
+  disciplinasBase,
+  usuarioLogado,
+) {
   const ids = normalizarIdsEvento(evento);
 
   if (ids.some((id) => disciplinaIdsDoAluno.has(Number(id)))) {
@@ -157,20 +166,22 @@ function eventoPertenceAoAluno(evento, disciplinaIdsDoAluno, disciplinasBase, us
 function mergeEventos(jsonList, storageList) {
   const map = new Map();
 
-  [...(Array.isArray(jsonList) ? jsonList : []), ...(Array.isArray(storageList) ? storageList : [])]
-    .forEach((item, index) => {
-      if (!item) return;
+  [
+    ...(Array.isArray(jsonList) ? jsonList : []),
+    ...(Array.isArray(storageList) ? storageList : []),
+  ].forEach((item, index) => {
+    if (!item) return;
 
-      const hasId = item.id !== undefined && item.id !== null && item.id !== "";
-      const key = hasId
-        ? `id:${String(item.id)}`
-        : `sem-id:${String(item.titulo || "")}:${String(item.dataEvento || "")}:${index}`;
+    const hasId = item.id !== undefined && item.id !== null && item.id !== "";
+    const key = hasId
+      ? `id:${String(item.id)}`
+      : `sem-id:${String(item.titulo || "")}:${String(item.dataEvento || "")}:${index}`;
 
-      map.set(key, {
-        ...item,
-        disciplinaIds: normalizarIdsEvento(item),
-      });
+    map.set(key, {
+      ...item,
+      disciplinaIds: normalizarIdsEvento(item),
     });
+  });
 
   return Array.from(map.values());
 }
@@ -180,41 +191,63 @@ export default function DetalheCalendarioAluno() {
   const { data } = useParams();
 
   const usuarioLogado = getUsuarioLogado();
-  const alunoId = Number(usuarioLogado?.id) || 101;
+  const alunoId = Number(usuarioLogado?.id);
+
+  const [mostrarSecundarias, setMostrarSecundarias] = useState(() => {
+    return localStorage.getItem("menuAlunoSecundariasVisiveis") === "true";
+  });
 
   const [eventosVistos, setEventosVistos] = useState({});
 
   useEffect(() => {
-    const sync = () => setEventosVistos(getEventosVistos());
+    const sync = () => {
+      setEventosVistos(getEventosVistos());
+      setMostrarSecundarias(
+        localStorage.getItem("menuAlunoSecundariasVisiveis") === "true",
+      );
+    };
 
     sync();
+
     window.addEventListener("storage", sync);
     window.addEventListener("eventosVistos:changed", sync);
-    window.addEventListener("eventos:changed", sync);
-    window.addEventListener("app:data-changed", sync);
+    window.addEventListener("menuAlunoSecundarias:changed", sync);
 
     return () => {
       window.removeEventListener("storage", sync);
       window.removeEventListener("eventosVistos:changed", sync);
-      window.removeEventListener("eventos:changed", sync);
-      window.removeEventListener("app:data-changed", sync);
+      window.removeEventListener("menuAlunoSecundarias:changed", sync);
     };
   }, []);
 
-  const disciplinasJson = Array.isArray(dados?.disciplinas) ? dados.disciplinas : [];
+  const disciplinasJson = Array.isArray(dados?.disciplinas)
+    ? dados.disciplinas
+    : [];
   const eventosJson = Array.isArray(dados?.eventos) ? dados.eventos : [];
 
   const disciplinasStorage = useMemo(
-    () => getFirstStorageArray(STORAGE_DISCIPLINAS_KEYS, []),
-    []
+    () => getFirstStorageArray(STORAGE_DISCIPLINAS_KEYS),
+    [],
   );
 
   const eventosStorage = useMemo(
     () => getAllStorageArrays(STORAGE_EVENTOS_KEYS),
-    []
+    [],
   );
 
-  const disciplinasBase = disciplinasStorage.length ? disciplinasStorage : disciplinasJson;
+  const disciplinasBase = useMemo(() => {
+    const map = new Map();
+
+    disciplinasJson.forEach((disc) => {
+      map.set(Number(disc.id), disc);
+    });
+
+    disciplinasStorage.forEach((disc) => {
+      map.set(Number(disc.id), disc);
+    });
+
+    return Array.from(map.values());
+  }, [disciplinasJson, disciplinasStorage]);
 
   const eventosBase = useMemo(() => {
     return mergeEventos(eventosJson, eventosStorage);
@@ -242,9 +275,9 @@ export default function DetalheCalendarioAluno() {
         .filter(
           (disc) =>
             Array.isArray(disc.alunoIds) &&
-            disc.alunoIds.map(Number).includes(alunoId)
+            disc.alunoIds.map(Number).includes(alunoId),
         )
-        .map((disc) => Number(disc.id))
+        .map((disc) => Number(disc.id)),
     );
   }, [disciplinasBase, alunoId]);
 
@@ -252,13 +285,26 @@ export default function DetalheCalendarioAluno() {
 
   const dateKey = useMemo(
     () => (dataSelecionada ? toDateKey(dataSelecionada) : ""),
-    [dataSelecionada]
+    [dataSelecionada],
   );
 
   const eventosDaData = useMemo(() => {
     return eventosBase
       .filter((evento) => {
         if (!evento?.calendario) return false;
+
+        const disciplinasRelacionadas = normalizarIdsEvento(evento)
+          .map((id) => disciplinaMap.get(Number(id)))
+          .filter(Boolean);
+
+        const visiveis = disciplinasRelacionadas.filter((disc) => {
+          const isSecundaria =
+            String(disc?.tipo || "").toLowerCase() === "secundaria";
+
+          return mostrarSecundarias || !isSecundaria;
+        });
+
+        if (!visiveis.length) return false;
 
         const eventoDate = parseLocalDate(evento.dataEvento);
         if (!eventoDate) return false;
@@ -268,12 +314,12 @@ export default function DetalheCalendarioAluno() {
           evento,
           disciplinaIdsDoAluno,
           disciplinasBase,
-          usuarioLogado
+          usuarioLogado,
         );
       })
       .map((evento) => {
         const idsRelacionados = normalizarIdsEvento(evento).filter((id) =>
-          disciplinaIdsDoAluno.has(Number(id))
+          disciplinaIdsDoAluno.has(Number(id)),
         );
 
         const disciplinasRelacionadas = idsRelacionados
@@ -310,20 +356,22 @@ export default function DetalheCalendarioAluno() {
     usuarioLogado,
   ]);
 
-  function handleMarcarComoVisto(eventoId) {
-    const atual = getEventosVistos();
+ function handleMarcarComoVisto(eventoId) {
+  const atual = getEventosVistos();
 
-    const proximo = {
-      ...atual,
-      [alunoId]: {
-        ...(atual[alunoId] || {}),
-        [String(eventoId)]: true,
-      },
-    };
+  const jaVisto = Boolean(atual?.[alunoId]?.[String(eventoId)]);
 
-    salvarEventosVistos(proximo);
-    setEventosVistos(proximo);
-  }
+  const proximo = {
+    ...atual,
+    [alunoId]: {
+      ...(atual[alunoId] || {}),
+      [String(eventoId)]: !jaVisto,
+    },
+  };
+
+  salvarEventosVistos(proximo);
+  setEventosVistos(proximo);
+}
 
   if (!dataSelecionada) {
     return (
@@ -405,7 +453,6 @@ export default function DetalheCalendarioAluno() {
                         : "evento-card-aluno__action--ghost"
                     }`}
                     onClick={() => handleMarcarComoVisto(evento.id)}
-                    disabled={evento.visto}
                   >
                     ✓ {evento.visto ? "Visto" : "Marcar como visto"}
                   </button>

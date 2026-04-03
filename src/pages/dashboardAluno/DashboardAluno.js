@@ -126,6 +126,15 @@ export default function DashboardAluno() {
       bump();
     };
 
+    const syncVistos = () => {
+      const vistos = safeParse(
+        localStorage.getItem("eventos_vistos_aluno"),
+        {},
+      );
+      setEventosVistos(vistos);
+      bump();
+    };
+
     const onStorage = (e) => {
       if (!e.key) {
         bump();
@@ -145,12 +154,18 @@ export default function DashboardAluno() {
       }
     };
 
+    // listeners
     window.addEventListener("app:data-changed", bump);
     window.addEventListener("storage", onStorage);
     window.addEventListener(
       "menuAlunoSecundarias:changed",
       syncMostrarSecundarias,
     );
+    window.addEventListener("eventosVistos:changed", syncVistos);
+
+    // init
+    syncMostrarSecundarias();
+    syncVistos();
 
     return () => {
       window.removeEventListener("app:data-changed", bump);
@@ -159,6 +174,7 @@ export default function DashboardAluno() {
         "menuAlunoSecundarias:changed",
         syncMostrarSecundarias,
       );
+      window.removeEventListener("eventosVistos:changed", syncVistos);
     };
   }, []);
 
@@ -168,6 +184,9 @@ export default function DashboardAluno() {
   });
 
   const usuarioLogado = useMemo(() => getUsuarioLogado(), [dataVersion]);
+  const [eventosVistos, setEventosVistos] = useState(() =>
+    safeParse(localStorage.getItem("eventos_vistos_aluno"), {}),
+  );
 
   const tipoUsuario = String(usuarioLogado?.tipo || "").toLowerCase();
   const isResponsavel = tipoUsuario === "responsavel";
@@ -353,10 +372,21 @@ export default function DashboardAluno() {
         if (
           !current.dots.some((item) => item.disciplinaId === disciplinaIdNum)
         ) {
+          const vistosDoAluno = eventosVistos?.[alunoId] || {};
+
+          const eventosDaMesmaDisciplina = current.eventos.filter((ev) =>
+            normalizarIds(ev).includes(disciplinaIdNum),
+          );
+
+          const todosVistos = eventosDaMesmaDisciplina.every(
+            (ev) => vistosDoAluno[String(ev.id)],
+          );
+
           current.dots.push({
             disciplinaId: disciplinaIdNum,
             cor: getCorDisciplinaParaUsuario(disciplina, alunoId),
             nome: disciplina.nome,
+            visto: todosVistos,
           });
         }
       });
@@ -369,6 +399,7 @@ export default function DashboardAluno() {
     disciplinaMap,
     alunoId,
     mostrarSecundarias,
+    eventosVistos,
   ]);
 
   const dias = useMemo(() => {
@@ -489,7 +520,10 @@ export default function DashboardAluno() {
                       <span
                         key={`${key}-${dot.disciplinaId}`}
                         className={`ver-calendario-aluno__dot ${passado ? "is-past" : ""}`}
-                        style={{ backgroundColor: dot.cor }}
+                        style={{
+                          backgroundColor: dot.cor,
+                          opacity: dot.visto ? 0.4 : 1,
+                        }}
                         title={dot.nome}
                       />
                     ))}
