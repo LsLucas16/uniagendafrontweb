@@ -23,6 +23,15 @@
     "faculdadeId": 1
     
   },
+   {
+    "id": 3232,
+    "user": "pascoa",
+    "senha": "123",
+    "nome": "Pascoa",
+    "tipo": "responsavel",
+    "faculdadeId": 1
+    
+  },
   {
     "id": 101,
     "user": "aluno",
@@ -268,7 +277,7 @@
     "professorIds": [18791, 201],
     "responsavelIds": [401, 501, 502, 503],
     "coordenadorIds": [301],
-    "alunoIds": [101, 103, 105, 106, 401, 501, 502, 503, 2323],
+    "alunoIds": [101, 103, 105, 106, 401, 501, 502, 503, 2323, 3232],
     "criado_por": 301
   },
   {
@@ -283,7 +292,7 @@
     "professorIds": [18791],
     "responsavelIds": [401, 501],
     "coordenadorIds": [301],
-    "alunoIds": [101, 103, 104, 401, 501, 502, 503, 2323],
+    "alunoIds": [101, 103, 104, 401, 501, 502, 503, 2323, 3232],
     "criado_por": 301
   },
   {
@@ -299,7 +308,7 @@
     "professorIds": [18791, 201],
     "responsavelIds": [401],
     "coordenadorIds": [301],
-    "alunoIds": [101, 103, 104, 106, 401, 501, 502, 2323],
+    "alunoIds": [101, 103, 104, 106, 401, 501, 502, 2323, 3232],
     "criado_por": 301
   },
   {
@@ -327,7 +336,7 @@
     "professorIds": [201],
     "responsavelIds": [401, 503],
     "coordenadorIds": [301],
-    "alunoIds": [103, 104, 105, 106, 401, 503, 2323],
+    "alunoIds": [103, 104, 105, 106, 401, 503, 2323, 3232],
     "criado_por": 301
   },
   {
@@ -355,7 +364,7 @@
     "professorIds": [18791],
     "responsavelIds": [401, 501, 503],
     "coordenadorIds": [301],
-    "alunoIds": [101, 104, 105, 106, 401, 501, 503, 2323],
+    "alunoIds": [101, 104, 105, 106, 401, 501, 503, 2323, 3232],
     "criado_por": 301
   },
   {
@@ -368,7 +377,7 @@
     "professorIds": [201],
     "responsavelIds": [401, 502],
     "coordenadorIds": [301],
-    "alunoIds": [103, 104, 105, 401, 502, 503, 2323],
+    "alunoIds": [103, 104, 105, 401, 502, 503, 2323, 3232],
     "criado_por": 301
   }
 ],
