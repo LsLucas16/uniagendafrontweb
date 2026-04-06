@@ -19,6 +19,8 @@ export const Login = () => {
   const handleLogin = (e) => {
     e.preventDefault();
 
+    localStorage.setItem("menuAlunoSecundariasVisiveis", "true");
+
     const usuarioAuth = dados.usuarios.find(
       (u) =>
         u.user === loginDigitado &&

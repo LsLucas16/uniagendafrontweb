@@ -514,12 +514,12 @@ export default function DashboardAluno() {
                   {dia.getDate()}
                 </span>
 
-                {dots.length > 0 && (
+                {!passado && dots.length > 0 && (
                   <div className="ver-calendario-aluno__dots">
                     {visibleDots.map((dot) => (
                       <span
                         key={`${key}-${dot.disciplinaId}`}
-                        className={`ver-calendario-aluno__dot ${passado ? "is-past" : ""}`}
+                        className="ver-calendario-aluno__dot"
                         style={{
                           backgroundColor: dot.cor,
                           opacity: dot.visto ? 0.4 : 1,
@@ -529,9 +529,7 @@ export default function DashboardAluno() {
                     ))}
 
                     {extraCount > 0 && (
-                      <span
-                        className={`ver-calendario-aluno__more ${passado ? "is-past" : ""}`}
-                      >
+                      <span className="ver-calendario-aluno__more">
                         +{extraCount}
                       </span>
                     )}

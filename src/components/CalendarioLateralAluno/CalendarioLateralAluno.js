@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import dados from "../../data/dados.json";
 import "./CalendarioLateralAluno.scss";
+import { useNavigate } from "react-router-dom";
 
 const STORAGE_EVENTOS_KEYS = [
   "eventos_override",
@@ -287,6 +288,8 @@ export default function CalendarioAlunoLateral() {
     lerMostrarSecundarias,
   );
 
+  const navigate = useNavigate();
+
   const today = useMemo(() => startOfToday(), []);
 
   useEffect(() => {
@@ -544,6 +547,13 @@ export default function CalendarioAlunoLateral() {
                       style={{
                         "--bar-color": evento.disciplinaCor,
                         "--dot-color": evento.disciplinaCor,
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        const data = evento?.dataEvento;
+                        if (!data) return;
+
+                        navigate(`/detalhe-calendario-aluno/${data}`);
                       }}
                     >
                       <h4 className="calendario-aluno-lateral__title">
