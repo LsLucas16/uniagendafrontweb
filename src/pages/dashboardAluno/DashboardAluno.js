@@ -325,8 +325,7 @@ export default function DashboardAluno() {
 
       const idsVisiveis = idsDoAlunoNoEvento.filter((id) => {
         const disciplina = disciplinaMap.get(Number(id));
-        const isSecundaria =
-          String(disciplina?.tipo || "").toLowerCase() === "secundaria";
+        const isSecundaria = isDisciplinaSecundaria(disciplina);
 
         return mostrarSecundarias || !isSecundaria;
       });
@@ -401,6 +400,18 @@ export default function DashboardAluno() {
     mostrarSecundarias,
     eventosVistos,
   ]);
+
+function isDisciplinaSecundaria(disciplina) {
+  const normalize = (v) =>
+    String(v || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").trim().toLowerCase();
+
+  return (
+    normalize(disciplina?.tipo) === "secundaria" ||
+    normalize(disciplina?.categoria) === "secundaria" ||
+    normalize(disciplina?.modalidade) === "secundaria" ||
+    normalize(disciplina?.nome).includes("extensao")
+  );
+}
 
   const dias = useMemo(() => {
     const start = getCalendarStart(mesAtual);

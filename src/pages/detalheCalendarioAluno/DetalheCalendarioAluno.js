@@ -288,6 +288,22 @@ export default function DetalheCalendarioAluno() {
     [dataSelecionada],
   );
 
+  function isDisciplinaSecundaria(disciplina) {
+  const normalize = (v) =>
+    String(v || "")
+      .normalize("NFD")
+      .replace(/\p{Diacritic}/gu, "")
+      .trim()
+      .toLowerCase();
+
+  return (
+    normalize(disciplina?.tipo) === "secundaria" ||
+    normalize(disciplina?.categoria) === "secundaria" ||
+    normalize(disciplina?.modalidade) === "secundaria" ||
+    normalize(disciplina?.nome).includes("extensao")
+  );
+}
+
   const eventosDaData = useMemo(() => {
     return eventosBase
       .filter((evento) => {
@@ -298,8 +314,8 @@ export default function DetalheCalendarioAluno() {
           .filter(Boolean);
 
         const visiveis = disciplinasRelacionadas.filter((disc) => {
-          const isSecundaria =
-            String(disc?.tipo || "").toLowerCase() === "secundaria";
+          
+        const isSecundaria = isDisciplinaSecundaria(disc);
 
           return mostrarSecundarias || !isSecundaria;
         });
