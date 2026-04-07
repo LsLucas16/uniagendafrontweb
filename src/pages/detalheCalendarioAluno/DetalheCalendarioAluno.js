@@ -289,20 +289,27 @@ export default function DetalheCalendarioAluno() {
   );
 
   function isDisciplinaSecundaria(disciplina) {
-  const normalize = (v) =>
-    String(v || "")
-      .normalize("NFD")
-      .replace(/\p{Diacritic}/gu, "")
-      .trim()
-      .toLowerCase();
+    const normalize = (v) =>
+      String(v || "")
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .trim()
+        .toLowerCase();
 
-  return (
-    normalize(disciplina?.tipo) === "secundaria" ||
-    normalize(disciplina?.categoria) === "secundaria" ||
-    normalize(disciplina?.modalidade) === "secundaria" ||
-    normalize(disciplina?.nome).includes("extensao")
-  );
-}
+    return (
+      normalize(disciplina?.tipo) === "secundaria" ||
+      normalize(disciplina?.categoria) === "secundaria" ||
+      normalize(disciplina?.modalidade) === "secundaria" ||
+      normalize(disciplina?.nome).includes("extensao")
+    );
+  }
+
+  function getCorDisciplinaParaUsuario(disciplina, usuarioId) {
+    const userId = String(usuarioId || "");
+    return (
+      disciplina?.coresPorUsuario?.[userId] || disciplina?.cor || "#76A9DA"
+    );
+  }
 
   const eventosDaData = useMemo(() => {
     return eventosBase
@@ -314,8 +321,7 @@ export default function DetalheCalendarioAluno() {
           .filter(Boolean);
 
         const visiveis = disciplinasRelacionadas.filter((disc) => {
-          
-        const isSecundaria = isDisciplinaSecundaria(disc);
+          const isSecundaria = isDisciplinaSecundaria(disc);
 
           return mostrarSecundarias || !isSecundaria;
         });
@@ -372,22 +378,22 @@ export default function DetalheCalendarioAluno() {
     usuarioLogado,
   ]);
 
- function handleMarcarComoVisto(eventoId) {
-  const atual = getEventosVistos();
+  function handleMarcarComoVisto(eventoId) {
+    const atual = getEventosVistos();
 
-  const jaVisto = Boolean(atual?.[alunoId]?.[String(eventoId)]);
+    const jaVisto = Boolean(atual?.[alunoId]?.[String(eventoId)]);
 
-  const proximo = {
-    ...atual,
-    [alunoId]: {
-      ...(atual[alunoId] || {}),
-      [String(eventoId)]: !jaVisto,
-    },
-  };
+    const proximo = {
+      ...atual,
+      [alunoId]: {
+        ...(atual[alunoId] || {}),
+        [String(eventoId)]: !jaVisto,
+      },
+    };
 
-  salvarEventosVistos(proximo);
-  setEventosVistos(proximo);
-}
+    salvarEventosVistos(proximo);
+    setEventosVistos(proximo);
+  }
 
   if (!dataSelecionada) {
     return (
@@ -442,8 +448,10 @@ export default function DetalheCalendarioAluno() {
                       <span
                         className="evento-card-aluno__badge"
                         style={{
-                          backgroundColor:
-                            evento.disciplinaPrincipal.cor || "#E9C46A",
+                          backgroundColor: getCorDisciplinaParaUsuario(
+                            evento.disciplinaPrincipal,
+                            alunoId,
+                          ),
                         }}
                       >
                         {evento.disciplinaPrincipal.nome}
