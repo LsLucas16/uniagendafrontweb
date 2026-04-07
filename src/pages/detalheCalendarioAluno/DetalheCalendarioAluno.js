@@ -362,8 +362,15 @@ export default function DetalheCalendarioAluno() {
         };
       })
       .sort((a, b) => {
+        // 1. Prioridade: não vistos primeiro
+        if (a.visto !== b.visto) {
+          return a.visto ? 1 : -1; // visto vai pra baixo
+        }
+
+        // 2. Dentro do grupo, ordena por ultimaAtualizacao (mais recente primeiro)
         const da = new Date(a.ultimaAtualizacao).getTime() || 0;
         const db = new Date(b.ultimaAtualizacao).getTime() || 0;
+
         return db - da;
       });
   }, [

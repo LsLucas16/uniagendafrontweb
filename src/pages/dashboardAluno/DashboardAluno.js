@@ -401,17 +401,21 @@ export default function DashboardAluno() {
     eventosVistos,
   ]);
 
-function isDisciplinaSecundaria(disciplina) {
-  const normalize = (v) =>
-    String(v || "").normalize("NFD").replace(/\p{Diacritic}/gu, "").trim().toLowerCase();
+  function isDisciplinaSecundaria(disciplina) {
+    const normalize = (v) =>
+      String(v || "")
+        .normalize("NFD")
+        .replace(/\p{Diacritic}/gu, "")
+        .trim()
+        .toLowerCase();
 
-  return (
-    normalize(disciplina?.tipo) === "secundaria" ||
-    normalize(disciplina?.categoria) === "secundaria" ||
-    normalize(disciplina?.modalidade) === "secundaria" ||
-    normalize(disciplina?.nome).includes("extensao")
-  );
-}
+    return (
+      normalize(disciplina?.tipo) === "secundaria" ||
+      normalize(disciplina?.categoria) === "secundaria" ||
+      normalize(disciplina?.modalidade) === "secundaria" ||
+      normalize(disciplina?.nome).includes("extensao")
+    );
+  }
 
   const dias = useMemo(() => {
     const start = getCalendarStart(mesAtual);
@@ -500,7 +504,14 @@ function isDisciplinaSecundaria(disciplina) {
             const passado = isPastDay(dia);
 
             const dots = info?.dots || [];
-            const visibleDots = dots.slice(0, 4);
+            const sortedDots = [...dots].sort((a, b) => {
+              if (a.visto !== b.visto) {
+                return a.visto ? 1 : -1; // vistos vão pra direita (fim)
+              }
+              return 0;
+            });
+
+            const visibleDots = sortedDots.slice(0, 4);
             const extraCount = dots.length > 4 ? dots.length - 4 : 0;
 
             const canClick = !passado && (info?.eventos?.length || 0) > 0;

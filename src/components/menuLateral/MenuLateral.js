@@ -494,7 +494,7 @@ const MenuLateral = () => {
                     setPaletaAbertaId(null);
                   }}
                 >
-                  Resetar
+                  Escolha automática
                 </button>
 
                 <button
