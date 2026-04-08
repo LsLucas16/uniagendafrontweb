@@ -339,27 +339,31 @@ export default function DetalheCalendarioAluno() {
           usuarioLogado,
         );
       })
-      .map((evento) => {
+      .flatMap((evento) => {
         const idsRelacionados = normalizarIdsEvento(evento).filter((id) =>
           disciplinaIdsDoAluno.has(Number(id)),
         );
 
         const disciplinasRelacionadas = idsRelacionados
           .map((id) => disciplinaMap.get(Number(id)))
-          .filter(Boolean);
+          .filter(Boolean)
+          .filter((disc) => {
+            const isSecundaria = isDisciplinaSecundaria(disc);
+            return mostrarSecundarias || !isSecundaria;
+          });
 
-        const primeiraDisciplina = disciplinasRelacionadas[0] || null;
         const criadoPor = usuarioMap.get(Number(evento.criadoPorId));
 
         const visto = Boolean(eventosVistos?.[alunoId]?.[String(evento.id)]);
 
-        return {
+        // 🔥 AQUI está a mágica
+        return disciplinasRelacionadas.map((disciplina) => ({
           ...evento,
           visto,
-          disciplinaPrincipal: primeiraDisciplina,
-          disciplinasRelacionadas,
+          disciplina,
           criadoPorNome: criadoPor?.nome || "Não informado",
-        };
+          __uniqueKey: `${evento.id}-${disciplina.id}`,
+        }));
       })
       .sort((a, b) => {
         // 1. Prioridade: não vistos primeiro
@@ -440,7 +444,7 @@ export default function DetalheCalendarioAluno() {
           ) : (
             eventosDaData.map((evento, index) => (
               <article
-                key={`${evento.id || evento.titulo}-${index}`}
+                key={evento.__uniqueKey}
                 className={`evento-card-aluno ${
                   evento.visto ? "evento-card-aluno--visto" : ""
                 }`}
@@ -451,17 +455,17 @@ export default function DetalheCalendarioAluno() {
                       {evento.titulo}
                     </h2>
 
-                    {evento.disciplinaPrincipal && (
+                    {evento.disciplina && (
                       <span
                         className="evento-card-aluno__badge"
                         style={{
                           backgroundColor: getCorDisciplinaParaUsuario(
-                            evento.disciplinaPrincipal,
+                            evento.disciplina,
                             alunoId,
                           ),
                         }}
                       >
-                        {evento.disciplinaPrincipal.nome}
+                        {evento.disciplina.nome}
                       </span>
                     )}
                   </div>

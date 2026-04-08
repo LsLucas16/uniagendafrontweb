@@ -440,8 +440,6 @@ export default function CalendarioAlunoLateral() {
 
       if (!idsVisiveis.length) return;
 
-      const disciplinaPrincipal = disciplinasMap.get(idsVisiveis[0]);
-
       const key = toDateKey(data);
 
       if (!map.has(key)) {
@@ -453,16 +451,15 @@ export default function CalendarioAlunoLateral() {
         });
       }
 
-      map.get(key).eventos.push({
-        ...evento,
-        disciplinaNome: disciplinaPrincipal?.nome || "Sem disciplina",
-        disciplinaCor: getCorDisciplinaParaUsuario(
-          disciplinaPrincipal,
-          alunoId,
-        ),
-        __uniqueKey:
-          evento.__uniqueKey ||
-          `${key}-${evento.id || evento.titulo || Math.random()}`,
+      idsVisiveis.forEach((disciplinaId) => {
+        const disciplina = disciplinasMap.get(Number(disciplinaId));
+
+        map.get(key).eventos.push({
+          ...evento,
+          disciplinaNome: disciplina?.nome || "Sem disciplina",
+          disciplinaCor: getCorDisciplinaParaUsuario(disciplina, alunoId),
+          __uniqueKey: `${key}-${evento.id}-${disciplinaId}`, 
+        });
       });
     });
 
