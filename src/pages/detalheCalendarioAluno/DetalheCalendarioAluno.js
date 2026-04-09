@@ -354,16 +354,18 @@ export default function DetalheCalendarioAluno() {
 
         const criadoPor = usuarioMap.get(Number(evento.criadoPorId));
 
-        const visto = Boolean(eventosVistos?.[alunoId]?.[String(evento.id)]);
+        return disciplinasRelacionadas.map((disciplina) => {
+          const uniqueId = `${evento.id}-${disciplina.id}`;
+          const visto = Boolean(eventosVistos?.[alunoId]?.[uniqueId]);
 
-        // 🔥 AQUI está a mágica
-        return disciplinasRelacionadas.map((disciplina) => ({
-          ...evento,
-          visto,
-          disciplina,
-          criadoPorNome: criadoPor?.nome || "Não informado",
-          __uniqueKey: `${evento.id}-${disciplina.id}`,
-        }));
+          return {
+            ...evento,
+            visto,
+            disciplina,
+            criadoPorNome: criadoPor?.nome || "Não informado",
+            __uniqueKey: uniqueId,
+          };
+        });
       })
       .sort((a, b) => {
         // 1. Prioridade: não vistos primeiro
@@ -389,16 +391,18 @@ export default function DetalheCalendarioAluno() {
     usuarioLogado,
   ]);
 
-  function handleMarcarComoVisto(eventoId) {
+  function handleMarcarComoVisto(eventoId, disciplinaId) {
     const atual = getEventosVistos();
 
-    const jaVisto = Boolean(atual?.[alunoId]?.[String(eventoId)]);
+    const uniqueId = `${eventoId}-${disciplinaId}`;
+
+    const jaVisto = Boolean(atual?.[alunoId]?.[uniqueId]);
 
     const proximo = {
       ...atual,
       [alunoId]: {
         ...(atual[alunoId] || {}),
-        [String(eventoId)]: !jaVisto,
+        [uniqueId]: !jaVisto,
       },
     };
 
@@ -487,7 +491,9 @@ export default function DetalheCalendarioAluno() {
                         ? "evento-card-aluno__action--done"
                         : "evento-card-aluno__action--ghost"
                     }`}
-                    onClick={() => handleMarcarComoVisto(evento.id)}
+                    onClick={() =>
+                      handleMarcarComoVisto(evento.id, evento.disciplina.id)
+                    }
                   >
                     ✓ {evento.visto ? "Visto" : "Marcar como visto"}
                   </button>

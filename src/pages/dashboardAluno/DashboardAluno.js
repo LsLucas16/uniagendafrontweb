@@ -377,9 +377,10 @@ export default function DashboardAluno() {
             normalizarIds(ev).includes(disciplinaIdNum),
           );
 
-          const todosVistos = eventosDaMesmaDisciplina.every(
-            (ev) => vistosDoAluno[String(ev.id)],
-          );
+          const todosVistos = eventosDaMesmaDisciplina.every((ev) => {
+            const uniqueId = `${ev.id}-${disciplinaIdNum}`;
+            return vistosDoAluno[uniqueId];
+          });
 
           current.dots.push({
             disciplinaId: disciplinaIdNum,
