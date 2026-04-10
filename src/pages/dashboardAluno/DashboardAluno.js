@@ -441,6 +441,31 @@ export default function DashboardAluno() {
     navigate(`/detalhe-calendario-aluno/${toDateKey(date)}`);
   }
 
+  function darkenColor(hex, amount = 0.35) {
+    if (!hex) return hex;
+
+    let col = hex.replace("#", "");
+
+    if (col.length === 3) {
+      col = col
+        .split("")
+        .map((c) => c + c)
+        .join("");
+    }
+
+    const num = parseInt(col, 16);
+
+    let r = (num >> 16) & 255;
+    let g = (num >> 8) & 255;
+    let b = num & 255;
+
+    r = Math.floor(r * (1 - amount));
+    g = Math.floor(g * (1 - amount));
+    b = Math.floor(b * (1 - amount));
+
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
   return (
     <>
       <AvisoDestaque
@@ -542,13 +567,18 @@ export default function DashboardAluno() {
                     {visibleDots.map((dot) => (
                       <span
                         key={`${key}-${dot.disciplinaId}`}
-                        className="ver-calendario-aluno__dot"
+                        className={`ver-calendario-aluno__dot ${
+                          dot.visto ? "is-visto" : ""
+                        }`}
                         style={{
-                          backgroundColor: dot.cor,
-                          opacity: dot.visto ? 0.4 : 1,
+                          backgroundColor: dot.visto
+                            ? darkenColor(dot.cor, 0.35)
+                            : dot.cor,
                         }}
                         title={dot.nome}
-                      />
+                      >
+                        {dot.visto && "✓"}
+                      </span>
                     ))}
 
                     {extraCount > 0 && (

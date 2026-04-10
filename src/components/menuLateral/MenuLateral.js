@@ -110,7 +110,7 @@ const MenuLateral = () => {
       "menuAlunoSecundariasVisiveis",
       String(mostrarSecundarias),
     );
-
+    
     window.dispatchEvent(new Event("menuAlunoSecundarias:changed"));
   }, [mostrarSecundarias]);
 

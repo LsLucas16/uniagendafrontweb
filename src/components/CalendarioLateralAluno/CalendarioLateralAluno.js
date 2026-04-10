@@ -225,11 +225,23 @@ function getAlunoDisciplinas(alunoId, disciplinas) {
   });
 }
 
+const STORAGE_EVENTOS_VISTOS = "eventos_vistos_aluno";
+
+function getEventosVistos() {
+  const raw = localStorage.getItem(STORAGE_EVENTOS_VISTOS);
+  try {
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
 function getEventoDisciplinasVisiveis(
   evento,
   disciplinasMap,
   disciplinaIdsDoAluno,
   mostrarSecundarias,
+  eventosVistos,
 ) {
   const ids = normalizarDisciplinaIds(evento);
 
@@ -267,6 +279,8 @@ export default function CalendarioAlunoLateral() {
   const [mostrarSecundarias, setMostrarSecundarias] = useState(
     lerMostrarSecundarias,
   );
+
+  const [eventosVistos, setEventosVistos] = useState(getEventosVistos);
 
   const navigate = useNavigate();
 
@@ -416,6 +430,7 @@ export default function CalendarioAlunoLateral() {
     disciplinasMap,
     todasDisciplinasDoAlunoIds,
     mostrarSecundarias,
+    eventosVistos,
   ]);
 
   const grupos = useMemo(() => {
@@ -454,11 +469,15 @@ export default function CalendarioAlunoLateral() {
       idsVisiveis.forEach((disciplinaId) => {
         const disciplina = disciplinasMap.get(Number(disciplinaId));
 
+        const uniqueId = `${evento.id}-${disciplinaId}`;
+        const visto = Boolean(eventosVistos?.[alunoId]?.[uniqueId]);
+
         map.get(key).eventos.push({
           ...evento,
           disciplinaNome: disciplina?.nome || "Sem disciplina",
           disciplinaCor: getCorDisciplinaParaUsuario(disciplina, alunoId),
-          __uniqueKey: `${key}-${evento.id}-${disciplinaId}`, 
+          __uniqueKey: `${key}-${evento.id}-${disciplinaId}`,
+          visto,
         });
       });
     });
@@ -472,6 +491,18 @@ export default function CalendarioAlunoLateral() {
     alunoId,
     mostrarSecundarias,
   ]);
+
+  useEffect(() => {
+    const syncVistos = () => {
+      setEventosVistos(getEventosVistos());
+    };
+
+    window.addEventListener("eventosVistos:changed", syncVistos);
+
+    return () => {
+      window.removeEventListener("eventosVistos:changed", syncVistos);
+    };
+  }, []);
 
   useEffect(() => {
     const keysValidas = new Set(grupos.map((grupo) => grupo.key));
@@ -537,7 +568,9 @@ export default function CalendarioAlunoLateral() {
                   {grupo.eventos.map((evento, index) => (
                     <article
                       key={evento.__uniqueKey || `${grupo.key}-${index}`}
-                      className="calendario-aluno-lateral__card"
+                      className={`calendario-aluno-lateral__card ${
+                        evento.visto ? "is-visto" : ""
+                      }`}
                       style={{
                         "--bar-color": evento.disciplinaCor,
                         "--dot-color": evento.disciplinaCor,

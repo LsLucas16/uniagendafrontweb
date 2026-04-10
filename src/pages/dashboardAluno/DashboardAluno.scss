@@ -463,3 +463,22 @@ $radius-card: 24px;
     margin-left: -2px;
   }
 }
+
+.ver-calendario-aluno__dot {
+  width: 15px;
+  height: 15px;
+  min-width: 15px;
+  border-radius: 50%;
+  flex: 0 0 15px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #fff;
+
+  font-size: 11px; // aumentamos
+  font-weight: 700; // mais forte
+
+  line-height: 1;
+}

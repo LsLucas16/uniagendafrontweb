@@ -60,6 +60,7 @@
 }
 
 .calendario-aluno-lateral__card {
+  position: relative;
   background: transparent;
   border: 0;
   border-radius: 0;
@@ -113,4 +114,18 @@
   font-size: 11px;
   color: #7b8794;
   background: #ffffff;
+}
+
+
+
+.calendario-aluno-lateral__card.is-visto {
+  opacity: 0.6;
+}
+
+.calendario-aluno-lateral__card.is-visto
+  .calendario-aluno-lateral__title,
+.calendario-aluno-lateral__card.is-visto
+  .calendario-aluno-lateral__description {
+  text-decoration: line-through;
+  text-decoration-color: #6f7d96;
 }

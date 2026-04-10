@@ -11,13 +11,6 @@ const STORAGE_EVENTOS_KEYS = [
   "uniagenda_eventos",
 ];
 
-const STORAGE_DISCIPLINAS_KEYS = [
-  "turmas_override",
-  "disciplinas_override",
-  "disciplinas",
-  "turmas",
-];
-
 const STORAGE_USUARIO = "usuario";
 const STORAGE_EVENTOS_VISTOS = "eventos_vistos_aluno";
 
@@ -45,14 +38,6 @@ function getStorageArray(key, fallback = []) {
   if (!raw) return fallback;
   const parsed = safeParse(raw, fallback);
   return Array.isArray(parsed) ? parsed : fallback;
-}
-
-function getFirstStorageArray(keys, fallback = []) {
-  for (const key of keys) {
-    const parsed = getStorageArray(key, []);
-    if (parsed.length) return parsed;
-  }
-  return fallback;
 }
 
 function getAllStorageArrays(keys) {
@@ -187,52 +172,65 @@ function mergeEventos(jsonList, storageList) {
 }
 
 export default function DetalheCalendarioAluno() {
+  
   const navigate = useNavigate();
   const { data } = useParams();
 
+  const [dataVersion, setDataVersion] = useState(0);
+
   const usuarioLogado = getUsuarioLogado();
+
   const alunoId = Number(usuarioLogado?.id);
 
   const [mostrarSecundarias, setMostrarSecundarias] = useState(() => {
     return localStorage.getItem("menuAlunoSecundariasVisiveis") === "true";
   });
 
-  const [eventosVistos, setEventosVistos] = useState({});
+  const [eventosVistos, setEventosVistos] = useState(() => getEventosVistos());
 
-  useEffect(() => {
-    const sync = () => {
-      setEventosVistos(getEventosVistos());
-      setMostrarSecundarias(
-        localStorage.getItem("menuAlunoSecundariasVisiveis") === "true",
-      );
-    };
+useEffect(() => {
+  const sync = () => {
+    setEventosVistos(getEventosVistos());
+    setMostrarSecundarias(
+      localStorage.getItem("menuAlunoSecundariasVisiveis") === "true"
+    );
+    setDataVersion((v) => v + 1);
+  };
 
-    sync();
+  window.addEventListener("storage", sync);
+  window.addEventListener("eventosVistos:changed", sync);
+  window.addEventListener("menuAlunoSecundarias:changed", sync);
 
-    window.addEventListener("storage", sync);
-    window.addEventListener("eventosVistos:changed", sync);
-    window.addEventListener("menuAlunoSecundarias:changed", sync);
+  // 🔥 FALTA ISSO AQUI:
+  window.addEventListener("app:data-changed", sync);
 
-    return () => {
-      window.removeEventListener("storage", sync);
-      window.removeEventListener("eventosVistos:changed", sync);
-      window.removeEventListener("menuAlunoSecundarias:changed", sync);
-    };
-  }, []);
+  return () => {
+    window.removeEventListener("storage", sync);
+    window.removeEventListener("eventosVistos:changed", sync);
+    window.removeEventListener("menuAlunoSecundarias:changed", sync);
 
-  const disciplinasJson = Array.isArray(dados?.disciplinas)
-    ? dados.disciplinas
-    : [];
-  const eventosJson = Array.isArray(dados?.eventos) ? dados.eventos : [];
+    // 🔥 E REMOVER TAMBÉM:
+    window.removeEventListener("app:data-changed", sync);
+  };
+}, []);
 
-  const disciplinasStorage = useMemo(
-    () => getFirstStorageArray(STORAGE_DISCIPLINAS_KEYS),
-    [],
-  );
+  const disciplinasJson = useMemo(
+  () => Array.isArray(dados?.disciplinas) ? dados.disciplinas : [],
+  [],
+);
+const eventosJson = useMemo(
+  () => Array.isArray(dados?.eventos) ? dados.eventos : [],
+  [],
+);
+
+const disciplinasStorage = useMemo(
+  () => getStorageArray("turmas_override", []),
+  [dataVersion],
+);
 
   const eventosStorage = useMemo(
     () => getAllStorageArrays(STORAGE_EVENTOS_KEYS),
-    [],
+    [dataVersion],
   );
 
   const disciplinasBase = useMemo(() => {
@@ -389,6 +387,7 @@ export default function DetalheCalendarioAluno() {
     eventosVistos,
     alunoId,
     usuarioLogado,
+    mostrarSecundarias,
   ]);
 
   function handleMarcarComoVisto(eventoId, disciplinaId) {
