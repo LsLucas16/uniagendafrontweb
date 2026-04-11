@@ -465,11 +465,12 @@ $radius-card: 24px;
 }
 
 .ver-calendario-aluno__dot {
-  width: 15px;
-  height: 15px;
-  min-width: 15px;
+  width: clamp(8px, 1.2vw, 18px); // escala automático
+  aspect-ratio: 1 / 1; // sempre círculo perfeito
+  min-width: unset;
+  flex: 0 0 auto;
+
   border-radius: 50%;
-  flex: 0 0 15px;
 
   display: flex;
   align-items: center;
@@ -477,8 +478,8 @@ $radius-card: 24px;
 
   color: #fff;
 
-  font-size: 11px; // aumentamos
-  font-weight: 700; // mais forte
-
+  font-size: clamp(6px, 0.7vw, 11px);
+  font-weight: 700;
   line-height: 1;
 }
+

@@ -368,27 +368,16 @@ export default function DashboardAluno() {
 
         if (!mostrarSecundarias && isSecundaria) return;
 
-        if (
-          !current.dots.some((item) => item.disciplinaId === disciplinaIdNum)
-        ) {
-          const vistosDoAluno = eventosVistos?.[alunoId] || {};
+        const vistosDoAluno = eventosVistos?.[alunoId] || {};
+        const uniqueId = `${evento.id}-${disciplinaIdNum}`;
 
-          const eventosDaMesmaDisciplina = current.eventos.filter((ev) =>
-            normalizarIds(ev).includes(disciplinaIdNum),
-          );
-
-          const todosVistos = eventosDaMesmaDisciplina.every((ev) => {
-            const uniqueId = `${ev.id}-${disciplinaIdNum}`;
-            return vistosDoAluno[uniqueId];
-          });
-
-          current.dots.push({
-            disciplinaId: disciplinaIdNum,
-            cor: getCorDisciplinaParaUsuario(disciplina, alunoId),
-            nome: disciplina.nome,
-            visto: todosVistos,
-          });
-        }
+        current.dots.push({
+          disciplinaId: disciplinaIdNum,
+          eventoId: evento.id, // 🔥 garante unicidade
+          cor: getCorDisciplinaParaUsuario(disciplina, alunoId),
+          nome: disciplina.nome,
+          visto: Boolean(vistosDoAluno[uniqueId]),
+        });
       });
     });
 
@@ -566,14 +555,12 @@ export default function DashboardAluno() {
                   <div className="ver-calendario-aluno__dots">
                     {visibleDots.map((dot) => (
                       <span
-                        key={`${key}-${dot.disciplinaId}`}
+                       key={`${key}-${dot.disciplinaId}-${dot.eventoId}`} 
                         className={`ver-calendario-aluno__dot ${
                           dot.visto ? "is-visto" : ""
                         }`}
                         style={{
-                          backgroundColor: dot.visto
-                            ? darkenColor(dot.cor, 0.35)
-                            : dot.cor,
+                          backgroundColor: dot.cor,
                         }}
                         title={dot.nome}
                       >
