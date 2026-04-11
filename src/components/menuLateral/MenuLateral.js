@@ -110,9 +110,20 @@ const MenuLateral = () => {
       "menuAlunoSecundariasVisiveis",
       String(mostrarSecundarias),
     );
-    
+
     window.dispatchEvent(new Event("menuAlunoSecundarias:changed"));
   }, [mostrarSecundarias]);
+
+  function gerarCorAleatoria() {
+    const letras = "0123456789ABCDEF";
+    let cor = "#";
+
+    for (let i = 0; i < 6; i++) {
+      cor += letras[Math.floor(Math.random() * 16)];
+    }
+
+    return cor;
+  }
 
   function safeJsonParse(value, fallback) {
     try {
@@ -490,7 +501,8 @@ const MenuLateral = () => {
                   type="button"
                   className="menuLateral__colorBtn menuLateral__colorBtn--ghost"
                   onClick={() => {
-                    resetarCorDisciplinaUsuario(disc.id);
+                    const novaCor = gerarCorAleatoria();
+                    salvarCorDisciplinaUsuario(disc.id, novaCor);
                     setPaletaAbertaId(null);
                   }}
                 >
