@@ -204,13 +204,7 @@ const CriarEvento = () => {
 
       const id = nextEventoId(dados.eventos);
 
-      const dataEventoISO = notificacoes.calendario
-        ? new Date(
-            startDate.getFullYear(),
-            startDate.getMonth(),
-            startDate.getDate(),
-          ).toISOString()
-        : null;
+      const dataEventoISO = notificacoes.calendario ? startDate : null;
 
       const agoraISO = new Date().toISOString();
 
@@ -564,13 +558,9 @@ const CriarEvento = () => {
                 <input
                   type="date"
                   className="input-estilizado"
-                  value={startDate ? startDate.toISOString().split("T")[0] : ""}
+                  value={startDate ?? ""}
                   min={new Date().toISOString().split("T")[0]}
-                  onChange={(e) =>
-                    setStartDate(
-                      e.target.value ? new Date(e.target.value) : null,
-                    )
-                  }
+                  onChange={(e) => setStartDate(e.target.value || null)}
                   onClick={(e) => e.target.showPicker?.()}
                 />
               </div>

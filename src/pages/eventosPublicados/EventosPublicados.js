@@ -5,10 +5,20 @@ import "./EventosPublicados.scss";
 import data from "../../data/dados.json";
 import { getEventos } from "../../services/eventosStore";
 
+// Converte "YYYY-MM-DD" como horário local (evita perda de 1 dia em UTC-3)
+function parseDateLocal(value) {
+  if (!value) return null;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    const [y, m, d] = value.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }
+  return new Date(value);
+}
+
 function formatarDataPtBR(iso) {
   if (!iso) return "";
-  const dt = new Date(iso);
-  if (Number.isNaN(dt.getTime())) return "";
+  const dt = parseDateLocal(iso);
+  if (!dt || Number.isNaN(dt.getTime())) return "";
   return dt.toLocaleDateString("pt-BR");
 }
 
@@ -352,11 +362,11 @@ export default function EventosPublicados() {
   }
 
   function isDataEventoPassada(dataEvento) {
-    if (!dataEvento) return false;
-    const dt = new Date(dataEvento);
-    if (Number.isNaN(dt.getTime())) return false;
-    return startOfDay(dt).getTime() < startOfDay(new Date()).getTime();
-  }
+  if (!dataEvento) return false;
+  const dt = parseDateLocal(dataEvento);
+  if (!dt || Number.isNaN(dt.getTime())) return false;
+  return startOfDay(dt).getTime() < startOfDay(new Date()).getTime();
+}
 
   const eventosFiltrados = useMemo(() => {
     if (!user && !usuarioLogado) return [];

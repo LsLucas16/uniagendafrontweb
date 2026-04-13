@@ -360,24 +360,35 @@ const EditarEvento = () => {
     try {
       const original = getEventoAtual();
       if (!original) {
-        Swal.fire({
+        await Swal.fire({
           title: "Evento não encontrado",
           text: "Esse evento já não está disponível.",
           icon: "info",
           confirmButtonColor: "#2E4A67",
-        }).then(() => navigate("/eventos-publicados"));
+        });
+        navigate("/eventos-publicados");
         return;
       }
 
+      // Salva o usuário ANTES de qualquer operação no store
+      const usuarioAntes = localStorage.getItem("usuario");
+
       deleteEvento(original.id);
 
-      Swal.fire({
+      // Restaura o usuário caso o store tenha tocado no localStorage
+      if (usuarioAntes && !localStorage.getItem("usuario")) {
+        localStorage.setItem("usuario", usuarioAntes);
+      }
+
+      await Swal.fire({
         title: "Excluído",
         text: "O evento foi excluído com sucesso.",
         icon: "success",
         confirmButtonText: "Ok",
         confirmButtonColor: "#2E4A67",
-      }).then(() => navigate("/eventos-publicados"));
+      });
+
+      navigate("/eventos");
     } catch {
       Swal.fire({
         title: "Erro ao excluir",
