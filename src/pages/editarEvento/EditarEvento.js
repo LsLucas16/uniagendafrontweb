@@ -40,9 +40,17 @@ function parseDataEvento(ev) {
 
   if (!raw) return null;
 
+  // ✅ CORREÇÃO PRINCIPAL (YYYY-MM-DD como LOCAL)
+  if (typeof raw === "string" && /^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const [yyyy, mm, dd] = raw.split("-").map(Number);
+    return new Date(yyyy, mm - 1, dd);
+  }
+
+  // fallback normal
   const isoTry = new Date(raw);
   if (!Number.isNaN(isoTry.getTime())) return isoTry;
 
+  // formato BR
   if (typeof raw === "string" && raw.includes("/")) {
     const [dd, mm, yyyy] = raw.split("/").map(Number);
     if (dd && mm && yyyy) {
@@ -164,7 +172,7 @@ const EditarEvento = () => {
         icon: "error",
         confirmButtonText: "Fechar",
         confirmButtonColor: "#2E4A67",
-      }).then(() => navigate("/eventos-publicados"));
+      }).then(() => navigate("/eventos"));
       return;
     }
 
@@ -178,7 +186,7 @@ const EditarEvento = () => {
         icon: "error",
         confirmButtonText: "Fechar",
         confirmButtonColor: "#2E4A67",
-      }).then(() => navigate("/eventos-publicados"));
+      }).then(() => navigate("/eventos"));
       return;
     }
 
@@ -282,11 +290,9 @@ const EditarEvento = () => {
 
       const dataEventoISO =
         notificacoes.calendario && startDate
-          ? new Date(
-              startDate.getFullYear(),
-              startDate.getMonth(),
-              startDate.getDate(),
-            ).toISOString()
+          ? `${startDate.getFullYear()}-${String(
+              startDate.getMonth() + 1,
+            ).padStart(2, "0")}-${String(startDate.getDate()).padStart(2, "0")}`
           : null;
 
       const turmasIdsFinal = isCoordenador
@@ -329,7 +335,7 @@ const EditarEvento = () => {
         confirmButtonColor: "#2E4A67",
       });
 
-      navigate("/eventos-publicados");
+      navigate("/eventos");
     } catch (error) {
       Swal.close();
       Swal.fire({
@@ -366,7 +372,7 @@ const EditarEvento = () => {
           icon: "info",
           confirmButtonColor: "#2E4A67",
         });
-        navigate("/eventos-publicados");
+        navigate("/eventos");
         return;
       }
 
