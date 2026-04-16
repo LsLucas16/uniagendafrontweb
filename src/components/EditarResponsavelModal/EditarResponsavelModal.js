@@ -20,6 +20,7 @@ export default function EditarResponsavelModal({
   onRemove,
   bloquearResponsavel = false,
   bloquearRemocao = false,
+  usuarioLogado,
 }) {
   const [draft, setDraft] = useState(null);
   const [errors, setErrors] = useState({});
@@ -36,10 +37,27 @@ export default function EditarResponsavelModal({
       initialValue?.fixo === true ||
       initialValue?.removivel === false);
 
+  function normalizeMatricula(value) {
+    return String(value || "").trim();
+  }
+
+  function getUsuarioMatricula(u) {
+    return normalizeMatricula(u?.user);
+  }
+
+  const isSelf =
+    String(initialValue?.userId) === String(getUsuarioMatricula(usuarioLogado));
+
   const permissoesTravadas =
+    isSelf ||
     String(initialValue?.cargo || "").toLowerCase() === "coordenador" ||
     initialValue?.fixo === true ||
     initialValue?.coordenadorPadrao === true;
+
+  console.log("SELF CHECK:", {
+    initial: initialValue?.userId,
+    logado: getUsuarioMatricula(usuarioLogado),
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -165,29 +183,29 @@ export default function EditarResponsavelModal({
   };
 
   const validate = () => {
-  const next = {};
+    const next = {};
 
-  const nomeTrim = String(draft.nome || "").trim();
-  const cargoTrim = String(draft.cargo || "").trim();
-  const contatoTrim = String(draft.contato || "").trim();
+    const nomeTrim = String(draft.nome || "").trim();
+    const cargoTrim = String(draft.cargo || "").trim();
+    const contatoTrim = String(draft.contato || "").trim();
 
-  if (!draft.userId || !nomeTrim) {
-    next.nome = "Selecione um responsável.";
-  }
+    if (!draft.userId || !nomeTrim) {
+      next.nome = "Selecione um responsável.";
+    }
 
-  // ao adicionar novo, cargo precisa ser preenchido
-  if (isAdd && !cargoTrim) {
-    next.cargo = "Preencha o cargo antes de salvar.";
-  }
+    // ao adicionar novo, cargo precisa ser preenchido
+    if (isAdd && !cargoTrim) {
+      next.cargo = "Preencha o cargo antes de salvar.";
+    }
 
-  // mantém sua regra atual
-  if (contatoTrim && !cargoTrim) {
-    next.cargo = "Cargo é obrigatório quando houver contato.";
-  }
+    // mantém sua regra atual
+    if (contatoTrim && !cargoTrim) {
+      next.cargo = "Cargo é obrigatório quando houver contato.";
+    }
 
-  setErrors(next);
-  return Object.keys(next).length === 0;
-};
+    setErrors(next);
+    return Object.keys(next).length === 0;
+  };
 
   const save = () => {
     if (!draft.userId) return;

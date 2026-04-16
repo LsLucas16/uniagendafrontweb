@@ -46,6 +46,7 @@ export const Login = () => {
             nome: usuarioAuth.nome,
             tipo: usuarioAuth.tipo,
             faculdadeId: usuarioAuth.faculdadeId,
+            user: usuarioAuth.user,
           })
         );
 

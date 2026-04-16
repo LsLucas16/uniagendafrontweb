@@ -981,6 +981,7 @@ export default function EditarTurma() {
       </section>
 
       <EditarResponsavelModal
+        usuarioLogado={usuarioLogado}
         open={modalOpen}
         onClose={closeModal}
         usuarios={usuariosComUser}
